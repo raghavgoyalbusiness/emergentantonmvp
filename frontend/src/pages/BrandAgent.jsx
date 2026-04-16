@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Plus, Bot, User, Sparkles, Copy, Check, Mail, X, Loader2 } from "lucide-react";
+import {
+  Send, Plus, Bot, User, Sparkles, Copy, Check,
+  Mail, X, Loader2, CheckSquare, Square, Users, ChevronDown
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const newSessionId = () => `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
-// ─── Markdown → Influencer card parser ───────────────────────────────────────
+// ─── Parser ───────────────────────────────────────────────────────────────────
 function parseInfluencers(text) {
   const results = [];
   const sections = text.split(/###\s*\d+\.\s*/);
@@ -25,22 +28,18 @@ function parseInfluencers(text) {
     const followersMatch = section.match(/Followers[:\*\s]+\*{0,2}([\d.]+[KMBkm]?)/i);
     const engMatch = section.match(/Engagement(?:\s+Rate)?[:\*\s]+\*{0,2}([\d.]+%)/i);
     if (!results.find(i => i.handle === handle)) {
-      results.push({
-        handle,
-        name,
-        email,
+      results.push({ handle, name, email,
         followers: followersMatch ? followersMatch[1] : null,
-        engagement: engMatch ? engMatch[1] : null,
-      });
+        engagement: engMatch ? engMatch[1] : null });
     }
   }
   return results;
 }
 
-// ─── Motion variants ──────────────────────────────────────────────────────────
-const wrap = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
-const item = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
-const msgItem = { hidden: { opacity: 0, y: 12, scale: 0.98 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } } };
+// ─── Variants ─────────────────────────────────────────────────────────────────
+const wrap     = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
+const item     = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
+const msgItem  = { hidden: { opacity: 0, y: 12, scale: 0.98 }, visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.3, ease: "easeOut" } } };
 const cardItem = { hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0, transition: { duration: 0.28, ease: "easeOut" } } };
 
 const STARTERS = [
@@ -50,7 +49,7 @@ const STARTERS = [
   "Suggest travel influencers for a luxury hotel campaign.",
 ];
 
-// ─── Copy button ──────────────────────────────────────────────────────────────
+// ─── Copy ─────────────────────────────────────────────────────────────────────
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -61,7 +60,7 @@ function CopyButton({ text }) {
   );
 }
 
-// ─── Markdown renderer ────────────────────────────────────────────────────────
+// ─── Markdown ─────────────────────────────────────────────────────────────────
 function AgentMarkdown({ content }) {
   return (
     <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
@@ -74,15 +73,15 @@ function AgentMarkdown({ content }) {
       ol: ({ children }) => <ol className="space-y-1 my-2 pl-4 list-decimal">{children}</ol>,
       li: ({ children }) => <li className="text-sm text-white/80 leading-relaxed flex gap-2"><span className="text-[#00D4C8] mt-1.5 flex-shrink-0">•</span><span>{children}</span></li>,
       hr: () => <hr className="border-0 border-t border-white/10 my-3" />,
-      a:  ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">{children}</a>,
+      a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">{children}</a>,
       code: ({ inline, children }) => inline
         ? <code className="bg-white/10 text-[#00D4C8] text-xs px-1.5 py-0.5 rounded font-mono">{children}</code>
         : <pre className="bg-[#0A0F2E] border border-white/10 rounded-lg p-3 overflow-x-auto my-2"><code className="text-xs text-white/80 font-mono">{children}</code></pre>,
-      table:  ({ children }) => <div className="overflow-x-auto my-3"><table className="w-full text-xs border-collapse">{children}</table></div>,
+      table: ({ children }) => <div className="overflow-x-auto my-3"><table className="w-full text-xs border-collapse">{children}</table></div>,
       thead: ({ children }) => <thead className="border-b border-white/10">{children}</thead>,
-      tr:   ({ children }) => <tr className="border-b border-white/5 hover:bg-white/2">{children}</tr>,
-      th:   ({ children }) => <th className="text-left text-white/40 font-medium py-1.5 pr-4">{children}</th>,
-      td:   ({ children }) => <td className="text-white/75 py-1.5 pr-4">{children}</td>,
+      tr: ({ children }) => <tr className="border-b border-white/5">{children}</tr>,
+      th: ({ children }) => <th className="text-left text-white/40 font-medium py-1.5 pr-4">{children}</th>,
+      td: ({ children }) => <td className="text-white/75 py-1.5 pr-4">{children}</td>,
     }}>
       {content}
     </ReactMarkdown>
@@ -90,33 +89,51 @@ function AgentMarkdown({ content }) {
 }
 
 // ─── Influencer card ──────────────────────────────────────────────────────────
-function InfluencerCard({ inf, onConnect }) {
-  const avatarUrl = `https://unavatar.io/instagram/${inf.handle}`;
-  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=128&font-size=0.4`;
-  const [imgSrc, setImgSrc] = useState(avatarUrl);
+function InfluencerCard({ inf, selected, onToggle, onConnect }) {
+  const [imgSrc, setImgSrc] = useState(`https://unavatar.io/instagram/${inf.handle}`);
+  const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=128`;
 
   return (
-    <motion.div variants={cardItem}
-      className="flex items-center gap-3 bg-[#0A0F2E] border border-white/6 rounded-xl p-3 hover:border-[#00D4C8]/25 transition-all">
+    <motion.div
+      variants={cardItem}
+      className={`flex items-center gap-3 rounded-xl p-3 border transition-all cursor-pointer ${
+        selected
+          ? "bg-[#00D4C8]/5 border-[#00D4C8]/35"
+          : "bg-[#0A0F2E] border-white/6 hover:border-white/15"
+      }`}
+      onClick={() => onToggle(inf.handle)}
+    >
+      {/* Checkbox */}
+      <div className="flex-shrink-0" onClick={e => { e.stopPropagation(); onToggle(inf.handle); }}>
+        {selected
+          ? <CheckSquare className="w-4 h-4 text-[#00D4C8]" />
+          : <Square className="w-4 h-4 text-white/20" />}
+      </div>
+
+      {/* Avatar */}
       <img
         src={imgSrc}
         alt={inf.name}
-        onError={() => setImgSrc(fallbackUrl)}
-        className="w-11 h-11 rounded-full object-cover flex-shrink-0 border border-white/10"
+        onError={() => setImgSrc(fallback)}
+        className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-white/10"
       />
+
+      {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="text-white text-xs font-semibold truncate">{inf.name}</p>
         <p className="text-white/40 text-xs">@{inf.handle}</p>
-        <div className="flex gap-3 mt-0.5">
-          {inf.followers   && <span className="text-white/30 text-xs">{inf.followers} followers</span>}
-          {inf.engagement  && <span className="text-[#00D4C8]/60 text-xs">{inf.engagement} eng</span>}
+        <div className="flex gap-2 mt-0.5">
+          {inf.followers  && <span className="text-white/30 text-xs">{inf.followers} followers</span>}
+          {inf.engagement && <span className="text-[#00D4C8]/60 text-xs">{inf.engagement}</span>}
         </div>
-        <p className="text-white/25 text-xs truncate mt-0.5">{inf.email}</p>
+        <p className="text-white/20 text-xs truncate">{inf.email}</p>
       </div>
+
+      {/* Individual connect */}
       <button
-        onClick={() => onConnect(inf)}
+        onClick={e => { e.stopPropagation(); onConnect([inf]); }}
         data-testid={`connect-btn-${inf.handle}`}
-        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all flex-shrink-0"
+        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all flex-shrink-0"
       >
         <Mail className="w-3 h-3" /> Connect
       </button>
@@ -124,13 +141,65 @@ function InfluencerCard({ inf, onConnect }) {
   );
 }
 
-// ─── Connect modal ────────────────────────────────────────────────────────────
-function ConnectModal({ inf, onClose }) {
+// ─── Bulk action bar ──────────────────────────────────────────────────────────
+function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll }) {
+  const allSelected = selected.size === influencers.length;
+  const noneSelected = selected.size === 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t border-white/5"
+    >
+      {/* Select toggle */}
+      <button
+        onClick={onToggleAll}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/8 text-white/60 hover:text-white text-xs transition-all"
+        data-testid="toggle-select-all"
+      >
+        {allSelected ? <CheckSquare className="w-3.5 h-3.5 text-[#00D4C8]" /> : <Square className="w-3.5 h-3.5" />}
+        {allSelected ? "Deselect All" : "Select All"}
+      </button>
+
+      {selected.size > 0 && (
+        <span className="text-white/40 text-xs">{selected.size} selected</span>
+      )}
+
+      <div className="flex gap-2 ml-auto">
+        {/* Send to selected */}
+        <button
+          onClick={onSendSelected}
+          disabled={noneSelected}
+          data-testid="send-selected-btn"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-[#00D4C8]/10 hover:border-[#00D4C8]/30 text-white/60 hover:text-[#00D4C8] text-xs transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <Users className="w-3.5 h-3.5" />
+          Send to Selected ({selected.size})
+        </button>
+
+        {/* Send to all */}
+        <button
+          onClick={onSendAll}
+          data-testid="send-all-btn"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] text-[#0A0F2E] text-xs font-semibold transition-all"
+        >
+          <Mail className="w-3.5 h-3.5" />
+          Send to All ({influencers.length})
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Outreach modal (single or bulk) ─────────────────────────────────────────
+function OutreachModal({ targets, onClose }) {
+  const isBulk = targets.length > 1;
   const [form, setForm] = useState({
     brand_name: "", budget: "", target_audience: "", campaign_details: "", product_details: "",
   });
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [results, setResults] = useState(null); // null | { sent, failed }
   const [error, setError] = useState("");
 
   const field = (k, v) => setForm(p => ({ ...p, [k]: v }));
@@ -140,17 +209,20 @@ function ConnectModal({ inf, onClose }) {
       setError("Please fill in all fields."); return;
     }
     setSending(true); setError("");
-    try {
-      await axios.post(`${API}/agent/send-outreach`, {
-        to_email: inf.email,
-        influencer_name: inf.name,
-        influencer_handle: inf.handle,
-        ...form,
-      });
-      setSent(true);
-    } catch (e) {
-      setError(e?.response?.data?.detail || "Failed to send email. Please try again.");
-    } finally { setSending(false); }
+    const settled = await Promise.allSettled(
+      targets.map(inf =>
+        axios.post(`${API}/agent/send-outreach`, {
+          to_email: inf.email,
+          influencer_name: inf.name,
+          influencer_handle: inf.handle,
+          ...form,
+        })
+      )
+    );
+    const sent   = settled.filter(r => r.status === "fulfilled").length;
+    const failed = settled.filter(r => r.status === "rejected").length;
+    setResults({ sent, failed });
+    setSending(false);
   };
 
   const inputCls = "w-full bg-[#0A0F2E] border border-white/10 focus:border-[#00D4C8]/50 rounded-lg px-3 py-2.5 text-white text-sm placeholder-white/25 focus:outline-none transition-colors";
@@ -164,36 +236,67 @@ function ConnectModal({ inf, onClose }) {
         transition={{ duration: 0.22 }}
         className="bg-[#131936] border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
-        data-testid="connect-modal"
+        data-testid="outreach-modal"
       >
         {/* Header */}
         <div className="flex items-center gap-3 p-5 border-b border-white/5">
-          <img
-            src={`https://unavatar.io/instagram/${inf.handle}`}
-            alt={inf.name}
-            onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=128`; }}
-            className="w-10 h-10 rounded-full object-cover border border-white/10"
-          />
-          <div className="flex-1 min-w-0">
-            <h3 className="font-heading font-semibold text-white text-base">{inf.name}</h3>
-            <p className="text-white/40 text-xs">@{inf.handle} · {inf.email}</p>
+          <div className="w-9 h-9 rounded-xl bg-[#00D4C8]/10 border border-[#00D4C8]/25 flex items-center justify-center flex-shrink-0">
+            {isBulk ? <Users className="w-4 h-4 text-[#00D4C8]" /> : <Mail className="w-4 h-4 text-[#00D4C8]" />}
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors">
+          <div className="flex-1 min-w-0">
+            {isBulk ? (
+              <>
+                <h3 className="font-heading font-semibold text-white text-base">Bulk Outreach</h3>
+                <p className="text-white/40 text-xs">Sending to {targets.length} influencers</p>
+              </>
+            ) : (
+              <>
+                <h3 className="font-heading font-semibold text-white text-base">{targets[0].name}</h3>
+                <p className="text-white/40 text-xs">@{targets[0].handle} · {targets[0].email}</p>
+              </>
+            )}
+          </div>
+          {/* Bulk: show avatar stack */}
+          {isBulk && (
+            <div className="flex -space-x-2 mr-2">
+              {targets.slice(0, 4).map(inf => (
+                <img key={inf.handle}
+                  src={`https://unavatar.io/instagram/${inf.handle}`}
+                  alt={inf.name}
+                  onError={e => { e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=64`; }}
+                  className="w-7 h-7 rounded-full border-2 border-[#131936] object-cover"
+                />
+              ))}
+              {targets.length > 4 && (
+                <div className="w-7 h-7 rounded-full border-2 border-[#131936] bg-[#00D4C8]/20 flex items-center justify-center">
+                  <span className="text-[#00D4C8] text-xs font-bold">+{targets.length - 4}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-white/5 text-white/40 hover:text-white transition-colors flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {sent ? (
-          <div className="flex flex-col items-center justify-center py-12 px-8 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-green-500/10 border border-green-500/20 flex items-center justify-center mb-4">
-              <Check className="w-7 h-7 text-green-400" />
+        {results ? (
+          /* Results screen */
+          <div className="flex flex-col items-center py-10 px-8 text-center">
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${results.failed === 0 ? "bg-green-500/10 border border-green-500/20" : "bg-yellow-500/10 border border-yellow-500/20"}`}>
+              <Check className={`w-7 h-7 ${results.failed === 0 ? "text-green-400" : "text-yellow-400"}`} />
             </div>
-            <h4 className="font-heading font-semibold text-white text-lg mb-2">Email Sent!</h4>
-            <p className="text-white/50 text-sm">Outreach email delivered to <span className="text-white">{inf.email}</span></p>
-            <p className="text-white/30 text-xs mt-1">Sent from influencerconnectai@hotmail.com</p>
+            <h4 className="font-heading font-semibold text-white text-lg mb-1">
+              {results.failed === 0 ? "All Emails Sent!" : "Partially Sent"}
+            </h4>
+            <p className="text-white/50 text-sm">
+              <span className="text-green-400 font-semibold">{results.sent} sent</span>
+              {results.failed > 0 && <span className="text-red-400 font-semibold ml-2">{results.failed} failed</span>}
+            </p>
+            <p className="text-white/30 text-xs mt-1">Sent from influencerconnect3@gmail.com · Reply-To: influencerconnectai@hotmail.com</p>
             <button onClick={onClose} className="mt-6 btn-primary px-6 py-2.5 rounded-xl text-sm">Done</button>
           </div>
         ) : (
+          /* Form */
           <div className="p-5 space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -211,7 +314,7 @@ function ConnectModal({ inf, onClose }) {
             </div>
             <div>
               <label className="text-white/50 text-xs mb-1 block">Campaign Details *</label>
-              <textarea value={form.campaign_details} onChange={e => field("campaign_details", e.target.value)} placeholder="e.g. 2 Instagram posts + 1 story showcasing the serum, posting in June" rows={2} className={`${inputCls} resize-none`} data-testid="modal-campaign" />
+              <textarea value={form.campaign_details} onChange={e => field("campaign_details", e.target.value)} placeholder="e.g. 2 Instagram posts + 1 story in June showcasing the product" rows={2} className={`${inputCls} resize-none`} data-testid="modal-campaign" />
             </div>
             <div>
               <label className="text-white/50 text-xs mb-1 block">Target Audience *</label>
@@ -223,10 +326,14 @@ function ConnectModal({ inf, onClose }) {
               <button onClick={submit} disabled={sending} data-testid="send-outreach-btn"
                 className="flex-1 btn-primary py-2.5 rounded-xl text-sm flex items-center gap-2 justify-center disabled:opacity-60">
                 {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-                {sending ? "Sending..." : "Send Email"}
+                {sending
+                  ? `Sending to ${targets.length}...`
+                  : isBulk
+                    ? `Send to ${targets.length} Influencers`
+                    : "Send Email"}
               </button>
             </div>
-            <p className="text-white/25 text-xs text-center">Sent from influencerconnectai@hotmail.com</p>
+            <p className="text-white/20 text-xs text-center">From influencerconnect3@gmail.com · Reply-To influencerconnectai@hotmail.com</p>
           </div>
         )}
       </motion.div>
@@ -248,9 +355,23 @@ function TypingIndicator() {
   );
 }
 
-// ─── Single message + influencer cards below ──────────────────────────────────
-function Message({ msg, onConnect }) {
+// ─── Message + cards section ──────────────────────────────────────────────────
+function Message({ msg, onOpenModal }) {
   const isUser = msg.role === "user";
+  const [selected, setSelected] = useState(new Set());
+
+  const toggle = (handle) =>
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(handle) ? next.delete(handle) : next.add(handle);
+      return next;
+    });
+
+  const toggleAll = () => {
+    if (selected.size === msg.influencers.length) setSelected(new Set());
+    else setSelected(new Set(msg.influencers.map(i => i.handle)));
+  };
+
   return (
     <motion.div variants={msgItem} className="space-y-3">
       <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"} group`}>
@@ -268,23 +389,37 @@ function Message({ msg, onConnect }) {
         </div>
       </div>
 
-      {/* Influencer cards — only for agent messages */}
+      {/* Influencer cards + bulk bar */}
       {!isUser && msg.influencers?.length > 0 && (
         <div className="ml-11">
           <p className="text-white/30 text-xs mb-2 flex items-center gap-1.5">
             <Mail className="w-3 h-3 text-[#00D4C8]" />
-            {msg.influencers.length} creator{msg.influencers.length > 1 ? "s" : ""} with contact info — click Connect to send outreach
+            {msg.influencers.length} creator{msg.influencers.length > 1 ? "s" : ""} found — select &amp; send outreach emails
           </p>
+
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 gap-2"
-            initial="hidden"
-            animate="visible"
+            initial="hidden" animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
           >
             {msg.influencers.map(inf => (
-              <InfluencerCard key={inf.handle} inf={inf} onConnect={onConnect} />
+              <InfluencerCard
+                key={inf.handle}
+                inf={inf}
+                selected={selected.has(inf.handle)}
+                onToggle={toggle}
+                onConnect={onOpenModal}
+              />
             ))}
           </motion.div>
+
+          <BulkBar
+            influencers={msg.influencers}
+            selected={selected}
+            onToggleAll={toggleAll}
+            onSendSelected={() => onOpenModal(msg.influencers.filter(i => selected.has(i.handle)))}
+            onSendAll={() => onOpenModal(msg.influencers)}
+          />
         </div>
       )}
     </motion.div>
@@ -297,7 +432,7 @@ export default function BrandAgent() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [connectTarget, setConnectTarget] = useState(null);
+  const [modalTargets, setModalTargets] = useState(null); // null | influencer[]
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
   const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -359,7 +494,9 @@ export default function BrandAgent() {
                   <Sparkles className="w-7 h-7 text-[#00D4C8]" strokeWidth={1.5} />
                 </div>
                 <h3 className="font-heading font-semibold text-white text-lg mb-1">Ask your Brand Agent</h3>
-                <p className="text-white/40 text-sm mb-8 max-w-xs">Find influencers, get contact info, and send outreach — all in one place.</p>
+                <p className="text-white/40 text-sm mb-8 max-w-sm">
+                  Find influencers, select who to target, and send personalised outreach — all from one place.
+                </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
                   {STARTERS.map((s, i) => (
                     <button key={i} onClick={() => send(s)} data-testid={`starter-${i}`}
@@ -372,7 +509,9 @@ export default function BrandAgent() {
             ) : (
               <motion.div key="msgs" className="space-y-5" initial="hidden" animate="visible"
                 variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }}>
-                {messages.map(msg => <Message key={msg.id} msg={msg} onConnect={setConnectTarget} />)}
+                {messages.map(msg => (
+                  <Message key={msg.id} msg={msg} onOpenModal={setModalTargets} />
+                ))}
               </motion.div>
             )}
           </AnimatePresence>
@@ -404,9 +543,15 @@ export default function BrandAgent() {
         </div>
       </motion.div>
 
-      {/* Connect modal */}
+      {/* Outreach modal */}
       <AnimatePresence>
-        {connectTarget && <ConnectModal inf={connectTarget} onClose={() => setConnectTarget(null)} />}
+        {modalTargets && (
+          <OutreachModal
+            key="modal"
+            targets={modalTargets}
+            onClose={() => setModalTargets(null)}
+          />
+        )}
       </AnimatePresence>
     </motion.div>
   );
