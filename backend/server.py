@@ -18,6 +18,9 @@ from emergentintegrations.payments.stripe.checkout import StripeCheckout, Checko
 import boto3
 from botocore.config import Config as BotoConfig
 from botocore.exceptions import ClientError
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -84,11 +87,21 @@ class OutreachUpdate(BaseModel):
 
 class AgentChatRequest(BaseModel):
     message: str
-    session_id: str  # must be 2-100 chars, unique per conversation
+    session_id: str
 
 class AgentChatResponse(BaseModel):
     response: str
     session_id: str
+
+class OutreachEmailRequest(BaseModel):
+    to_email: str
+    influencer_name: str
+    influencer_handle: str
+    brand_name: str
+    budget: str
+    target_audience: str
+    campaign_details: str
+    product_details: str
 
 # ---- AUTH HELPERS ----
 
@@ -875,6 +888,102 @@ async def agent_chat(body: AgentChatRequest):
         raise HTTPException(status_code=502, detail=f"Bedrock error ({code}): {msg}")
     except Exception as e:
         logger.error(f"Bedrock unexpected error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@api_router.post("/agent/send-outreach")
+async def send_outreach(body: OutreachEmailRequest):
+    smtp_email    = os.environ.get("SMTP_EMAIL", "")
+    smtp_password = os.environ.get("SMTP_PASSWORD", "")
+
+    if not smtp_email or not smtp_password:
+        raise HTTPException(status_code=500, detail="Email service not configured")
+
+    html_body = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8">
+<style>
+  body{{font-family:Georgia,'Times New Roman',serif;background:#f5f7fa;margin:0;padding:20px;color:#333}}
+  .wrapper{{max-width:600px;margin:0 auto}}
+  .card{{background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.10)}}
+  .hdr{{background:#0A0F2E;padding:32px;text-align:center}}
+  .logo{{font-family:Georgia,serif;font-size:22px;color:#00D4C8;font-weight:bold;margin:0}}
+  .logo-sub{{color:rgba(255,255,255,.45);font-size:12px;margin:6px 0 0}}
+  .body{{padding:32px}}
+  p{{font-size:14px;line-height:1.75;color:#444;margin:0 0 16px}}
+  .block{{background:#f0fffe;border-left:3px solid #00D4C8;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:14px}}
+  .blabel{{font-size:10px;text-transform:uppercase;letter-spacing:.9px;color:#00a896;font-weight:bold;margin-bottom:5px}}
+  .bval{{font-size:14px;color:#1a1a2e;line-height:1.55}}
+  .cta{{text-align:center;margin:28px 0}}
+  .btn{{display:inline-block;background:#00D4C8;color:#0A0F2E;padding:13px 30px;border-radius:8px;font-weight:bold;text-decoration:none;font-size:14px;font-family:Georgia,serif}}
+  .footer{{background:#f5f7fa;padding:18px 32px;text-align:center;font-size:11px;color:#aaa;border-top:1px solid #eee}}
+  a{{color:#00a896}}
+</style>
+</head>
+<body>
+<div class="wrapper"><div class="card">
+  <div class="hdr">
+    <p class="logo">InfluencerConnect</p>
+    <p class="logo-sub">AI-Powered Brand Partnership Platform</p>
+  </div>
+  <div class="body">
+    <p>Hi <strong>{body.influencer_name}</strong>,</p>
+    <p>I hope this message finds you well! I'm reaching out on behalf of <strong>{body.brand_name}</strong> through <strong>InfluencerConnect</strong> — an AI-powered platform connecting premium brands with top creators.</p>
+    <p>We've identified you as a strong match for an upcoming campaign and would love to explore a collaboration.</p>
+    <div class="block">
+      <div class="blabel">Brand &amp; Product</div>
+      <div class="bval"><strong>{body.brand_name}</strong> — {body.product_details}</div>
+    </div>
+    <div class="block">
+      <div class="blabel">Campaign Details</div>
+      <div class="bval">{body.campaign_details}</div>
+    </div>
+    <div class="block">
+      <div class="blabel">Target Audience</div>
+      <div class="bval">{body.target_audience}</div>
+    </div>
+    <div class="block">
+      <div class="blabel">Budget Range</div>
+      <div class="bval">{body.budget}</div>
+    </div>
+    <div class="cta">
+      <a href="mailto:{smtp_email}" class="btn">Reply to Discuss &rarr;</a>
+    </div>
+    <p>We believe this could be a great fit. Please reply to this email with any questions or to express your interest.</p>
+    <p>Looking forward to connecting!<br><br>
+    <strong>InfluencerConnect Team</strong><br>
+    <a href="mailto:{smtp_email}">{smtp_email}</a></p>
+  </div>
+  <div class="footer">
+    Sent via InfluencerConnect AI on behalf of {body.brand_name}. Reply "unsubscribe" to opt out.
+  </div>
+</div></div>
+</body></html>"""
+
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"Brand Partnership Opportunity — {body.brand_name} x @{body.influencer_handle}"
+        msg["From"]    = f"InfluencerConnect <{smtp_email}>"
+        msg["To"]      = body.to_email
+        msg["Reply-To"] = smtp_email
+        msg.attach(MIMEText(html_body, "html"))
+
+        loop = asyncio.get_event_loop()
+        def _send():
+            with smtplib.SMTP("smtp-mail.outlook.com", 587, timeout=30) as srv:
+                srv.ehlo()
+                srv.starttls()
+                srv.ehlo()
+                srv.login(smtp_email, smtp_password)
+                srv.sendmail(smtp_email, body.to_email, msg.as_string())
+        await loop.run_in_executor(None, _send)
+        return {"success": True, "message": f"Outreach email sent to {body.to_email}"}
+
+    except smtplib.SMTPAuthenticationError:
+        raise HTTPException(status_code=401, detail="Email authentication failed — check SMTP credentials.")
+    except smtplib.SMTPException as e:
+        raise HTTPException(status_code=502, detail=f"SMTP error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Email send error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 # ---- SEED HELPERS ----
