@@ -8,12 +8,16 @@ import uuid
 import requests as req
 import json
 import random
+import asyncio
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionRequest
+import boto3
+from botocore.config import Config as BotoConfig
+from botocore.exceptions import ClientError
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -77,6 +81,14 @@ class OutreachUpdate(BaseModel):
     email_subject: Optional[str] = None
     email_body: Optional[str] = None
     dm_script: Optional[str] = None
+
+class AgentChatRequest(BaseModel):
+    message: str
+    session_id: str  # must be 2-100 chars, unique per conversation
+
+class AgentChatResponse(BaseModel):
+    response: str
+    session_id: str
 
 # ---- AUTH HELPERS ----
 
@@ -806,6 +818,64 @@ async def mark_outreach_sent(outreach_id: str, user=Depends(get_current_user)):
         {"$set": {"status": "Sent", "sent_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"message": "Outreach marked as sent"}
+
+# ---- BRAND AGENT (AWS Bedrock) ----
+
+def _get_bedrock_client():
+    """Create a boto3 bedrock-agent-runtime client using env credentials."""
+    return boto3.client(
+        service_name="bedrock-agent-runtime",
+        region_name=os.environ.get("AWS_REGION", "us-east-1"),
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+        config=BotoConfig(
+            retries={"max_attempts": 3, "mode": "standard"},
+            connect_timeout=60,
+            read_timeout=120,
+        ),
+    )
+
+def _extract_agent_response(completion_stream) -> str:
+    """Read the event stream from invoke_agent and return the full text."""
+    text = ""
+    for event in completion_stream:
+        if "chunk" in event:
+            chunk_bytes = event["chunk"].get("bytes", b"")
+            text += chunk_bytes.decode("utf-8")
+    return text
+
+@api_router.post("/agent/chat")
+async def agent_chat(body: AgentChatRequest):
+    agent_id    = os.environ.get("BEDROCK_AGENT_ID", "")
+    alias_id    = os.environ.get("BEDROCK_AGENT_ALIAS_ID", "")
+
+    if not agent_id or not alias_id:
+        raise HTTPException(status_code=500, detail="Bedrock agent not configured")
+
+    try:
+        bedrock = _get_bedrock_client()
+        response = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: bedrock.invoke_agent(
+                agentId=agent_id,
+                agentAliasId=alias_id,
+                sessionId=body.session_id,
+                inputText=body.message,
+                enableTrace=False,
+                endSession=False,
+            )
+        )
+        text = _extract_agent_response(response.get("completion", []))
+        return AgentChatResponse(response=text, session_id=body.session_id)
+
+    except ClientError as e:
+        code = e.response.get("Error", {}).get("Code", "Unknown")
+        msg  = e.response.get("Error", {}).get("Message", str(e))
+        logger.error(f"Bedrock ClientError [{code}]: {msg}")
+        raise HTTPException(status_code=502, detail=f"Bedrock error ({code}): {msg}")
+    except Exception as e:
+        logger.error(f"Bedrock unexpected error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ---- SEED HELPERS ----
 
