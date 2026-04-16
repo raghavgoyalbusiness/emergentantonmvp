@@ -1,0 +1,163 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Plus, ArrowRight, ChevronRight } from "lucide-react";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const STAGES = ["Brief", "Outreach", "Accepted", "Live", "Content Review", "Paid", "Reported"];
+
+const stageColors = {
+  Brief: { bg: "bg-yellow-500/10", border: "border-yellow-500/20", text: "text-yellow-400", dot: "bg-yellow-400" },
+  Outreach: { bg: "bg-blue-500/10", border: "border-blue-500/20", text: "text-blue-400", dot: "bg-blue-400" },
+  Accepted: { bg: "bg-purple-500/10", border: "border-purple-500/20", text: "text-purple-400", dot: "bg-purple-400" },
+  Live: { bg: "bg-[#00D4C8]/10", border: "border-[#00D4C8]/20", text: "text-[#00D4C8]", dot: "bg-[#00D4C8]" },
+  "Content Review": { bg: "bg-orange-500/10", border: "border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },
+  Paid: { bg: "bg-green-500/10", border: "border-green-500/20", text: "text-green-400", dot: "bg-green-400" },
+  Reported: { bg: "bg-gray-500/10", border: "border-gray-500/20", text: "text-gray-400", dot: "bg-gray-400" },
+};
+
+function CampaignCard({ campaign, onMoveStage }) {
+  const stageIdx = STAGES.indexOf(campaign.stage);
+  const nextStage = STAGES[stageIdx + 1];
+  const colors = stageColors[campaign.stage] || stageColors.Brief;
+
+  return (
+    <div
+      data-testid={`kanban-card-${campaign.campaign_id}`}
+      className="bg-[#0A0F2E] border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-all duration-200 cursor-pointer"
+    >
+      <div className="flex items-start justify-between gap-2 mb-2">
+        <div className="flex-1 min-w-0">
+          <h4 className="font-heading font-semibold text-white text-sm leading-tight truncate">{campaign.name}</h4>
+          <p className="text-white/40 text-xs mt-0.5 truncate">{campaign.brand_name}</p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-1 mb-2">
+        {campaign.platforms?.map((p) => (
+          <span key={p} className="text-xs bg-white/5 text-white/40 px-1.5 py-0.5 rounded">
+            {p === "Instagram" && <i className="fa-brands fa-instagram mr-1 text-pink-400 text-xs" />}
+            {p === "TikTok" && <i className="fa-brands fa-tiktok mr-1 text-xs" />}
+            {p === "YouTube" && <i className="fa-brands fa-youtube mr-1 text-red-400 text-xs" />}
+            {p}
+          </span>
+        ))}
+      </div>
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-white/30">{campaign.selected_influencers?.length || 0} creators</span>
+        <span className="text-white/30">${(campaign.budget_min / 1000).toFixed(0)}K - ${(campaign.budget_max / 1000).toFixed(0)}K</span>
+      </div>
+      {nextStage && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onMoveStage(campaign.campaign_id, nextStage); }}
+          data-testid={`move-stage-${campaign.campaign_id}`}
+          className="mt-2 w-full flex items-center justify-center gap-1 py-1.5 bg-[#00D4C8]/5 hover:bg-[#00D4C8]/10 border border-[#00D4C8]/15 hover:border-[#00D4C8]/30 rounded text-[#00D4C8] text-xs transition-all"
+        >
+          Move to {nextStage} <ChevronRight className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function CampaignPipeline() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${API}/campaigns`, { withCredentials: true })
+      .then(res => setCampaigns(res.data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const moveStage = async (campaignId, newStage) => {
+    try {
+      const res = await axios.patch(`${API}/campaigns/${campaignId}/stage`, { stage: newStage }, { withCredentials: true });
+      setCampaigns(prev => prev.map(c => c.campaign_id === campaignId ? res.data : c));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const grouped = STAGES.reduce((acc, stage) => {
+    acc[stage] = campaigns.filter(c => c.stage === stage);
+    return acc;
+  }, {});
+
+  if (loading) {
+    return (
+      <div className="page-enter">
+        <div className="skeleton h-12 rounded-xl mb-6" />
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {STAGES.map(s => <div key={s} className="skeleton min-w-48 h-64 rounded-xl flex-shrink-0" />)}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page-enter">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Campaign Pipeline</h1>
+          <p className="text-white/40 text-sm mt-1">{campaigns.length} campaigns across all stages</p>
+        </div>
+        <button
+          onClick={() => navigate("/campaigns/new")}
+          data-testid="new-campaign-pipeline-btn"
+          className="btn-primary px-4 py-2.5 rounded-lg text-sm flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" /> New Campaign
+        </button>
+      </div>
+
+      <div className="overflow-x-auto pb-4 -mx-4 px-4">
+        <div className="flex gap-3 min-w-max">
+          {STAGES.map((stage) => {
+            const colors = stageColors[stage];
+            const stageCampaigns = grouped[stage] || [];
+            return (
+              <div
+                key={stage}
+                data-testid={`kanban-column-${stage.toLowerCase().replace(/ /g, "-")}`}
+                className="kanban-column w-52 flex-shrink-0"
+              >
+                {/* Column header */}
+                <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${colors.bg} border ${colors.border} mb-2`}>
+                  <div className={`w-2 h-2 rounded-full ${colors.dot}`} />
+                  <span className={`${colors.text} text-xs font-semibold font-heading flex-1`}>{stage}</span>
+                  <span className="bg-white/10 text-white/50 text-xs rounded-full px-1.5 py-0.5 font-mono">
+                    {stageCampaigns.length}
+                  </span>
+                </div>
+                {/* Cards */}
+                <div className="space-y-2">
+                  {stageCampaigns.map(c => (
+                    <CampaignCard key={c.campaign_id} campaign={c} onMoveStage={moveStage} />
+                  ))}
+                  {stageCampaigns.length === 0 && (
+                    <div className="border border-dashed border-white/5 rounded-lg p-4 text-center">
+                      <p className="text-white/20 text-xs">Empty</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="mt-6 flex flex-wrap gap-3 text-xs text-white/30">
+        <span>Pipeline flow:</span>
+        {STAGES.map((s, i) => (
+          <span key={s} className="flex items-center gap-1">
+            <span className={stageColors[s].text}>{s}</span>
+            {i < STAGES.length - 1 && <ArrowRight className="w-3 h-3" />}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
