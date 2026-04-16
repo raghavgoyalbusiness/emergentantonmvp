@@ -98,3 +98,23 @@
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Spline loader spinner */
+.spline-loader {
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: 2px solid rgba(0, 212, 200, 0.15);
+  border-radius: 50%;
+  border-top-color: #00D4C8;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Hero card gradient border glow */
+.hero-card-glow {
+  box-shadow: 0 0 0 1px rgba(0,212,200,0.08), 0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}

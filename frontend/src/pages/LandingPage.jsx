@@ -1,7 +1,9 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star } from "lucide-react";
+import { SplineScene } from "@/components/ui/splite";
+import { Spotlight } from "@/components/ui/spotlight";
+import { Card } from "@/components/ui/card";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 
@@ -45,7 +47,8 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0F2E] text-white overflow-x-hidden">
-      {/* Navbar */}
+
+      {/* ── Sticky Navbar ── */}
       <header className="sticky top-0 z-50 bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -69,62 +72,111 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative pt-24 pb-20 px-4">
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url(https://images.unsplash.com/photo-1764258560300-2346b28b4e7c?crop=entropy&cs=srgb&fm=jpg&q=85)`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0A0F2E]/50 via-[#0A0F2E]/70 to-[#0A0F2E]" />
-        <div className="relative max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[#00D4C8]/10 border border-[#00D4C8]/20 rounded-full px-4 py-1.5 text-[#00D4C8] text-xs font-semibold uppercase tracking-widest mb-8 animate-fade-in">
-            <Zap className="w-3 h-3" /> AI-Powered Influencer Marketing
-          </div>
-          <h1 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl text-white leading-none tracking-tighter mb-6 animate-fade-up">
-            Find, Brief &amp; Pay<br />
-            <span className="gradient-text">Influencers in Minutes</span>
-            <br />Not Weeks.
-          </h1>
-          <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto mb-10 animate-fade-up stagger-2">
-            The AI-powered platform that replaces manual influencer research, spreadsheets, and chasing creators — with a single intelligent system.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up stagger-3">
-            <button
-              onClick={handleCTA}
-              data-testid="hero-cta-btn"
-              className="btn-primary px-8 py-4 rounded-xl text-lg flex items-center gap-2 justify-center"
-            >
-              Start Your Campaign <ArrowRight className="w-5 h-5" />
-            </button>
-            <a href="#how-it-works" className="btn-secondary px-8 py-4 rounded-xl text-lg">
-              See How It Works
-            </a>
-          </div>
-          <div className="mt-10 flex items-center justify-center gap-6 text-sm text-white/40 animate-fade-up stagger-4">
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> No credit card required</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> Live in 5 minutes</span>
-            <span className="flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> 500+ creators indexed</span>
-          </div>
+      {/* ── HERO — Spline 3D Split Layout ── */}
+      <section className="px-4 sm:px-6 pt-8 pb-6">
+        <div className="max-w-7xl mx-auto">
+          <Card
+            className="w-full min-h-[580px] bg-black/[0.96] relative overflow-hidden border-white/[0.08] hero-card-glow"
+            data-testid="hero-spline-card"
+          >
+            {/* Spotlight effect — teal tinted for brand consistency */}
+            <Spotlight
+              className="-top-40 left-0 md:left-60 md:-top-20"
+              fill="#00D4C8"
+            />
+
+            <div className="flex flex-col md:flex-row h-full min-h-[580px]">
+
+              {/* ── Left: Text Content ── */}
+              <div className="flex-1 p-8 md:p-12 lg:p-16 relative z-10 flex flex-col justify-center">
+
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-[#00D4C8]/10 border border-[#00D4C8]/25 rounded-full px-4 py-1.5 text-[#00D4C8] text-xs font-semibold uppercase tracking-widest mb-7 w-fit animate-fade-in">
+                  <Zap className="w-3 h-3" /> AI-Powered Influencer Marketing
+                </div>
+
+                {/* Headline */}
+                <h1 className="font-heading font-black text-4xl md:text-5xl lg:text-6xl leading-[1.05] tracking-tighter mb-5 animate-fade-up">
+                  <span className="bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
+                    Find, Brief &amp; Pay<br />
+                    Influencers in<br />
+                    Minutes.
+                  </span>
+                  <span className="block text-[#00D4C8]">Not Weeks.</span>
+                </h1>
+
+                {/* Subheadline */}
+                <p className="text-neutral-400 text-base md:text-lg max-w-md mb-8 leading-relaxed animate-fade-up stagger-2">
+                  The AI agent that replaces manual creator research, scattered spreadsheets,
+                  and slow outreach — with a single intelligent system.
+                </p>
+
+                {/* CTAs */}
+                <div className="flex flex-col sm:flex-row gap-3 mb-8 animate-fade-up stagger-3">
+                  <button
+                    onClick={handleCTA}
+                    data-testid="hero-cta-btn"
+                    className="btn-primary px-7 py-3.5 rounded-xl text-base flex items-center gap-2 justify-center"
+                  >
+                    Start Your Campaign <ArrowRight className="w-5 h-5" />
+                  </button>
+                  <a
+                    href="#how-it-works"
+                    className="btn-secondary px-7 py-3.5 rounded-xl text-base text-center"
+                  >
+                    See How It Works
+                  </a>
+                </div>
+
+                {/* Social proof chips */}
+                <div className="flex flex-wrap gap-3 text-xs text-white/40 animate-fade-up stagger-4">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> No credit card required
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> Live in 5 minutes
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> 500+ creators indexed
+                  </span>
+                </div>
+              </div>
+
+              {/* ── Right: Spline 3D Scene ── */}
+              <div className="flex-1 relative min-h-[300px] md:min-h-0">
+                {/* Fade mask on left edge so 3D blends into text side */}
+                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-black/[0.96] to-transparent z-10 pointer-events-none" />
+                <SplineScene
+                  scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+                  className="w-full h-full"
+                />
+              </div>
+
+            </div>
+          </Card>
         </div>
       </section>
 
-      {/* Integration bar */}
+      {/* ── Integration Bar ── */}
       <section className="py-10 border-y border-white/5 bg-[#131936]/50">
         <div className="max-w-6xl mx-auto px-4">
-          <p className="text-center text-white/30 text-xs uppercase tracking-widest mb-6">Powered by the best tools in the industry</p>
+          <p className="text-center text-white/30 text-xs uppercase tracking-widest mb-6">
+            Powered by the best tools in the industry
+          </p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
             {integrations.map((name) => (
-              <span key={name} className="text-white/40 text-sm font-semibold hover:text-white/70 transition-colors cursor-default">{name}</span>
+              <span
+                key={name}
+                className="text-white/40 text-sm font-semibold hover:text-white/70 transition-colors cursor-default"
+              >
+                {name}
+              </span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
+      {/* ── How It Works ── */}
       <section id="how-it-works" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -148,7 +200,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features */}
+      {/* ── Features ── */}
       <section id="features" className="py-24 px-4 bg-[#131936]/30">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -171,7 +223,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* ── Pricing ── */}
       <section id="pricing" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -184,9 +236,8 @@ export default function LandingPage() {
               <div
                 key={name}
                 data-testid={`pricing-${name.toLowerCase()}`}
-                className={`rounded-xl p-6 border relative ${highlight
-                  ? "bg-[#00D4C8]/5 border-[#00D4C8]/30 teal-glow"
-                  : "bg-[#131936] border-white/5"
+                className={`rounded-xl p-6 border relative ${
+                  highlight ? "bg-[#00D4C8]/5 border-[#00D4C8]/30 teal-glow" : "bg-[#131936] border-white/5"
                 }`}
               >
                 {highlight && (
@@ -220,27 +271,34 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Banner */}
+      {/* ── CTA Banner ── */}
       <section className="py-20 px-4">
-        <div className="max-w-3xl mx-auto text-center bg-[#131936] border border-[#00D4C8]/20 rounded-2xl p-12 teal-glow">
-          <div className="flex justify-center gap-1 mb-4">
-            {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#00D4C8] text-[#00D4C8]" />)}
-          </div>
-          <h2 className="font-heading font-black text-4xl md:text-5xl text-white mb-4">
-            Ready to scale your<br />influencer marketing?
-          </h2>
-          <p className="text-white/50 mb-8 text-lg">Join brands running smarter campaigns with AI. Start for free today.</p>
-          <button
-            onClick={handleCTA}
-            data-testid="bottom-cta-btn"
-            className="btn-primary px-10 py-4 rounded-xl text-lg inline-flex items-center gap-2"
-          >
-            Start Your Campaign <ArrowRight className="w-5 h-5" />
-          </button>
+        <div className="max-w-3xl mx-auto">
+          <Card className="bg-black/[0.96] border-white/[0.08] relative overflow-hidden hero-card-glow">
+            <Spotlight className="-top-40 left-0 md:left-40 md:-top-20" fill="#00D4C8" />
+            <div className="relative z-10 text-center p-12">
+              <div className="flex justify-center gap-1 mb-4">
+                {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-[#00D4C8] text-[#00D4C8]" />)}
+              </div>
+              <h2 className="font-heading font-black text-4xl md:text-5xl mb-4 bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400">
+                Ready to scale your<br />influencer marketing?
+              </h2>
+              <p className="text-neutral-400 mb-8 text-lg">
+                Join brands running smarter campaigns with AI. Start for free today.
+              </p>
+              <button
+                onClick={handleCTA}
+                data-testid="bottom-cta-btn"
+                className="btn-primary px-10 py-4 rounded-xl text-lg inline-flex items-center gap-2"
+              >
+                Start Your Campaign <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </Card>
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── Footer ── */}
       <footer className="border-t border-white/5 py-10 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/30">
           <div className="flex items-center gap-2">
@@ -257,6 +315,7 @@ export default function LandingPage() {
           <span>&copy; 2025 Influencer Connect. All rights reserved.</span>
         </div>
       </footer>
+
     </div>
   );
 }

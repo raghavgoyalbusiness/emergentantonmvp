@@ -45,6 +45,10 @@ module.exports = {
         'glow-pulse': { '0%, 100%': { boxShadow: '0 0 8px rgba(0,212,200,0.3)' }, '50%': { boxShadow: '0 0 20px rgba(0,212,200,0.7)' } },
         'slide-in-left': { '0%': { opacity: '0', transform: 'translateX(-20px)' }, '100%': { opacity: '1', transform: 'translateX(0)' } },
         'score-fill': { '0%': { strokeDashoffset: '100' }, '100%': { strokeDashoffset: '0' } },
+        'spotlight': {
+          '0%': { opacity: '0', transform: 'translate(-72%, -62%) scale(0.5)' },
+          '100%': { opacity: '1', transform: 'translate(-50%, -40%) scale(1)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -53,6 +57,7 @@ module.exports = {
         'fade-in': 'fade-in 0.4s ease-out forwards',
         'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
         'slide-in-left': 'slide-in-left 0.4s ease-out forwards',
+        'spotlight': 'spotlight 2s ease 0.75s 1 forwards',
       },
     },
   },
