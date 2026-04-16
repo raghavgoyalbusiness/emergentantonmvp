@@ -12,27 +12,69 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const newSessionId = () => `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 
 // ─── Parser ───────────────────────────────────────────────────────────────────
+// Handles actual Bedrock format: **1. Name (@handle)** + **Email Contact:** email
 function parseInfluencers(text) {
   const results = [];
-  const sections = text.split(/###\s*\d+\.\s*/);
+  const seen = new Set();
+
+  // Split into individual influencer blocks.
+  // Supports "**1. Name" (Bedrock actual) and "### 1. **Name" (fallback)
+  const sections = text
+    .split(/\n(?=(?:\*{1,2}\d+[\.\)]\s|#{1,4}\s*\d+[\.\)]\s*\*{0,2}))/)
+    .filter(s => s.trim());
+
   for (const section of sections) {
     if (!section.trim()) continue;
-    const handleMatch = section.match(/\*{0,2}(@[\w.]+)\*{0,2}/);
+
+    // Extract @handle — look for (@handle) pattern first, then standalone @handle
+    const handleMatch =
+      section.match(/\(@([\w.]+)\)/) ||
+      section.match(/(?:^|\*|\s)@([\w.]+)(?:\*|\s|\)|\n|$)/m);
     if (!handleMatch) continue;
-    const handle = handleMatch[1].replace("@", "");
-    const nameMatch = section.match(/\*{0,2}@[\w.]+\*{0,2}\s*[-–]\s*([^\n*\-]+)/);
+    const handle = handleMatch[1];
+
+    // Skip handles that are actually email domains
+    if (["gmail", "yahoo", "hotmail", "outlook", "instagram", "twitter", "tiktok"].includes(handle.toLowerCase())) continue;
+    if (seen.has(handle)) continue;
+
+    // Extract email: labelled first ("Email Contact:", "Contact Email:", "Email:"),
+    // then fall back to any email address found in the section.
+    const labeledEmailMatch = section.match(
+      /Email[^:\n]{0,25}:\s*\*{0,2}\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i
+    );
+    const anyEmailMatch = section.match(
+      /\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/
+    );
+    const email = labeledEmailMatch
+      ? labeledEmailMatch[1].trim()
+      : anyEmailMatch
+      ? anyEmailMatch[1]
+      : null;
+    if (!email) continue; // skip influencers with no email
+
+    // Extract name from the title line that contains the @handle
+    const titleLine =
+      section.split("\n").find(l => l.includes(`@${handle}`)) ||
+      section.split("\n")[0];
+    const nameMatch = titleLine.match(/^[*#\d.\s]*([A-Z][^(@\n*]+?)(?:\s*\(@)/);
     const name = nameMatch ? nameMatch[1].trim() : handle;
-    const emailMatch = section.match(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/);
-    if (!emailMatch) continue;
-    const email = emailMatch[0];
-    const followersMatch = section.match(/Followers[:\*\s]+\*{0,2}([\d.]+[KMBkm]?)/i);
-    const engMatch = section.match(/Engagement(?:\s+Rate)?[:\*\s]+\*{0,2}([\d.]+%)/i);
-    if (!results.find(i => i.handle === handle)) {
-      results.push({ handle, name, email,
-        followers: followersMatch ? followersMatch[1] : null,
-        engagement: engMatch ? engMatch[1] : null });
-    }
+
+    // Extract followers (handles commas like "4,813,673" and K/M suffixes)
+    const followersMatch = section.match(/Followers?[^:\n]*:\s*\*{0,2}([0-9,]+(?:\s*[KMBkm])?)/i);
+    // Extract engagement rate
+    const engMatch = section.match(/Engagement[^:\n]*:\s*\*{0,2}([0-9.]+%?)/i);
+    const engVal = engMatch ? engMatch[1] : null;
+
+    seen.add(handle);
+    results.push({
+      handle,
+      name: name || handle,
+      email,
+      followers: followersMatch ? followersMatch[1].trim() : null,
+      engagement: engVal ? (engVal.includes("%") ? engVal : `${engVal}%`) : null,
+    });
   }
+
   return results;
 }
 
