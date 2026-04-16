@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Plus, Bot, User, Sparkles, Copy, Check } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -42,6 +44,78 @@ function CopyButton({ text }) {
   );
 }
 
+function AgentMarkdown({ content }) {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h1: ({ children }) => (
+          <h1 className="font-heading font-bold text-lg text-white mt-3 mb-2 first:mt-0">{children}</h1>
+        ),
+        h2: ({ children }) => (
+          <h2 className="font-heading font-semibold text-base text-white mt-3 mb-1.5 first:mt-0">{children}</h2>
+        ),
+        h3: ({ children }) => (
+          <h3 className="font-heading font-semibold text-sm text-[#00D4C8] mt-3 mb-1 first:mt-0">{children}</h3>
+        ),
+        p: ({ children }) => (
+          <p className="text-white/85 text-sm leading-relaxed mb-2 last:mb-0">{children}</p>
+        ),
+        strong: ({ children }) => (
+          <strong className="font-semibold text-white">{children}</strong>
+        ),
+        em: ({ children }) => (
+          <em className="italic text-white/70">{children}</em>
+        ),
+        ul: ({ children }) => (
+          <ul className="space-y-1 my-2 pl-4">{children}</ul>
+        ),
+        ol: ({ children }) => (
+          <ol className="space-y-1 my-2 pl-4 list-decimal">{children}</ol>
+        ),
+        li: ({ children }) => (
+          <li className="text-sm text-white/80 leading-relaxed flex gap-2">
+            <span className="text-[#00D4C8] mt-1.5 flex-shrink-0">•</span>
+            <span>{children}</span>
+          </li>
+        ),
+        hr: () => (
+          <hr className="border-0 border-t border-white/10 my-3" />
+        ),
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">
+            {children}
+          </a>
+        ),
+        code: ({ inline, children }) =>
+          inline ? (
+            <code className="bg-white/10 text-[#00D4C8] text-xs px-1.5 py-0.5 rounded font-mono">{children}</code>
+          ) : (
+            <pre className="bg-[#0A0F2E] border border-white/10 rounded-lg p-3 overflow-x-auto my-2">
+              <code className="text-xs text-white/80 font-mono">{children}</code>
+            </pre>
+          ),
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-2 border-[#00D4C8]/40 pl-3 my-2 text-white/60 italic text-sm">
+            {children}
+          </blockquote>
+        ),
+        table: ({ children }) => (
+          <div className="overflow-x-auto my-3">
+            <table className="w-full text-xs border-collapse">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="border-b border-white/10">{children}</thead>,
+        tr: ({ children }) => <tr className="border-b border-white/5 hover:bg-white/2">{children}</tr>,
+        th: ({ children }) => <th className="text-left text-white/40 font-medium py-1.5 pr-4">{children}</th>,
+        td: ({ children }) => <td className="text-white/75 py-1.5 pr-4">{children}</td>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+}
+
 function Message({ msg }) {
   const isUser = msg.role === "user";
   return (
@@ -59,13 +133,17 @@ function Message({ msg }) {
       </div>
 
       {/* Bubble */}
-      <div className={`max-w-[75%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-1`}>
+      <div className={`max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col gap-1`}>
         <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
           isUser
             ? "bg-[#00D4C8] text-[#0A0F2E] font-medium rounded-tr-sm"
-            : "bg-[#131936] text-white/85 border border-white/5 rounded-tl-sm"
+            : "bg-[#0E1530] text-white/85 border border-white/8 rounded-tl-sm"
         }`}>
-          {msg.content}
+          {isUser ? (
+            <p className="text-[#0A0F2E]">{msg.content}</p>
+          ) : (
+            <AgentMarkdown content={msg.content} />
+          )}
         </div>
         <div className={`flex items-center gap-1 ${isUser ? "flex-row-reverse" : ""}`}>
           <span className="text-white/25 text-xs">{msg.time}</span>
