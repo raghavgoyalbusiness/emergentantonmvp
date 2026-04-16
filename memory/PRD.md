@@ -92,7 +92,8 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Landing Page 3D Spline Hero Integration
 
 ### ✅ Session 3 (Brand Agent Parser + Email Fix — 2026-04)
-- **Parser rewrite**: `parseInfluencers()` in `BrandAgent.jsx` now correctly handles actual Bedrock response format (`**1. Name (@handle)**` + `**Email Contact:**`) — influencer cards with checkboxes and Connect buttons now render after each AI response
+- **Parser rewrite (Pass 1)**: `parseInfluencers()` in `BrandAgent.jsx` now correctly handles actual Bedrock response format (`**1. Name (@handle)**` + `**Email Contact:**`)
+- **Parser Pass 2**: Extracts all remaining plain email addresses (raw email lists from Bedrock) that weren't in structured profiles — all 10 emails now render as influencer cards
 - **Email routing confirmed correct**: `/api/agent/send-outreach` sends to `body.to_email` (target influencer) not the SMTP sender
 - Testing: 100% pass rate (iteration_3.json) — all 7 features verified including Bedrock chat, card rendering, bulk actions, OutreachModal, email sending
 

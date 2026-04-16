@@ -13,11 +13,34 @@ const newSessionId = () => `session-${Date.now()}-${Math.random().toString(36).s
 
 // ─── Parser ───────────────────────────────────────────────────────────────────
 // Handles actual Bedrock format: **1. Name (@handle)** + **Email Contact:** email
+// Also extracts plain email-only lists when no structured profiles are present.
+
+// Emails that must never be treated as influencer contacts
+const SKIP_EMAILS = new Set([
+  "influencerconnect3@gmail.com",
+  "influencerconnectai@hotmail.com",
+]);
+
+function emailToHandle(email) {
+  const local = email.split("@")[0].toLowerCase();
+  const domain = email.split("@")[1] || "";
+  const domainName = domain.split(".")[0];
+  const GENERIC = ["business", "contact", "info", "hello", "hi", "admin", "support", "work", "mail", "team"];
+  return GENERIC.includes(local) ? domainName : local.replace(/[._-]/g, "").replace(/\d+$/, "");
+}
+
+function emailToName(email) {
+  const handle = emailToHandle(email);
+  // Capitalise first letter only; keep the rest as-is
+  return handle.charAt(0).toUpperCase() + handle.slice(1);
+}
+
 function parseInfluencers(text) {
   const results = [];
-  const seen = new Set();
+  const seenHandles = new Set();
+  const seenEmails  = new Set();
 
-  // Split into individual influencer blocks.
+  // ── PASS 1: structured profiles  ──────────────────────────────────────────
   // Supports "**1. Name" (Bedrock actual) and "### 1. **Name" (fallback)
   const sections = text
     .split(/\n(?=(?:\*{1,2}\d+[\.\)]\s|#{1,4}\s*\d+[\.\)]\s*\*{0,2}))/)
@@ -26,19 +49,15 @@ function parseInfluencers(text) {
   for (const section of sections) {
     if (!section.trim()) continue;
 
-    // Extract @handle — look for (@handle) pattern first, then standalone @handle
     const handleMatch =
       section.match(/\(@([\w.]+)\)/) ||
       section.match(/(?:^|\*|\s)@([\w.]+)(?:\*|\s|\)|\n|$)/m);
     if (!handleMatch) continue;
     const handle = handleMatch[1];
 
-    // Skip handles that are actually email domains
-    if (["gmail", "yahoo", "hotmail", "outlook", "instagram", "twitter", "tiktok"].includes(handle.toLowerCase())) continue;
-    if (seen.has(handle)) continue;
+    if (["gmail","yahoo","hotmail","outlook","instagram","twitter","tiktok"].includes(handle.toLowerCase())) continue;
+    if (seenHandles.has(handle)) continue;
 
-    // Extract email: labelled first ("Email Contact:", "Contact Email:", "Email:"),
-    // then fall back to any email address found in the section.
     const labeledEmailMatch = section.match(
       /Email[^:\n]{0,25}:\s*\*{0,2}\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i
     );
@@ -47,25 +66,22 @@ function parseInfluencers(text) {
     );
     const email = labeledEmailMatch
       ? labeledEmailMatch[1].trim()
-      : anyEmailMatch
-      ? anyEmailMatch[1]
-      : null;
-    if (!email) continue; // skip influencers with no email
+      : anyEmailMatch ? anyEmailMatch[1] : null;
+    if (!email) continue;
+    if (SKIP_EMAILS.has(email.toLowerCase())) continue;
 
-    // Extract name from the title line that contains the @handle
     const titleLine =
       section.split("\n").find(l => l.includes(`@${handle}`)) ||
       section.split("\n")[0];
     const nameMatch = titleLine.match(/^[*#\d.\s]*([A-Z][^(@\n*]+?)(?:\s*\(@)/);
     const name = nameMatch ? nameMatch[1].trim() : handle;
 
-    // Extract followers (handles commas like "4,813,673" and K/M suffixes)
     const followersMatch = section.match(/Followers?[^:\n]*:\s*\*{0,2}([0-9,]+(?:\s*[KMBkm])?)/i);
-    // Extract engagement rate
     const engMatch = section.match(/Engagement[^:\n]*:\s*\*{0,2}([0-9.]+%?)/i);
     const engVal = engMatch ? engMatch[1] : null;
 
-    seen.add(handle);
+    seenHandles.add(handle);
+    seenEmails.add(email.toLowerCase());
     results.push({
       handle,
       name: name || handle,
@@ -73,6 +89,21 @@ function parseInfluencers(text) {
       followers: followersMatch ? followersMatch[1].trim() : null,
       engagement: engVal ? (engVal.includes("%") ? engVal : `${engVal}%`) : null,
     });
+  }
+
+  // ── PASS 2: plain email addresses not captured above  ─────────────────────
+  const emailRegex = /\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g;
+  let match;
+  while ((match = emailRegex.exec(text)) !== null) {
+    const email = match[1];
+    const emailLower = email.toLowerCase();
+    if (SKIP_EMAILS.has(emailLower)) continue;
+    if (seenEmails.has(emailLower)) continue;
+
+    seenEmails.add(emailLower);
+    const handle = emailToHandle(email) + "_" + emailLower.replace(/[^a-z0-9]/g, "").slice(0, 6);
+    const name   = emailToName(email);
+    results.push({ handle, name, email, followers: null, engagement: null });
   }
 
   return results;
