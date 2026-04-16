@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check, Loader2, Zap } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -17,6 +18,15 @@ const processingMessages = [
   "Setting content style parameters...",
   "Campaign ready to launch!",
 ];
+
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
 
 export default function CampaignWizard() {
   const navigate = useNavigate();
@@ -70,7 +80,7 @@ export default function CampaignWizard() {
     setCreating(true);
     const interval = setInterval(() => setMsgIdx(i => (i + 1) % processingMessages.length), 900);
     try {
-      const res = await axios.post(`${API}/campaigns`, form, { withCredentials: true });
+      await axios.post(`${API}/campaigns`, form, { withCredentials: true });
       clearInterval(interval);
       setTimeout(() => navigate("/campaigns"), 1200);
     } catch (e) {
@@ -84,18 +94,20 @@ export default function CampaignWizard() {
   const inputCls = (err) => `w-full bg-[#0A0F2E] border ${err ? "border-red-500/50" : "border-white/10"} rounded-lg px-4 py-3 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#00D4C8]/50 focus:border-[#00D4C8] transition-all`;
 
   return (
-    <div className="page-enter max-w-2xl mx-auto">
-      <button onClick={() => navigate("/campaigns")} className="flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 transition-colors">
-        <ArrowLeft className="w-4 h-4" /> Back to Pipeline
-      </button>
+    <motion.div className="max-w-2xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item}>
+        <button onClick={() => navigate("/campaigns")} className="flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Pipeline
+        </button>
+      </motion.div>
 
-      <div className="mb-8">
+      <motion.div variants={item} className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl text-white mb-2">Create New Campaign</h1>
         <p className="text-white/40 text-sm">AI will generate your influencer criteria automatically</p>
-      </div>
+      </motion.div>
 
       {/* Progress */}
-      <div className="flex items-center gap-2 mb-8">
+      <motion.div variants={item} className="flex items-center gap-2 mb-8">
         {STEPS.map((s, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
@@ -108,10 +120,10 @@ export default function CampaignWizard() {
             <span className={`text-xs hidden sm:block ${i === step ? "text-white" : "text-white/30"}`}>{s}</span>
           </div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-6">
-        {/* Step 0: Brand Details */}
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-6">
+        {/* Step 0 */}
         {step === 0 && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="font-heading font-semibold text-xl text-white mb-4">Brand Details</h2>
@@ -133,7 +145,7 @@ export default function CampaignWizard() {
           </div>
         )}
 
-        {/* Step 1: Audience & Goals */}
+        {/* Step 1 */}
         {step === 1 && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="font-heading font-semibold text-xl text-white mb-4">Audience & Goals</h2>
@@ -161,7 +173,7 @@ export default function CampaignWizard() {
           </div>
         )}
 
-        {/* Step 2: Platforms & Tone */}
+        {/* Step 2 */}
         {step === 2 && (
           <div className="space-y-4 animate-fade-in">
             <h2 className="font-heading font-semibold text-xl text-white mb-4">Platforms & Brand Tone</h2>
@@ -212,7 +224,6 @@ export default function CampaignWizard() {
           </div>
         )}
 
-        {/* Navigation */}
         {step < 3 && (
           <div className="flex items-center justify-between mt-6 pt-4 border-t border-white/5">
             {step > 0 ? (
@@ -225,7 +236,7 @@ export default function CampaignWizard() {
             </button>
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

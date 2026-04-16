@@ -33,12 +33,12 @@
   }
   body {
     @apply bg-[#0A0F2E] text-white;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Times New Roman', Times, serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Outfit', sans-serif;
+    font-family: Georgia, serif;
   }
 }
 

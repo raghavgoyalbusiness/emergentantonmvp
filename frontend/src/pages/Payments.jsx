@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { CreditCard, CheckCircle2, Clock, AlertCircle, Loader2, Shield, DollarSign } from "lucide-react";
+import { motion } from "framer-motion";
+import { CreditCard, CheckCircle2, AlertCircle, Loader2, Shield } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -10,6 +11,15 @@ const statusColors = {
   paid: "text-green-400 bg-green-500/10 border-green-500/20",
   expired: "text-red-400 bg-red-500/10 border-red-500/20",
   complete: "text-green-400 bg-green-500/10 border-green-500/20",
+};
+
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
 };
 
 function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
@@ -130,7 +140,6 @@ export default function Payments() {
       setTransactions(txnRes.data);
     }).finally(() => setLoading(false));
 
-    // Check if returning from Stripe
     const sessionId = searchParams.get("session_id");
     if (sessionId) {
       setPolling(true);
@@ -163,40 +172,42 @@ export default function Payments() {
   };
 
   if (loading) return (
-    <div className="page-enter">
+    <div>
       <div className="skeleton h-40 rounded-xl mb-4" />
       <div className="skeleton h-64 rounded-xl" />
     </div>
   );
 
   return (
-    <div className="page-enter max-w-5xl mx-auto">
-      <div className="mb-6">
+    <motion.div className="max-w-5xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item} className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Payments</h1>
         <p className="text-white/40 text-sm mt-1">Escrow-based creator payments — secure and transparent</p>
-      </div>
+      </motion.div>
 
-      {/* Payment status alert */}
       {polling && (
-        <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-4 flex items-center gap-3">
+        <motion.div variants={item} className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4 mb-4 flex items-center gap-3">
           <Loader2 className="w-4 h-4 text-yellow-400 animate-spin" />
           <p className="text-yellow-400 text-sm">Checking payment status...</p>
-        </div>
+        </motion.div>
       )}
       {paymentStatus && !polling && (
-        <div className={`rounded-xl p-4 mb-4 border flex items-center gap-3 ${paymentStatus.payment_status === "paid" ? "bg-green-500/10 border-green-500/20" : "bg-red-500/10 border-red-500/20"}`}
-          data-testid="payment-status-alert">
+        <motion.div
+          variants={item}
+          className={`rounded-xl p-4 mb-4 border flex items-center gap-3 ${paymentStatus.payment_status === "paid" ? "bg-green-500/10 border-green-500/20" : "bg-red-500/10 border-red-500/20"}`}
+          data-testid="payment-status-alert"
+        >
           {paymentStatus.payment_status === "paid"
             ? <CheckCircle2 className="w-4 h-4 text-green-400" />
             : <AlertCircle className="w-4 h-4 text-red-400" />}
           <p className={`text-sm font-semibold ${paymentStatus.payment_status === "paid" ? "text-green-400" : "text-red-400"}`}>
             {paymentStatus.payment_status === "paid" ? "Payment successful! Funds held in escrow." : `Payment ${paymentStatus.status}.`}
           </p>
-        </div>
+        </motion.div>
       )}
 
       {/* Active campaigns */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
         <h3 className="font-heading font-semibold text-white mb-4">Campaigns Ready to Fund</h3>
         {activeCampaigns.length === 0 ? (
           <p className="text-white/30 text-sm">No active campaigns found.</p>
@@ -227,10 +238,10 @@ export default function Payments() {
             })}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Transaction history */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-5">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5">
         <h3 className="font-heading font-semibold text-white mb-4">Transaction History</h3>
         {transactions.length === 0 ? (
           <p className="text-white/30 text-sm text-center py-6">No transactions yet</p>
@@ -266,9 +277,8 @@ export default function Payments() {
             </table>
           </div>
         )}
-      </div>
+      </motion.div>
 
-      {/* Payment modal */}
       {selectedCampaign && (
         <PaymentModal
           campaign={selectedCampaign}
@@ -277,6 +287,6 @@ export default function Payments() {
           onSuccess={() => setSelectedCampaign(null)}
         />
       )}
-    </div>
+    </motion.div>
   );
 }

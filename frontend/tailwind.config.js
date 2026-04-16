@@ -5,8 +5,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ['Outfit', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        heading: ['Georgia', 'serif'],
+        body: ['"Times New Roman"', 'Times', 'serif'],
       },
       colors: {
         navy: {

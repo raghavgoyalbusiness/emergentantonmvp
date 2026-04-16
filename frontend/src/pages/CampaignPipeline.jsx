@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { motion } from "framer-motion";
 import { Plus, ArrowRight, ChevronRight } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -17,10 +18,26 @@ const stageColors = {
   Reported: { bg: "bg-gray-500/10", border: "border-gray-500/20", text: "text-gray-400", dot: "bg-gray-400" },
 };
 
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+const colWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+const colItem = {
+  hidden: { opacity: 0, x: -16 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.38, ease: "easeOut" } },
+};
+
 function CampaignCard({ campaign, onMoveStage }) {
   const stageIdx = STAGES.indexOf(campaign.stage);
   const nextStage = STAGES[stageIdx + 1];
-  const colors = stageColors[campaign.stage] || stageColors.Brief;
 
   return (
     <div
@@ -87,7 +104,7 @@ export default function CampaignPipeline() {
 
   if (loading) {
     return (
-      <div className="page-enter">
+      <div>
         <div className="skeleton h-12 rounded-xl mb-6" />
         <div className="flex gap-4 overflow-x-auto pb-4">
           {STAGES.map(s => <div key={s} className="skeleton min-w-48 h-64 rounded-xl flex-shrink-0" />)}
@@ -97,8 +114,8 @@ export default function CampaignPipeline() {
   }
 
   return (
-    <div className="page-enter">
-      <div className="flex items-center justify-between mb-6">
+    <motion.div initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Campaign Pipeline</h1>
           <p className="text-white/40 text-sm mt-1">{campaigns.length} campaigns across all stages</p>
@@ -110,20 +127,25 @@ export default function CampaignPipeline() {
         >
           <Plus className="w-4 h-4" /> New Campaign
         </button>
-      </div>
+      </motion.div>
 
-      <div className="overflow-x-auto pb-4 -mx-4 px-4">
-        <div className="flex gap-3 min-w-max">
+      <motion.div variants={item} className="overflow-x-auto pb-4 -mx-4 px-4">
+        <motion.div
+          className="flex gap-3 min-w-max"
+          initial="hidden"
+          animate="visible"
+          variants={colWrap}
+        >
           {STAGES.map((stage) => {
             const colors = stageColors[stage];
             const stageCampaigns = grouped[stage] || [];
             return (
-              <div
+              <motion.div
                 key={stage}
+                variants={colItem}
                 data-testid={`kanban-column-${stage.toLowerCase().replace(/ /g, "-")}`}
                 className="kanban-column w-52 flex-shrink-0"
               >
-                {/* Column header */}
                 <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${colors.bg} border ${colors.border} mb-2`}>
                   <div className={`w-2 h-2 rounded-full ${colors.dot}`} />
                   <span className={`${colors.text} text-xs font-semibold font-heading flex-1`}>{stage}</span>
@@ -131,7 +153,6 @@ export default function CampaignPipeline() {
                     {stageCampaigns.length}
                   </span>
                 </div>
-                {/* Cards */}
                 <div className="space-y-2">
                   {stageCampaigns.map(c => (
                     <CampaignCard key={c.campaign_id} campaign={c} onMoveStage={moveStage} />
@@ -142,14 +163,13 @@ export default function CampaignPipeline() {
                     </div>
                   )}
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
-      {/* Legend */}
-      <div className="mt-6 flex flex-wrap gap-3 text-xs text-white/30">
+      <motion.div variants={item} className="mt-6 flex flex-wrap gap-3 text-xs text-white/30">
         <span>Pipeline flow:</span>
         {STAGES.map((s, i) => (
           <span key={s} className="flex items-center gap-1">
@@ -157,7 +177,7 @@ export default function CampaignPipeline() {
             {i < STAGES.length - 1 && <ArrowRight className="w-3 h-3" />}
           </span>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

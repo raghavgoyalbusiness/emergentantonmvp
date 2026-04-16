@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Send, MessageSquare, Mail, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
+import { Send, MessageSquare } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -10,6 +11,23 @@ const platformIcons = {
   "TikTok DM": <i className="fa-brands fa-tiktok" />,
   "WhatsApp": <i className="fa-brands fa-whatsapp text-green-400" />,
   "SMS": <i className="fa-regular fa-comment-dots text-yellow-400" />,
+};
+
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 18 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+const threadWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+const threadItem = {
+  hidden: { opacity: 0, x: -12 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
 function timeAgo(ts) {
@@ -74,36 +92,44 @@ export default function Inbox() {
     return bTs - aTs;
   });
 
-  const threadMessages = selected ? messages.filter(m => m.influencer_name === selected.influencer_name).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)) : [];
+  const threadMessages = selected
+    ? messages.filter(m => m.influencer_name === selected.influencer_name).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
+    : [];
 
   if (loading) return (
-    <div className="page-enter flex gap-4 h-[calc(100vh-120px)]">
+    <div className="flex gap-4 h-[calc(100vh-120px)]">
       <div className="skeleton w-72 flex-shrink-0 rounded-xl" />
       <div className="skeleton flex-1 rounded-xl" />
     </div>
   );
 
   return (
-    <div className="page-enter">
-      <div className="mb-4">
+    <motion.div initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item} className="mb-4">
         <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Unified Inbox</h1>
         <p className="text-white/40 text-sm mt-1">All creator communications in one place</p>
-      </div>
+      </motion.div>
 
-      <div className="flex gap-4 h-[calc(100vh-200px)] min-h-96">
+      <motion.div variants={item} className="flex gap-4 h-[calc(100vh-200px)] min-h-96">
         {/* Thread list */}
         <div className="w-72 flex-shrink-0 bg-[#131936] border border-white/5 rounded-xl overflow-hidden flex flex-col">
           <div className="p-3 border-b border-white/5">
             <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Conversations</p>
           </div>
-          <div className="overflow-y-auto flex-1">
+          <motion.div
+            className="overflow-y-auto flex-1"
+            initial="hidden"
+            animate="visible"
+            variants={threadWrap}
+          >
             {threads.map(([name, msgs]) => {
               const lastMsg = msgs[msgs.length - 1];
               const unread = msgs.filter(m => !m.is_read).length;
               const isActive = selected?.influencer_name === name;
               return (
-                <button
+                <motion.button
                   key={name}
+                  variants={threadItem}
                   onClick={() => markRead(lastMsg)}
                   data-testid={`thread-${name.replace(/ /g, "-")}`}
                   className={`w-full text-left p-3 border-b border-white/3 hover:bg-white/3 transition-colors ${isActive ? "bg-[#00D4C8]/5 border-l-2 border-l-[#00D4C8]" : ""}`}
@@ -122,10 +148,10 @@ export default function Inbox() {
                   </div>
                   <p className="text-white/40 text-xs truncate pl-9">{lastMsg?.content?.substring(0, 45)}...</p>
                   <p className="text-white/20 text-xs pl-9 mt-0.5">{timeAgo(lastMsg?.timestamp)}</p>
-                </button>
+                </motion.button>
               );
             })}
-          </div>
+          </motion.div>
         </div>
 
         {/* Message thread */}
@@ -189,7 +215,7 @@ export default function Inbox() {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

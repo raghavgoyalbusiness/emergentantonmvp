@@ -1,4 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
 import { CheckCircle2, ExternalLink, Zap } from "lucide-react";
 
 const integrations = [
@@ -17,18 +18,35 @@ const integrations = [
   { name: "OpusClip", desc: "Video content repurposing", status: "demo", color: "text-violet-400" },
 ];
 
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+const gridWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.04 } },
+};
+const gridItem = {
+  hidden: { opacity: 0, scale: 0.96 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
+};
+
 export default function Settings() {
   const { user } = useAuth();
 
   return (
-    <div className="page-enter max-w-4xl mx-auto">
-      <div className="mb-6">
+    <motion.div className="max-w-4xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item} className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Settings</h1>
         <p className="text-white/40 text-sm mt-1">Manage your account and integrations</p>
-      </div>
+      </motion.div>
 
       {/* Profile */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-6 mb-6" data-testid="profile-section">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-6 mb-6" data-testid="profile-section">
         <h3 className="font-heading font-semibold text-white mb-4">Profile</h3>
         <div className="flex items-center gap-4 mb-4">
           {user?.picture ? (
@@ -69,23 +87,29 @@ export default function Settings() {
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Integrations */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-6 mb-6" data-testid="integrations-section">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-6 mb-6" data-testid="integrations-section">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-heading font-semibold text-white">Integrations</h3>
           <span className="text-white/30 text-xs">{integrations.filter(i => i.status === "connected").length} active • {integrations.filter(i => i.status === "demo").length} demo</span>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <motion.div
+          className="grid grid-cols-1 md:grid-cols-2 gap-3"
+          initial="hidden"
+          animate="visible"
+          variants={gridWrap}
+        >
           {integrations.map(int => (
-            <div
+            <motion.div
               key={int.name}
+              variants={gridItem}
               data-testid={`integration-${int.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
-              className="flex items-center justify-between p-3 bg-[#0A0F2E] rounded-lg border border-white/5"
+              className="flex items-center justify-between p-3 bg-[#0A0F2E] rounded-lg border border-white/5 hover:border-white/10 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center`}>
+                <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
                   <Zap className={`w-3.5 h-3.5 ${int.color}`} strokeWidth={2} />
                 </div>
                 <div>
@@ -104,13 +128,13 @@ export default function Settings() {
                   </span>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Plan info */}
-      <div className="bg-[#00D4C8]/5 border border-[#00D4C8]/20 rounded-xl p-6" data-testid="plan-section">
+      <motion.div variants={item} className="bg-[#00D4C8]/5 border border-[#00D4C8]/20 rounded-xl p-6" data-testid="plan-section">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-heading font-semibold text-white mb-1">Growth Plan</h3>
@@ -128,7 +152,7 @@ export default function Settings() {
             Upgrade <ExternalLink className="w-3.5 h-3.5" />
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

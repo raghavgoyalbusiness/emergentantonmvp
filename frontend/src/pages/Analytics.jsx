@@ -1,13 +1,27 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { motion } from "framer-motion";
 import {
-  BarChart3, TrendingUp, Users, DollarSign, Eye, MousePointer, ShoppingCart
+  BarChart3, TrendingUp, DollarSign, Eye, ShoppingCart
 } from "lucide-react";
 import {
-  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
+  AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from "recharts";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.09 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+const cardWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
+};
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
@@ -78,28 +92,28 @@ export default function Analytics() {
   };
 
   return (
-    <div className="page-enter max-w-7xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <motion.div className="max-w-7xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
+      <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Analytics</h1>
           <p className="text-white/40 text-sm mt-1">ROI tracking across all campaigns</p>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Overview cards */}
+      {/* Overview metric cards — staggered */}
       {overview && (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-          <MetricCard icon={BarChart3} label="Campaigns" value={overview.total_campaigns} color="teal" />
-          <MetricCard icon={Eye} label="Total Reach" value={`${(overview.total_reach / 1000).toFixed(0)}K`} color="blue" />
-          <MetricCard icon={ShoppingCart} label="Conversions" value={overview.total_conversions?.toLocaleString()} color="purple" />
-          <MetricCard icon={DollarSign} label="Total Spend" value={`$${(overview.total_spend / 1000).toFixed(0)}K`} color="orange" />
-          <MetricCard icon={TrendingUp} label="Avg ROAS" value={`${overview.avg_roas}x`} sub="Return on ad spend" color="green" />
-        </div>
+        <motion.div variants={cardWrap} className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <motion.div variants={item}><MetricCard icon={BarChart3} label="Campaigns" value={overview.total_campaigns} color="teal" /></motion.div>
+          <motion.div variants={item}><MetricCard icon={Eye} label="Total Reach" value={`${(overview.total_reach / 1000).toFixed(0)}K`} color="blue" /></motion.div>
+          <motion.div variants={item}><MetricCard icon={ShoppingCart} label="Conversions" value={overview.total_conversions?.toLocaleString()} color="purple" /></motion.div>
+          <motion.div variants={item}><MetricCard icon={DollarSign} label="Total Spend" value={`$${(overview.total_spend / 1000).toFixed(0)}K`} color="orange" /></motion.div>
+          <motion.div variants={item}><MetricCard icon={TrendingUp} label="Avg ROAS" value={`${overview.avg_roas}x`} sub="Return on ad spend" color="green" /></motion.div>
+        </motion.div>
       )}
 
       {/* Monthly trend */}
       {overview?.monthly_trend && (
-        <div className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+        <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
           <h3 className="font-heading font-semibold text-white mb-4">5-Month Performance</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={overview.monthly_trend}>
@@ -116,11 +130,11 @@ export default function Analytics() {
               <Area type="monotone" dataKey="reach" name="Reach" stroke="#00D4C8" fill="url(#reachGrad)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       )}
 
-      {/* Campaign selector */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      {/* Campaign deep dive */}
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-heading font-semibold text-white">Campaign Deep Dive</h3>
           <select
@@ -158,7 +172,6 @@ export default function Analytics() {
               </div>
             </div>
 
-            {/* Weekly chart */}
             <div className="mb-5">
               <h4 className="text-white/50 text-xs mb-3">Weekly Trend</h4>
               <ResponsiveContainer width="100%" height={180}>
@@ -173,7 +186,6 @@ export default function Analytics() {
               </ResponsiveContainer>
             </div>
 
-            {/* Creator breakdown */}
             {data.creator_breakdown?.length > 0 && (
               <div>
                 <h4 className="text-white/50 text-xs mb-3">Creator Performance</h4>
@@ -209,7 +221,7 @@ export default function Analytics() {
         ) : (
           <p className="text-white/30 text-sm text-center py-8">Select a campaign to view analytics</p>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

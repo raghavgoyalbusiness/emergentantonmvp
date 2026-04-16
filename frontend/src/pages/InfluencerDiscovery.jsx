@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Search, Filter, Star, Users, TrendingUp, Plus, Check, Loader2, Instagram, Youtube } from "lucide-react";
+import { motion } from "framer-motion";
+import { Search, Star, Plus, Check, Loader2 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -20,6 +21,23 @@ const aiMessages = [
   "Finalizing shortlist...",
 ];
 
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+const gridWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.05 } },
+};
+const cardItem = {
+  hidden: { opacity: 0, y: 18, scale: 0.97 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.35, ease: "easeOut" } },
+};
+
 function InfluencerCard({ inf, selected, onToggle, showScore }) {
   const score = inf.match_score;
   const scoreColor = score >= 80 ? "text-[#00D4C8]" : score >= 60 ? "text-yellow-400" : "text-white/50";
@@ -38,7 +56,7 @@ function InfluencerCard({ inf, selected, onToggle, showScore }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#131936] via-transparent to-transparent" />
         {showScore && score !== undefined && (
-          <div className={`absolute top-2 right-2 bg-[#0A0F2E]/90 border border-[#00D4C8]/30 rounded-lg px-2 py-1`}>
+          <div className="absolute top-2 right-2 bg-[#0A0F2E]/90 border border-[#00D4C8]/30 rounded-lg px-2 py-1">
             <span className={`font-heading font-black text-lg ${scoreColor}`}>{score}</span>
             <span className="text-white/30 text-xs ml-0.5">%</span>
           </div>
@@ -156,7 +174,7 @@ export default function InfluencerDiscovery() {
 
   if (loading) {
     return (
-      <div className="page-enter">
+      <div>
         <div className="skeleton h-16 rounded-xl mb-6" />
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-72 rounded-xl" />)}
@@ -166,9 +184,9 @@ export default function InfluencerDiscovery() {
   }
 
   return (
-    <div className="page-enter max-w-7xl mx-auto">
+    <motion.div className="max-w-7xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Influencer Discovery</h1>
           <p className="text-white/40 text-sm mt-1">AI-powered creator matching for your campaigns</p>
@@ -179,10 +197,10 @@ export default function InfluencerDiscovery() {
             Add {selectedIds.size} to Campaign
           </button>
         )}
-      </div>
+      </motion.div>
 
       {/* Controls */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-4 mb-6 flex flex-col md:flex-row gap-3">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-4 mb-6 flex flex-col md:flex-row gap-3">
         <select
           value={selectedCampaign}
           onChange={(e) => { setSelectedCampaign(e.target.value); setScored(false); }}
@@ -224,39 +242,45 @@ export default function InfluencerDiscovery() {
           <option value="TikTok">TikTok</option>
           <option value="YouTube">YouTube</option>
         </select>
-      </div>
+      </motion.div>
 
-      {/* AI Loading state */}
+      {/* AI Loading */}
       {scoring && (
-        <div className="bg-[#131936] border border-[#00D4C8]/20 rounded-xl p-8 mb-6 text-center">
+        <motion.div variants={item} className="bg-[#131936] border border-[#00D4C8]/20 rounded-xl p-8 mb-6 text-center">
           <div className="flex gap-2 justify-center mb-4">
             <div className="ai-dot" /><div className="ai-dot" /><div className="ai-dot" />
           </div>
           <p className="text-[#00D4C8] font-semibold text-sm">{aiMessages[aiMsgIdx]}</p>
           <p className="text-white/30 text-xs mt-1">Claude Sonnet 4.5 is analyzing {influencers.length} creator profiles</p>
-        </div>
+        </motion.div>
       )}
 
-      {/* Results header */}
       {scored && !scoring && (
-        <div className="flex items-center gap-2 mb-4 text-sm text-white/50">
+        <motion.div variants={item} className="flex items-center gap-2 mb-4 text-sm text-white/50">
           <Star className="w-4 h-4 text-[#00D4C8]" />
           <span>AI scoring complete — showing top matches ranked by relevance</span>
-        </div>
+        </motion.div>
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      {/* Grid — staggered cards */}
+      <motion.div
+        key={`${scored}-${platformFilter}-${search}`}
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+        initial="hidden"
+        animate="visible"
+        variants={gridWrap}
+      >
         {filtered.map((inf) => (
-          <InfluencerCard
-            key={inf.influencer_id}
-            inf={inf}
-            selected={selectedIds.has(inf.influencer_id)}
-            onToggle={toggleInfluencer}
-            showScore={scored}
-          />
+          <motion.div key={inf.influencer_id} variants={cardItem}>
+            <InfluencerCard
+              inf={inf}
+              selected={selectedIds.has(inf.influencer_id)}
+              onToggle={toggleInfluencer}
+              showScore={scored}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {filtered.length === 0 && (
         <div className="text-center py-16 text-white/30">
@@ -264,6 +288,6 @@ export default function InfluencerDiscovery() {
           <p>No influencers match your search.</p>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

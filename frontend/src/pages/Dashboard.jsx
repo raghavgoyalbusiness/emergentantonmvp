@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import axios from "axios";
+import { motion } from "framer-motion";
 import {
-  Zap, TrendingUp, Users, DollarSign, Activity, ArrowRight,
-  Clock, CheckCircle2, AlertCircle, Plus
+  Zap, Users, DollarSign, Activity, ArrowRight,
+  Clock, AlertCircle, Plus
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -19,10 +20,17 @@ const stageColors = {
   Reported: "bg-gray-500/15 text-gray-400 border-gray-500/20",
 };
 
-const platformColors = {
-  Instagram: "text-pink-400",
-  TikTok: "text-white",
-  YouTube: "text-red-400",
+const wrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+const item = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.42, ease: "easeOut" } },
+};
+const cardWrap = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07 } },
 };
 
 function StatCard({ icon: Icon, label, value, sub, color = "teal", testid }) {
@@ -80,7 +88,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="page-enter">
+      <div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-28 rounded-xl" />)}
         </div>
@@ -93,9 +101,14 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="page-enter max-w-7xl mx-auto">
+    <motion.div
+      className="max-w-7xl mx-auto"
+      initial="hidden"
+      animate="visible"
+      variants={wrap}
+    >
       {/* Welcome */}
-      <div className="flex items-center justify-between mb-6">
+      <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">
             Good morning, {user?.name?.split(" ")[0] || "there"}
@@ -110,18 +123,18 @@ export default function Dashboard() {
           <Plus className="w-4 h-4" />
           <span className="hidden sm:inline">New Campaign</span>
         </button>
-      </div>
+      </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={Activity} label="Total Campaigns" value={stats?.total_campaigns || 0} color="teal" testid="stat-total-campaigns" />
-        <StatCard icon={Zap} label="Active Campaigns" value={stats?.active_campaigns || 0} sub="Currently running" color="blue" testid="stat-active-campaigns" />
-        <StatCard icon={Users} label="Influencers" value={stats?.total_influencers || 0} sub="In your pipeline" color="purple" testid="stat-influencers" />
-        <StatCard icon={DollarSign} label="Total Spend" value={`$${(stats?.total_spend || 0).toLocaleString()}`} sub={`${stats?.total_influencers || 0} creators`} color="green" testid="stat-spend" />
-      </div>
+      {/* Stats — each card staggers in */}
+      <motion.div variants={cardWrap} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <motion.div variants={item}><StatCard icon={Activity} label="Total Campaigns" value={stats?.total_campaigns || 0} color="teal" testid="stat-total-campaigns" /></motion.div>
+        <motion.div variants={item}><StatCard icon={Zap} label="Active Campaigns" value={stats?.active_campaigns || 0} sub="Currently running" color="blue" testid="stat-active-campaigns" /></motion.div>
+        <motion.div variants={item}><StatCard icon={Users} label="Influencers" value={stats?.total_influencers || 0} sub="In your pipeline" color="purple" testid="stat-influencers" /></motion.div>
+        <motion.div variants={item}><StatCard icon={DollarSign} label="Total Spend" value={`$${(stats?.total_spend || 0).toLocaleString()}`} sub={`${stats?.total_influencers || 0} creators`} color="green" testid="stat-spend" /></motion.div>
+      </motion.div>
 
       {/* Campaign health bar */}
-      <div className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-heading font-semibold text-white">Campaign Health Score</h3>
@@ -138,9 +151,10 @@ export default function Dashboard() {
         <div className="flex justify-between text-xs text-white/30 mt-1">
           <span>0</span><span>50</span><span>100</span>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Bottom grid */}
+      <motion.div variants={item} className="grid lg:grid-cols-3 gap-6">
         {/* Active campaigns */}
         <div className="lg:col-span-2 bg-[#131936] border border-white/5 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
@@ -159,7 +173,9 @@ export default function Dashboard() {
           ) : (
             <div className="space-y-3">
               {activeCampaigns.slice(0, 4).map((c) => (
-                <div key={c.campaign_id} data-testid={`campaign-card-${c.campaign_id}`}
+                <div
+                  key={c.campaign_id}
+                  data-testid={`campaign-card-${c.campaign_id}`}
                   className="flex items-center justify-between p-3 bg-[#0A0F2E] rounded-lg border border-white/5 hover:border-[#00D4C8]/20 transition-colors cursor-pointer"
                   onClick={() => navigate("/campaigns")}
                 >
@@ -179,9 +195,8 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Right panel: pending + inbox */}
+        {/* Right panel */}
         <div className="space-y-4">
-          {/* Pending approvals */}
           <div className="bg-[#131936] border border-white/5 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <AlertCircle className="w-4 h-4 text-orange-400" strokeWidth={1.5} />
@@ -205,7 +220,6 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* Recent messages */}
           <div className="bg-[#131936] border border-white/5 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-heading font-semibold text-white text-sm">Recent Messages</h3>
@@ -230,7 +244,7 @@ export default function Dashboard() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
