@@ -76,7 +76,7 @@ export default function LandingPage() {
       <section className="px-4 sm:px-6 pt-8 pb-6">
         <div className="max-w-7xl mx-auto">
           <Card
-            className="w-full min-h-[580px] bg-black/[0.96] relative overflow-hidden border-white/[0.08] hero-card-glow"
+            className="w-full min-h-[580px] bg-[#0A0F2E] relative overflow-hidden border-[#00D4C8]/10 hero-card-glow"
             data-testid="hero-spline-card"
           >
             {/* Spotlight effect — teal tinted for brand consistency */}
@@ -145,7 +145,7 @@ export default function LandingPage() {
               {/* ── Right: Spline 3D Scene ── */}
               <div className="flex-1 relative min-h-[300px] md:min-h-0">
                 {/* Fade mask on left edge so 3D blends into text side */}
-                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-black/[0.96] to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-[#0A0F2E] to-transparent z-10 pointer-events-none" />
                 <SplineScene
                   scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                   className="w-full h-full"
@@ -274,7 +274,7 @@ export default function LandingPage() {
       {/* ── CTA Banner ── */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
-          <Card className="bg-black/[0.96] border-white/[0.08] relative overflow-hidden hero-card-glow">
+          <Card className="bg-[#0A0F2E] border-[#00D4C8]/10 relative overflow-hidden hero-card-glow">
             <Spotlight className="-top-40 left-0 md:left-40 md:-top-20" fill="#00D4C8" />
             <div className="relative z-10 text-center p-12">
               <div className="flex justify-center gap-1 mb-4">
