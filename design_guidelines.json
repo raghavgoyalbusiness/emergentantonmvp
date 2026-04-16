@@ -1,114 +1,56 @@
 {
-  "theme": "dark",
-  "archetype": "Archetype 4 (Swiss & High-Contrast) - Modified for Premium SaaS",
+  "theme": "DARK",
+  "archetype": "5 (Jewel & Luxury / High-End SaaS)",
+  "typography": {
+    "heading_font": "Georgia",
+    "body_font": "Times New Roman",
+    "rules": [
+      "No generic sans-serif for headings. Georgia must be used aggressively with tight tracking (tracking-tighter) for a premium print-magazine feel.",
+      "Large numbers (01, 02) used for editorial structure, acting as graphic elements rather than just text.",
+      "Body text uses default serif to contrast the massive headings."
+    ]
+  },
   "colors": {
-    "primary": "#0A0F2E",
-    "primary_foreground": "#FFFFFF",
-    "accent": "#00D4C8",
-    "accent_foreground": "#0A0F2E",
     "background": "#0A0F2E",
     "surface": "#131936",
-    "surface_elevated": "#1A2247",
-    "border": "rgba(255, 255, 255, 0.08)",
-    "border_active": "rgba(0, 212, 200, 0.4)",
+    "accent": "#00D4C8",
     "text_primary": "#FFFFFF",
     "text_secondary": "rgba(255, 255, 255, 0.6)",
-    "text_tertiary": "rgba(255, 255, 255, 0.4)",
-    "success": "#00D4C8",
-    "warning": "#F5A623",
-    "error": "#FF3B30"
-  },
-  "typography": {
-    "fonts": {
-      "headings": "Outfit, sans-serif",
-      "body": "Inter, sans-serif",
-      "mono": "JetBrains Mono, monospace"
-    },
-    "hierarchy": {
-      "h1": "text-5xl md:text-6xl font-black tracking-tighter text-white leading-none",
-      "h2": "text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight",
-      "h3": "text-xl md:text-2xl font-semibold tracking-tight text-white",
-      "h4": "text-lg font-medium tracking-tight text-white",
-      "body": "text-base font-normal text-white/70 leading-relaxed",
-      "small": "text-sm font-medium text-white/50",
-      "overline": "text-xs font-bold uppercase tracking-[0.2em] text-[#00D4C8]"
-    }
+    "borders": "rgba(255, 255, 255, 0.05)"
   },
   "layout_and_spacing": {
-    "strategy": "The Control Room Grid (Dashboard) + The Tetris Grid (Marketing)",
-    "spacing_scale": {
-      "container_padding": "p-6 md:p-8",
-      "section_gap": "gap-24 md:gap-32",
-      "widget_gap": "gap-4 md:gap-6",
-      "internal_padding": "p-6"
-    },
-    "borders": {
-      "radius": "rounded-lg",
-      "width": "border",
-      "style": "border-white/10"
-    }
+    "grid_system": "Mode A: The Tetris Grid (Asymmetric Bento)",
+    "rules": [
+      "Avoid 2x2 symmetrical grids for features.",
+      "Use a 12-column grid. Feature 1 spans 8 cols (hero size), Feature 2 spans 4 cols (tall portrait), Feature 3 spans 5 cols (square), Feature 4 spans 7 cols (wide).",
+      "Massive internal padding (p-10 to p-14) on cards to let content breathe.",
+      "Cards have rounded-[2rem] corners to look intentional and distinct from standard 8px SaaS corners."
+    ]
   },
-  "surfaces_and_micro_themes": {
-    "header": "Crystal Glass: bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5 sticky top-0 z-50",
-    "cards": "Solid flat: bg-[#131936] border border-white/5 hover:border-[#00D4C8]/30 transition-colors duration-300",
-    "interactive_elements": "The Tracing Beam effect for active campaigns or premium feature tiers.",
-    "modals_dialogs": "bg-[#1A2247] border border-white/10 shadow-2xl backdrop-blur-2xl"
-  },
-  "animations_and_interactions": {
-    "hover": "Slight lift (-translate-y-1) for cards, brightness boost for buttons, border color shift to #00D4C8.",
-    "click": "Scale down (scale-95) for buttons.",
-    "page_transitions": "Fade in with slight upward slide (framer-motion).",
-    "loading_states": "ASCII loaders or pulsing #00D4C8 glowing dots (No default spinners)."
+  "motion_and_interaction": {
+    "hover_states": [
+      "Borders transition from white/5 to #00D4C8/30 on group hover.",
+      "Background decorative elements (large icons, grid patterns) increase in opacity and scale gently (duration-700) on hover."
+    ]
   },
   "components": {
-    "buttons": {
-      "primary": "bg-[#00D4C8] text-[#0A0F2E] font-bold tracking-tight rounded-md px-6 py-3 hover:bg-[#00D4C8]/80 transition-all",
-      "secondary": "bg-transparent border border-white/20 text-white font-medium rounded-md px-6 py-3 hover:bg-white/5 hover:border-white/40 transition-all",
-      "ghost": "text-white/70 hover:text-white hover:bg-white/5 px-4 py-2 rounded-md transition-colors"
-    },
-    "inputs": {
-      "default": "bg-[#0A0F2E] border border-white/10 rounded-md px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#00D4C8]/50 focus:border-[#00D4C8] placeholder-white/30"
-    },
-    "kanban_board": {
-      "column": "bg-[#0A0F2E] rounded-lg border border-white/5 p-4 flex flex-col gap-4",
-      "card": "bg-[#131936] border border-white/5 rounded-md p-4 cursor-grab hover:border-[#00D4C8]/30 active:cursor-grabbing shadow-sm"
-    },
-    "influencer_discovery_card": {
-      "structure": "Grid based bento format. Top section image, bottom section stats. Use p-4 internal.",
-      "match_score": "Glowing ring or stark bold text in #00D4C8. It is the north star metric here."
+    "feature_card": {
+      "style": "Glassy/Solid Hybrid",
+      "details": "Icon sits in a perfectly round glass-like badge. Large numerals sit opposite the icon. Title and description sit at the bottom, left-aligned."
     }
   },
   "accessibility": {
-    "contrast": "Text over backgrounds exceeds WCAG AA (4.5:1). Dark navy with pure white or teal ensures extremely high contrast.",
-    "focus": "All interactive elements must use focus-visible:ring-2 focus-visible:ring-[#00D4C8] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0F2E].",
-    "testing": "All interactive elements MUST have data-testid attributes (e.g., data-testid='login-button', data-testid='campaign-card')."
+    "data_testids": [
+      "feature-discovery",
+      "feature-outreach",
+      "feature-analytics",
+      "feature-escrow"
+    ],
+    "contrast": "Ensure text over deep navy meets WCAG AA standards. Use white/60 for secondary text to maintain legibility against #131936."
   },
   "media": {
-    "icons": "lucide-react (stroke-width 1.5 for a sharp, technical look).",
-    "images": {
-      "hero_background": {
-        "url": "https://images.unsplash.com/photo-1764258560300-2346b28b4e7c?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHw0fHxhYnN0cmFjdCUyMGRhcmslMjBibHVlJTIwbmV0d29ya3xlbnwwfHx8fDE3NzYzNDQ5NDZ8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Abstract blue glowing lines representing AI marketing network."
-      },
-      "influencer_portraits": [
-        "https://images.unsplash.com/photo-1587403655231-b1734312903f?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1611082832745-efab49a266d4?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "https://images.unsplash.com/photo-1759350075177-eeb89d507990?crop=entropy&cs=srgb&fm=jpg&q=85"
-      ],
-      "dashboard_texture": {
-        "url": "https://images.unsplash.com/photo-1690494825126-98fa59e2ae24?crop=entropy&cs=srgb&fm=jpg&q=85",
-        "description": "Subtle dark abstract clock/wave texture for dashboard blank states or auth background."
-      }
-    }
+    "image_urls": [],
+    "notes": "Relies entirely on Lucide React icons scaled up massively for background texture, avoiding the need for generic vector illustrations."
   },
-  "instructions_to_main_agent": [
-    "Strictly adhere to the Deep Navy (#0A0F2E) base. Do not use generic tailwind slate/gray unless tinted heavily.",
-    "Never use purely transparent headers. Always use Crystal Glass protocol defined above.",
-    "For the Kanban pipeline, maximize screen estate. Use dense data design. No massive padding inside the kanban column wrappers.",
-    "Influencer match scores are the main 'A-ha' feature. Highlight them vividly in Electric Teal.",
-    "Use Shadcn UI components but strip their default borders/backgrounds to match the 'Solid Flat' card specification.",
-    "Ensure all async AI actions (Campaign Wizard, AI Onboarding) have robust loading states with dynamic messages.",
-    "Do NOT use 'Inter' for headings. Ensure 'Outfit' font family is added and applied to h1-h4."
-  ]
+  "instructions_to_main_agent": "Implement the provided Asymmetric Bento layout. Ensure 'font-heading' maps correctly to the existing Georgia configuration in Tailwind. Do not revert to symmetrical grids. Keep the massive padding and typography scales intact."
 }

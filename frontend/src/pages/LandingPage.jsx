@@ -200,25 +200,118 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Features ── */}
-      <section id="features" className="py-24 px-4 bg-[#131936]/30">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-[#00D4C8] text-xs font-bold uppercase tracking-widest mb-3">Everything You Need</p>
-            <h2 className="font-heading font-bold text-4xl md:text-5xl text-white">Built for serious marketers</h2>
+      {/* ── Features - Editorial Asymmetric Bento ── */}
+      <section id="features" className="py-32 px-4 bg-[#0A0F2E] relative overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Editorial Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8 border-b border-white/10 pb-12">
+            <div className="max-w-3xl">
+              <p className="text-[#00D4C8] text-sm font-bold uppercase tracking-[0.2em] mb-6 flex items-center gap-3">
+                <span className="w-12 h-px bg-[#00D4C8]"></span>
+                Everything You Need
+              </p>
+              <h2 className="font-heading font-black text-5xl md:text-6xl lg:text-7xl text-white tracking-tighter leading-none">
+                Built for serious<br />marketers.
+              </h2>
+            </div>
+            <p className="text-white/50 text-lg max-w-sm font-serif leading-relaxed">
+              Ditch the generic spreadsheets. Our intelligent engine handles the heavy lifting from discovery to payout.
+            </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {features.map(({ icon: Icon, title, desc }, i) => (
-              <div key={i} className="bg-[#131936] border border-white/5 rounded-xl p-6 card-hover flex gap-4">
-                <div className="w-10 h-10 rounded-lg bg-[#00D4C8]/10 flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-[#00D4C8]" strokeWidth={1.5} />
+
+          {/* Bento Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 auto-rows-[minmax(320px,auto)]">
+            
+            {/* 01: AI Discovery Engine - Hero Card */}
+            <div 
+              data-testid="feature-discovery"
+              className="md:col-span-8 group relative bg-[#131936] rounded-[2rem] p-10 md:p-14 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+            >
+              <div className="absolute -top-10 -right-10 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700 group-hover:scale-110 transform pointer-events-none">
+                <Search className="w-80 h-80 text-[#00D4C8]" />
+              </div>
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-20">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                    <Search className="w-7 h-7 text-[#00D4C8]" />
+                  </div>
+                  <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">01</span>
                 </div>
-                <div>
-                  <h3 className="font-heading font-semibold text-lg text-white mb-1">{title}</h3>
-                  <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
+                <div className="max-w-xl">
+                  <h3 className="font-heading text-4xl text-white mb-5">AI Discovery Engine</h3>
+                  <p className="text-white/60 text-xl leading-relaxed font-serif">
+                    Live scraping + AI scoring identifies the perfect micro and mid-tier creators for your brand in minutes, not days.
+                  </p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* 02: Automated Outreach - Tall Card */}
+            <div 
+              data-testid="feature-outreach"
+              className="md:col-span-4 group relative bg-gradient-to-b from-[#131936] to-[#0A0F2E] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+            >
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-20">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                    <Zap className="w-7 h-7 text-[#00D4C8]" />
+                  </div>
+                  <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">02</span>
+                </div>
+                <div>
+                  <h3 className="font-heading text-3xl text-white mb-5">Automated Outreach</h3>
+                  <p className="text-white/60 text-lg leading-relaxed font-serif">
+                    Personalised email and DM sequences generated by AI, sent automatically with smart follow-up triggers.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 03: ROI Analytics */}
+            <div 
+              data-testid="feature-analytics"
+              className="md:col-span-5 group relative bg-[#131936] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+            >
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-20">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                    <BarChart3 className="w-7 h-7 text-[#00D4C8]" />
+                  </div>
+                  <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">03</span>
+                </div>
+                <div>
+                  <h3 className="font-heading text-3xl text-white mb-5">ROI Analytics</h3>
+                  <p className="text-white/60 text-lg leading-relaxed font-serif">
+                    Real-time attribution dashboard showing reach, conversions, and ROAS per creator and campaign.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 04: Escrow Payments - Wide Card */}
+            <div 
+              data-testid="feature-escrow"
+              className="md:col-span-7 group relative bg-[#131936] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+            >
+              {/* Decorative Grid Background */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#00D4C811_1px,transparent_1px),linear-gradient(to_bottom,#00D4C811_1px,transparent_1px)] bg-[size:32px_32px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"></div>
+              
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="flex items-start justify-between mb-20">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                    <CreditCard className="w-7 h-7 text-[#00D4C8]" />
+                  </div>
+                  <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">04</span>
+                </div>
+                <div className="max-w-xl">
+                  <h3 className="font-heading text-3xl text-white mb-5">Escrow Payments</h3>
+                  <p className="text-white/60 text-lg leading-relaxed font-serif">
+                    Funds held securely until content is approved. Automatic release with full audit trail for both parties.
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
