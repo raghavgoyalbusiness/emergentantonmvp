@@ -951,7 +951,8 @@ async def send_outreach(body: OutreachEmailRequest):
     <p>We believe this could be a great fit. Please reply to this email with any questions or to express your interest.</p>
     <p>Looking forward to connecting!<br><br>
     <strong>InfluencerConnect Team</strong><br>
-    <a href="mailto:{smtp_email}">{smtp_email}</a></p>
+    <a href="mailto:influencerconnectai@hotmail.com">influencerconnectai@hotmail.com</a><br>
+    <em style="font-size:12px;color:#888">To reply, please contact us directly at: influencerconnectai@hotmail.com</em></p>
   </div>
   <div class="footer">
     Sent via InfluencerConnect AI on behalf of {body.brand_name}. Reply "unsubscribe" to opt out.
@@ -964,16 +965,17 @@ async def send_outreach(body: OutreachEmailRequest):
         msg["Subject"] = f"Brand Partnership Opportunity — {body.brand_name} x @{body.influencer_handle}"
         msg["From"]    = f"InfluencerConnect <{smtp_email}>"
         msg["To"]      = body.to_email
-        msg["Reply-To"] = smtp_email
+        msg["Reply-To"] = "influencerconnectai@hotmail.com"
         msg.attach(MIMEText(html_body, "html"))
 
         loop = asyncio.get_event_loop()
         def _send():
-            with smtplib.SMTP("smtp-mail.outlook.com", 587, timeout=30) as srv:
+            pwd = smtp_password.replace(" ", "")
+            with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as srv:
                 srv.ehlo()
                 srv.starttls()
                 srv.ehlo()
-                srv.login(smtp_email, smtp_password)
+                srv.login(smtp_email, pwd)
                 srv.sendmail(smtp_email, body.to_email, msg.as_string())
         await loop.run_in_executor(None, _send)
         return {"success": True, "message": f"Outreach email sent to {body.to_email}"}
