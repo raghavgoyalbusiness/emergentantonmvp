@@ -1,56 +1,99 @@
 {
-  "theme": "DARK",
-  "archetype": "5 (Jewel & Luxury / High-End SaaS)",
-  "typography": {
-    "heading_font": "Georgia",
-    "body_font": "Times New Roman",
-    "rules": [
-      "No generic sans-serif for headings. Georgia must be used aggressively with tight tracking (tracking-tighter) for a premium print-magazine feel.",
-      "Large numbers (01, 02) used for editorial structure, acting as graphic elements rather than just text.",
-      "Body text uses default serif to contrast the massive headings."
+  "design_system": {
+    "name": "E1 Crystal Space Glass System",
+    "theme": "Dark",
+    "archetype": "5 (Jewel & Luxury / Crystal Variant)",
+    "typography": {
+      "heading_font": "Georgia, serif",
+      "body_font": "'Times New Roman', Times, serif",
+      "rules": {
+        "headings": "Use tracking-tight for H1/H2, tracking-normal for smaller headings. Do not use Inter or generic sans.",
+        "body": "Use tracking-normal, generous line-height (leading-relaxed)."
+      }
+    },
+    "colors": {
+      "background": "#000000",
+      "primary": "#00D4C8",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "rgba(255, 255, 255, 0.7)",
+      "text_muted": "rgba(255, 255, 255, 0.5)",
+      "glass": {
+        "tier_1_subtle": "bg-white/[0.03] backdrop-blur-md border border-white/10",
+        "tier_2_standard": "bg-white/[0.08] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)]",
+        "tier_3_elevated": "bg-white/[0.15] backdrop-blur-2xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-saturate-150"
+      }
+    },
+    "layout_and_spacing": {
+      "philosophy": "Generous spacing. Allow the WebGL shader to breathe and be visible.",
+      "cards": "Use p-6 or p-8 inside glass cards.",
+      "grid": "Bento style. gap-6 or gap-8. Do not fill 100% of the screen seamlessly, leave gaps for the background to show through."
+    },
+    "components": {
+      "sidebar": {
+        "classes": "bg-white/[0.05] backdrop-blur-2xl border-r border-white/10 text-white",
+        "instructions": "Ensure it is not opaque black. The webGL shader must show through."
+      },
+      "header_topbar": {
+        "classes": "bg-white/[0.1] backdrop-blur-2xl border-b border-white/10 sticky top-0 z-50 backdrop-saturate-150 text-white",
+        "instructions": "Use Crystal Glass effect. Must not be opaque."
+      },
+      "cards": {
+        "classes": "bg-white/[0.08] backdrop-blur-xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.3)] rounded-xl text-white",
+        "instructions": "Apply Tier 2 glass to Dashboard Stat cards, Analytics containers, Landing page feature cards."
+      },
+      "inputs": {
+        "classes": "bg-white/[0.05] backdrop-blur-md border border-white/20 text-white placeholder:text-white/50 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 rounded-md px-4 py-2",
+        "instructions": "Frost effect inputs."
+      },
+      "buttons": {
+        "primary": "bg-teal-500 hover:bg-teal-400 text-black font-bold rounded-md px-4 py-2 transition-all",
+        "secondary": "bg-white/[0.1] hover:bg-white/[0.15] backdrop-blur-md border border-white/20 text-white rounded-md px-4 py-2 transition-all"
+      },
+      "message_bubbles": {
+        "outbound": "bg-teal-500 text-black rounded-2xl rounded-tr-sm px-4 py-2",
+        "inbound": "bg-white/[0.1] backdrop-blur-xl border border-white/10 text-white rounded-2xl rounded-tl-sm px-4 py-2"
+      },
+      "kanban": {
+        "column": "bg-white/[0.02] backdrop-blur-sm border border-white/5 rounded-xl p-4",
+        "card": "bg-white/[0.08] backdrop-blur-xl border border-white/10 shadow-lg rounded-lg p-4 cursor-grab active:cursor-grabbing hover:bg-white/[0.12] transition-colors text-white"
+      },
+      "landing_page": {
+        "hero_card": "bg-white/[0.08] backdrop-blur-2xl border border-white/15 shadow-2xl rounded-2xl p-8 backdrop-saturate-150",
+        "pricing_card": "bg-white/[0.08] backdrop-blur-xl border border-white/10 hover:border-teal-500/50 transition-colors shadow-xl rounded-2xl p-8 text-white"
+      }
+    },
+    "testing": {
+      "attributes": "All interactive and key informational elements MUST include a data-testid attribute in kebab-case."
+    },
+    "media": {
+      "images": [
+        {
+          "category": "influencer_portraits",
+          "description": "Portraits for Influencer Discovery grid",
+          "urls": [
+            "https://images.unsplash.com/photo-1650405844475-7397a46b6213?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMGZhc2hpb24lMjBtb2RlbHxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85",
+            "https://images.unsplash.com/photo-1671454390265-c0ed999cd528?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwzfHxwb3J0cmFpdCUyMGZhc2hpb24lMjBtb2RlbHxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85",
+            "https://images.unsplash.com/photo-1700150595270-499a1ce07804?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHw0fHxwb3J0cmFpdCUyMGZhc2hpb24lMjBtb2RlbHxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85",
+            "https://images.unsplash.com/photo-1559878541-926091e4c31b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1MDZ8MHwxfHNlYXJjaHwyfHxwb3J0cmFpdCUyMGZhc2hpb24lMjBtb2RlbHxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85"
+          ]
+        },
+        {
+          "category": "abstract_glass_elements",
+          "description": "Complementary 3D glass shapes for landing page or decorative backgrounds",
+          "urls": [
+            "https://images.unsplash.com/photo-1676917995754-536530c4017a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMDNkJTIwZ2xhc3MlMjBzaGFwZXxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85",
+            "https://images.unsplash.com/photo-1773107674188-5fb5a5a247d0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwzfHxhYnN0cmFjdCUyMDNkJTIwZ2xhc3MlMjBzaGFwZXxlbnwwfHx8fDE3NzY0MDMyOTh8MA&ixlib=rb-4.1.0&q=85"
+          ]
+        }
+      ]
+    },
+    "instructions_to_main_agent": [
+      "Remove any 'bg-black', 'bg-slate-900', or other opaque backgrounds from standard layouts, sidebars, headers, and cards so the z-index -10 WebGL shader can show through entirely.",
+      "Apply the specific Tier 1, 2, and 3 glassmorphism classes to all UI panels. The entire UI must feel like floating glass.",
+      "Use the primary teal color sparingly for call to actions only.",
+      "Retain Georgia for headings and Times New Roman for body text, maintaining the editorial aesthetic.",
+      "Add data-testid attributes to all buttons, links, inputs, and interactive components.",
+      "Do not use placeholder image URLs. Use the provided images from the 'media' object."
     ]
-  },
-  "colors": {
-    "background": "#0A0F2E",
-    "surface": "#131936",
-    "accent": "#00D4C8",
-    "text_primary": "#FFFFFF",
-    "text_secondary": "rgba(255, 255, 255, 0.6)",
-    "borders": "rgba(255, 255, 255, 0.05)"
-  },
-  "layout_and_spacing": {
-    "grid_system": "Mode A: The Tetris Grid (Asymmetric Bento)",
-    "rules": [
-      "Avoid 2x2 symmetrical grids for features.",
-      "Use a 12-column grid. Feature 1 spans 8 cols (hero size), Feature 2 spans 4 cols (tall portrait), Feature 3 spans 5 cols (square), Feature 4 spans 7 cols (wide).",
-      "Massive internal padding (p-10 to p-14) on cards to let content breathe.",
-      "Cards have rounded-[2rem] corners to look intentional and distinct from standard 8px SaaS corners."
-    ]
-  },
-  "motion_and_interaction": {
-    "hover_states": [
-      "Borders transition from white/5 to #00D4C8/30 on group hover.",
-      "Background decorative elements (large icons, grid patterns) increase in opacity and scale gently (duration-700) on hover."
-    ]
-  },
-  "components": {
-    "feature_card": {
-      "style": "Glassy/Solid Hybrid",
-      "details": "Icon sits in a perfectly round glass-like badge. Large numerals sit opposite the icon. Title and description sit at the bottom, left-aligned."
-    }
-  },
-  "accessibility": {
-    "data_testids": [
-      "feature-discovery",
-      "feature-outreach",
-      "feature-analytics",
-      "feature-escrow"
-    ],
-    "contrast": "Ensure text over deep navy meets WCAG AA standards. Use white/60 for secondary text to maintain legibility against #131936."
-  },
-  "media": {
-    "image_urls": [],
-    "notes": "Relies entirely on Lucide React icons scaled up massively for background texture, avoiding the need for generic vector illustrations."
-  },
-  "instructions_to_main_agent": "Implement the provided Asymmetric Bento layout. Ensure 'font-heading' maps correctly to the existing Georgia configuration in Tailwind. Do not revert to symmetrical grids. Keep the massive padding and typography scales intact."
+  }
 }
