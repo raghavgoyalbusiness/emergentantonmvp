@@ -34,7 +34,7 @@ export default function Layout({ children }) {
         glass-3 flex-col`}
     >
       <div className="p-6 border-b border-white/5">
-        <Link to="/dashboard" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
+        <Link to="/" data-testid="logo-home-btn" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
           <div className="w-8 h-8 rounded-lg bg-[#00D4C8]/20 backdrop-blur-xl border border-[#00D4C8]/40 flex items-center justify-center">
             <Zap className="w-4 h-4 text-[#00D4C8]" strokeWidth={2.5} />
           </div>
