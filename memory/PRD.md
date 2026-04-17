@@ -91,7 +91,13 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
-### ✅ Session 7 (Buttery Smooth UI — 2026-04)
+### ✅ Session 8 (WebGL Shader Transition Portal — 2026-04)
+- Added `shader-background.jsx` at `/components/ui/` — WebGL canvas with purple/violet plasma lines (16 animated sine-wave streams + floating circles)
+- Mounted persistently in `AppRouter` at `z-index: -10` so it is always rendering
+- Transition mechanic: page content fades to `opacity: 0` (0.25s exit) → shader portal fully visible → new page fades in (0.28s enter)
+- Zero extra state, zero extra libraries — pure WebGL, auto-resizes on window resize, cleans up `requestAnimationFrame` on unmount
+
+
 - **Page transitions**: AnimatePresence mode='wait' with fade+slide between all routes (App.js)
 - **Dashboard count-up**: Stat numbers animate from 0 → final value using useCountUp/requestAnimationFrame
 - **Dashboard health bar**: Fills from 0% → value over 1.2s cubic-bezier on load
