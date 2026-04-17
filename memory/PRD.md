@@ -1,4 +1,5 @@
 # Influencer Connect — PRD
+_Last updated: Feb 2026_
 
 ## Original Problem Statement
 Build "Influencer Connect", a fully functional AI-powered influencer marketing platform MVP that automatically matches brands with micro/mid-tier influencers, manages campaigns from brief to payment, and delivers ROI reporting.
@@ -155,6 +156,14 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - **Dark Theme Consistency**: All pages use pure black (#000000) background, #131936 cards, #00D4C8 teal accents
 - Testing: 100% pass rate (iteration_2.json)
 
+### ✅ Session 3 (Performance & Glitch Fixes — 2026-04)
+- **Root Cause Fixed**: Two competing WebGL contexts (shader + Spline) caused GPU stalls ("ReadPixels, High" severity). `shader-background.jsx` now has an `active` prop — when `false` the RAF loop is paused, freeing GPU for Spline. `App.js` passes `active={!isLanding}`.
+- **Removed persistent `will-change: transform`** from `.btn-primary`, `.btn-glass-teal`, `.btn-secondary` CSS classes to reduce GPU compositing layer overhead.
+- **Removed `layoutId="nav-active"`** from `Layout.jsx` — replaced with a plain `div`. Eliminated potential cross-route layout animation glitches.
+- **Reduced meteor count** from 18 → 12 on landing page to lower CSS animation load.
+- **Fixed `setTimeout` memory leak** in `Dashboard.jsx` — added `clearTimeout(timer)` cleanup in useEffect return.
+- Testing: 100% pass rate (iteration_8.json) — all landing page elements verified, GPU conflict resolved.
+
 ---
 
 ## Mocked / Simulated Integrations
@@ -169,11 +178,11 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - None (all resolved)
 
 ### P1 (High priority — upcoming)
-- Verify Claude Sonnet 4.5 AI scoring is correctly using Emergent Universal Key (not just simulated delays)
-- Expand Framer Motion to include exit/page-transition animations between routes
+- Verify Claude Sonnet 4.5 AI scoring strictly uses Emergent Universal Key (not just simulated delays)
 
 ### P2 (Nice to have — future)
 - Deeper simulated integration UI states (Jasper edit view, lemlist sequence preview)
+- "Sent Outreach" audit log page — tracks every email sent (influencer name, brand, date, status)
 - White-label reporting export (PDF)
 - Real-time notification system
-- Campaign approval workflow with e-signature
+- Fix message API multi-tenant security: `GET /api/messages` should filter by `user_id`
