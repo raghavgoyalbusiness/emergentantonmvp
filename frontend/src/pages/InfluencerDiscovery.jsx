@@ -141,6 +141,14 @@ export default function InfluencerDiscovery() {
       setInfluencers(res.data);
       setScored(true);
     } catch (e) {
+      const status = e?.response?.status;
+      if (status === 401) {
+        alert("Session expired. Please refresh the page and log in again.");
+      } else if (status === 404) {
+        alert("Campaign not found. Please select a valid campaign and try again.");
+      } else {
+        alert("AI scoring failed. Please try again.");
+      }
       console.error(e);
     } finally {
       clearInterval(interval);

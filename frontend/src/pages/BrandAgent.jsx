@@ -58,17 +58,24 @@ function parseInfluencers(text) {
     if (["gmail","yahoo","hotmail","outlook","instagram","twitter","tiktok"].includes(handle.toLowerCase())) continue;
     if (seenHandles.has(handle)) continue;
 
+    // ── Email extraction (optional — cards show even without email) ──────────
     const labeledEmailMatch = section.match(
       /Email[^:\n]{0,25}:\s*\*{0,2}\s*([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/i
     );
     const anyEmailMatch = section.match(
       /\b([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/
     );
-    const email = labeledEmailMatch
+    let email = labeledEmailMatch
       ? labeledEmailMatch[1].trim()
       : anyEmailMatch ? anyEmailMatch[1] : null;
-    if (!email) continue;
-    if (SKIP_EMAILS.has(email.toLowerCase())) continue;
+    if (email && SKIP_EMAILS.has(email.toLowerCase())) email = null;
+
+    // ── Fallback contact URL (LinkTree, YouTube, website) ───────────────────
+    const linktreeMatch = section.match(/(?:LinkTree|Linktree|linktree)[^:]*:\s*(https?:\/\/\S+)/i);
+    const youtubeMatch  = section.match(/(?:YouTube)[^:]*:\s*(https?:\/\/\S+)/i);
+    const contactUrl    = linktreeMatch ? linktreeMatch[1].trim()
+                        : youtubeMatch  ? youtubeMatch[1].trim()
+                        : null;
 
     const titleLine =
       section.split("\n").find(l => l.includes(`@${handle}`)) ||
@@ -79,15 +86,18 @@ function parseInfluencers(text) {
     const followersMatch = section.match(/Followers?[^:\n]*:\s*\*{0,2}([0-9,]+(?:\s*[KMBkm])?)/i);
     const engMatch = section.match(/Engagement[^:\n]*:\s*\*{0,2}([0-9.]+%?)/i);
     const engVal = engMatch ? engMatch[1] : null;
+    const countryMatch = section.match(/Country[^:\n]*:\s*\*{0,2}([^\n*]+)/i);
 
     seenHandles.add(handle);
-    seenEmails.add(email.toLowerCase());
+    if (email) seenEmails.add(email.toLowerCase());
     results.push({
       handle,
       name: name || handle,
-      email,
+      email,             // null if not found — card still shows, Connect disabled
+      contactUrl,        // fallback link if no email
       followers: followersMatch ? followersMatch[1].trim() : null,
       engagement: engVal ? (engVal.includes("%") ? engVal : `${engVal}%`) : null,
+      country: countryMatch ? countryMatch[1].trim() : null,
     });
   }
 
@@ -103,7 +113,7 @@ function parseInfluencers(text) {
     seenEmails.add(emailLower);
     const handle = emailToHandle(email) + "_" + emailLower.replace(/[^a-z0-9]/g, "").slice(0, 6);
     const name   = emailToName(email);
-    results.push({ handle, name, email, followers: null, engagement: null });
+    results.push({ handle, name, email, contactUrl: null, followers: null, engagement: null, country: null });
   }
 
   return results;
@@ -165,6 +175,7 @@ function AgentMarkdown({ content }) {
 function InfluencerCard({ inf, selected, onToggle, onConnect }) {
   const [imgSrc, setImgSrc] = useState(`https://unavatar.io/instagram/${inf.handle}`);
   const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=128`;
+  const hasContact = !!inf.email;
 
   return (
     <motion.div
@@ -195,21 +206,37 @@ function InfluencerCard({ inf, selected, onToggle, onConnect }) {
       <div className="flex-1 min-w-0">
         <p className="text-white text-xs font-semibold truncate">{inf.name}</p>
         <p className="text-white/40 text-xs">@{inf.handle}</p>
-        <div className="flex gap-2 mt-0.5">
+        <div className="flex gap-2 mt-0.5 flex-wrap">
           {inf.followers  && <span className="text-white/30 text-xs">{inf.followers} followers</span>}
           {inf.engagement && <span className="text-[#00D4C8]/60 text-xs">{inf.engagement}</span>}
+          {inf.country    && <span className="text-white/20 text-xs">{inf.country}</span>}
         </div>
-        <p className="text-white/20 text-xs truncate">{inf.email}</p>
+        {hasContact
+          ? <p className="text-white/20 text-xs truncate">{inf.email}</p>
+          : inf.contactUrl
+            ? <a href={inf.contactUrl} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="text-[#00D4C8]/40 text-xs truncate hover:text-[#00D4C8]/70 transition-colors">View profile</a>
+            : <p className="text-white/15 text-xs italic">No email available</p>
+        }
       </div>
 
-      {/* Individual connect */}
-      <button
-        onClick={e => { e.stopPropagation(); onConnect([inf]); }}
-        data-testid={`connect-btn-${inf.handle}`}
-        className="flex items-center gap-1 px-2.5 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all flex-shrink-0"
-      >
-        <Mail className="w-3 h-3" /> Connect
-      </button>
+      {/* Connect button — enabled only when email is available */}
+      {hasContact ? (
+        <button
+          onClick={e => { e.stopPropagation(); onConnect([inf]); }}
+          data-testid={`connect-btn-${inf.handle}`}
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all flex-shrink-0"
+        >
+          <Mail className="w-3 h-3" /> Connect
+        </button>
+      ) : (
+        <div
+          data-testid={`connect-btn-${inf.handle}`}
+          title="No email found for this influencer"
+          className="flex items-center gap-1 px-2.5 py-1.5 bg-white/3 border border-white/8 text-white/25 rounded-lg text-xs flex-shrink-0 cursor-not-allowed select-none"
+        >
+          <Mail className="w-3 h-3" /> No email
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -217,7 +244,8 @@ function InfluencerCard({ inf, selected, onToggle, onConnect }) {
 // ─── Bulk action bar ──────────────────────────────────────────────────────────
 function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll }) {
   const allSelected = selected.size === influencers.length;
-  const noneSelected = selected.size === 0;
+  const withEmail   = influencers.filter(i => i.email);
+  const selectedWithEmail = influencers.filter(i => selected.has(i.handle) && i.email);
 
   return (
     <motion.div
@@ -240,26 +268,29 @@ function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll
       )}
 
       <div className="flex gap-2 ml-auto">
-        {/* Send to selected */}
-        <button
-          onClick={onSendSelected}
-          disabled={noneSelected}
-          data-testid="send-selected-btn"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-[#00D4C8]/10 hover:border-[#00D4C8]/30 text-white/60 hover:text-[#00D4C8] text-xs transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-        >
-          <Users className="w-3.5 h-3.5" />
-          Send to Selected ({selected.size})
-        </button>
+        {/* Send to selected (only those with emails) */}
+        {selectedWithEmail.length > 0 && (
+          <button
+            onClick={() => onSendSelected(selectedWithEmail)}
+            data-testid="send-selected-btn"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-[#00D4C8]/10 hover:border-[#00D4C8]/30 text-white/60 hover:text-[#00D4C8] text-xs transition-all"
+          >
+            <Users className="w-3.5 h-3.5" />
+            Send to Selected ({selectedWithEmail.length})
+          </button>
+        )}
 
-        {/* Send to all */}
-        <button
-          onClick={onSendAll}
-          data-testid="send-all-btn"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-glass-teal text-xs font-semibold transition-all"
-        >
-          <Mail className="w-3.5 h-3.5" />
-          Send to All ({influencers.length})
-        </button>
+        {/* Send to all with emails */}
+        {withEmail.length > 0 && (
+          <button
+            onClick={() => onSendAll(withEmail)}
+            data-testid="send-all-btn"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-glass-teal text-xs font-semibold transition-all"
+          >
+            <Mail className="w-3.5 h-3.5" />
+            Send to All ({withEmail.length})
+          </button>
+        )}
       </div>
     </motion.div>
   );
@@ -281,9 +312,14 @@ function OutreachModal({ targets, onClose }) {
     if (!form.brand_name || !form.budget || !form.target_audience || !form.campaign_details || !form.product_details) {
       setError("Please fill in all fields."); return;
     }
+    // Only send to targets that have email addresses
+    const emailTargets = targets.filter(inf => inf.email);
+    if (emailTargets.length === 0) {
+      setError("None of the selected influencers have contact emails available."); return;
+    }
     setSending(true); setError("");
     const settled = await Promise.allSettled(
-      targets.map(inf =>
+      emailTargets.map(inf =>
         axios.post(`${API}/agent/send-outreach`, {
           to_email: inf.email,
           influencer_name: inf.name,
@@ -465,10 +501,19 @@ function Message({ msg, onOpenModal }) {
       {/* Influencer cards + bulk bar */}
       {!isUser && msg.influencers?.length > 0 && (
         <div className="ml-11">
-          <p className="text-white/30 text-xs mb-2 flex items-center gap-1.5">
-            <Mail className="w-3 h-3 text-[#00D4C8]" />
-            {msg.influencers.length} creator{msg.influencers.length > 1 ? "s" : ""} found — select &amp; send outreach emails
-          </p>
+          {(() => {
+            const withEmail = msg.influencers.filter(i => i.email);
+            return (
+              <p className="text-white/30 text-xs mb-2 flex items-center gap-1.5">
+                <Mail className="w-3 h-3 text-[#00D4C8]" />
+                {msg.influencers.length} creator{msg.influencers.length > 1 ? "s" : ""} found
+                {withEmail.length < msg.influencers.length && (
+                  <span className="text-white/20">· {withEmail.length} with contact email</span>
+                )}
+                {withEmail.length > 0 && <span className="text-white/20">— select &amp; send outreach</span>}
+              </p>
+            );
+          })()}
 
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 gap-2"
@@ -490,8 +535,8 @@ function Message({ msg, onOpenModal }) {
             influencers={msg.influencers}
             selected={selected}
             onToggleAll={toggleAll}
-            onSendSelected={() => onOpenModal(msg.influencers.filter(i => selected.has(i.handle)))}
-            onSendAll={() => onOpenModal(msg.influencers)}
+            onSendSelected={(list) => onOpenModal(list)}
+            onSendAll={(list) => onOpenModal(list)}
           />
         </div>
       )}
@@ -525,7 +570,14 @@ export default function BrandAgent() {
       const influencers = parseInfluencers(response);
       setMessages(prev => [...prev, { role: "agent", content: response, influencers, time: now(), id: Date.now() + 1 }]);
     } catch (e) {
-      setMessages(prev => [...prev, { role: "agent", content: `Error: ${e?.response?.data?.detail || e.message}`, influencers: [], time: now(), id: Date.now() + 1 }]);
+      const detail = e?.response?.data?.detail || e.message || "Something went wrong";
+      setMessages(prev => [...prev, {
+        role: "agent",
+        content: `I ran into an issue fetching that data. Please try rephrasing your query or try again.\n\n_Error details: ${detail}_`,
+        influencers: [],
+        time: now(),
+        id: Date.now() + 1
+      }]);
     } finally {
       setLoading(false);
       inputRef.current?.focus();

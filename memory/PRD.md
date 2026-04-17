@@ -164,6 +164,13 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - **Fixed `setTimeout` memory leak** in `Dashboard.jsx` — added `clearTimeout(timer)` cleanup in useEffect return.
 - Testing: 100% pass rate (iteration_8.json) — all landing page elements verified, GPU conflict resolved.
 
+### ✅ Session 4 (BrandAgent Influencer Cards Fix — 2026-04)
+- **Root Cause Found**: `parseInfluencers()` had `if (!email) continue` — Bedrock agent responses often return real influencer profiles WITHOUT email addresses. This caused 0 influencer cards to appear even when the agent text said "I found 5 influencers," leaving users confused.
+- **Fix**: Removed hard email requirement from parser. Cards now show for ALL parsed handles. Cards without email show a disabled "No email" badge instead of hiding entirely. LinkTree/YouTube fallback URLs are extracted and shown as "View profile" links.
+- **BulkBar**: Updated to only count/send to influencers WITH emails; never crashes on null email.
+- **InfluencerDiscovery**: `runAIScoring` now shows user-facing `alert()` on 401 (session expired) and 404 (campaign not found) instead of silently swallowing errors.
+- **BrandAgent error message**: Improved to "I ran into an issue fetching that data. Please try rephrasing..." instead of raw error text.
+
 ---
 
 ## Mocked / Simulated Integrations
