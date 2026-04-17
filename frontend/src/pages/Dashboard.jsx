@@ -97,6 +97,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [healthBarWidth, setHealthBarWidth] = useState(0);
 
+  // Runs once on mount to load initial data. API/axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     let timer;
     const load = async () => {

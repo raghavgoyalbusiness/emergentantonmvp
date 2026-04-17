@@ -129,6 +129,8 @@ export default function Payments() {
   const [loading, setLoading] = useState(true);
   const [polling, setPolling] = useState(false);
 
+  // Runs once on mount. API/axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/campaigns`, { withCredentials: true }),

@@ -120,6 +120,8 @@ export default function InfluencerDiscovery() {
   const [platformFilter, setPlatformFilter] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // Runs once on mount. API/axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/influencers`, { withCredentials: true }),

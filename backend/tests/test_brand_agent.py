@@ -63,7 +63,7 @@ class TestSendOutreach:
         print(f"Outreach response: {resp.text[:300]}")
         assert resp.status_code == 200, f"Expected 200, got {resp.status_code}: {resp.text[:300]}"
         data = resp.json()
-        assert data.get("success") is True, f"Expected success=True: {data}"
+        assert data.get("success"), f"Expected success=True: {data}"
         assert "techmaster@socialcurrent.in" in data.get("message", ""), f"Email not in message: {data}"
 
     def test_send_outreach_missing_fields_returns_error(self):

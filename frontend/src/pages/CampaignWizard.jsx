@@ -109,7 +109,7 @@ export default function CampaignWizard() {
       {/* Progress */}
       <motion.div variants={item} className="flex items-center gap-2 mb-8">
         {STEPS.map((s, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div key={s} className="flex-1 flex flex-col items-center gap-1">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
               i < step ? "bg-[#00D4C8]/20 border border-[#00D4C8]/60 text-[#00D4C8] backdrop-blur-xl" :
               i === step ? "bg-[#00D4C8]/25 border border-[#00D4C8] text-[#00D4C8] backdrop-blur-xl shadow-[0_0_12px_rgba(0,212,200,0.3)]" :

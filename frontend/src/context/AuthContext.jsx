@@ -9,6 +9,8 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // API and axios are module-level constants — intentionally omitted from deps.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch(`${API}/auth/me`, { credentials: "include" });

@@ -4,7 +4,7 @@ import requests
 import os
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://brand-brief-1.preview.emergentagent.com').rstrip('/')
-TOKEN = "test_session_e2e_2025"
+TOKEN = os.getenv("TEST_SESSION_TOKEN", "test_session_e2e_2025")
 HEADERS = {"Authorization": f"Bearer {TOKEN}", "Content-Type": "application/json"}
 TEST_CAMPAIGN_ID = "campaign_4f65982f244d"
 

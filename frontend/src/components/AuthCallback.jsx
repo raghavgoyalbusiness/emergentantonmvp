@@ -36,7 +36,10 @@ export default function AuthCallback() {
       .catch(() => {
         navigate("/");
       });
-  }, []);
+    // hasProcessed is a ref (stable) — intentionally excluded from deps.
+    // navigate, setUser are stable react-router/context refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash]);
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center">

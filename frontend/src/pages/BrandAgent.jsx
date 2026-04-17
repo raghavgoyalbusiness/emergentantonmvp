@@ -555,6 +555,8 @@ export default function BrandAgent() {
   const inputRef  = useRef(null);
   const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
+  // Scrolls to bottom when messages or loading state changes. bottomRef is a stable ref.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
   const send = async (text) => {
@@ -624,7 +626,7 @@ export default function BrandAgent() {
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
                   {STARTERS.map((s, i) => (
-                    <button key={i} onClick={() => send(s)} data-testid={`starter-${i}`}
+                    <button key={s.slice(0, 20)} onClick={() => send(s)} data-testid={`starter-${i}`}
                       className="text-left px-4 py-3 glass-1 hover:border-[#00D4C8]/25 rounded-xl text-white/60 hover:text-white text-xs leading-relaxed transition-all">
                       {s}
                     </button>

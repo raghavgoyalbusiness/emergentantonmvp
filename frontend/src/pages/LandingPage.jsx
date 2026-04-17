@@ -282,7 +282,7 @@ export default function LandingPage() {
               const Icon = step.icon;
               return (
                 <motion.div
-                  key={i}
+                  key={step.title}
                   variants={fadeUp}
                   className="group relative glass-2 rounded-2xl p-6 hover:border-[#00D4C8]/30 transition-all duration-300"
                 >
@@ -339,7 +339,7 @@ export default function LandingPage() {
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
           >
             {steps.map((step, i) => (
-              <motion.div key={i} variants={fadeUp} className="relative">
+              <motion.div key={step.num} variants={fadeUp} className="relative">
                 {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-[#00D4C8]/30 to-transparent z-0" />
                 )}

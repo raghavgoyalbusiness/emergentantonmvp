@@ -427,7 +427,7 @@ class TestAgentSendOutreach:
         assert resp.status_code in [200, 401, 502], f"Unexpected: {resp.status_code}: {resp.text}"
         if resp.status_code == 200:
             data = resp.json()
-            assert data.get("success") is True
+            assert data.get("success")
             assert "message" in data
             print("PASS: POST /api/agent/send-outreach 200 — email sent")
         elif resp.status_code == 401:
