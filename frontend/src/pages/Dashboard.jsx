@@ -34,6 +34,26 @@ const cardWrap = {
   visible: { transition: { staggerChildren: 0.07 } },
 };
 
+function useCountUp(target, duration = 900) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const end = typeof target === "number" ? target : 0;
+    if (end === 0) { setCount(0); return; }
+    let startTime = null;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+      setCount(Math.floor(eased * end));
+      if (progress < 1) requestAnimationFrame(step);
+      else setCount(end);
+    };
+    const raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return count;
+}
+
 function StatCard({ icon: Icon, label, value, sub, color = "teal", testid }) {
   const colorMap = {
     teal: "bg-[#00D4C8]/10 text-[#00D4C8]",
@@ -41,17 +61,30 @@ function StatCard({ icon: Icon, label, value, sub, color = "teal", testid }) {
     purple: "bg-purple-500/10 text-purple-400",
     green: "bg-green-500/10 text-green-400",
   };
+  const numericVal = typeof value === "string"
+    ? parseInt(value.replace(/[^0-9]/g, ""), 10) || 0
+    : (value || 0);
+  const prefix = typeof value === "string" && value.startsWith("$") ? "$" : "";
+  const counted = useCountUp(numericVal);
+  const displayValue = prefix + counted.toLocaleString();
+
   return (
-    <div data-testid={testid} className="bg-[#131936] border border-white/5 rounded-xl p-5 card-hover">
+    <motion.div
+      data-testid={testid}
+      className="bg-[#131936] border border-white/5 rounded-xl p-5 card-hover"
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+    >
       <div className="flex items-start justify-between mb-3">
         <div className={`w-9 h-9 rounded-lg ${colorMap[color]} flex items-center justify-center`}>
           <Icon className="w-4 h-4" strokeWidth={1.5} />
         </div>
       </div>
-      <div className="font-heading font-black text-3xl text-white mb-1">{value}</div>
+      <div className="font-heading font-black text-3xl text-white mb-1">{displayValue}</div>
       <div className="text-white/50 text-sm">{label}</div>
       {sub && <div className="text-[#00D4C8] text-xs mt-1">{sub}</div>}
-    </div>
+    </motion.div>
   );
 }
 
@@ -62,6 +95,7 @@ export default function Dashboard() {
   const [campaigns, setCampaigns] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [healthBarWidth, setHealthBarWidth] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -74,6 +108,7 @@ export default function Dashboard() {
         setStats(statsRes.data);
         setCampaigns(campaignsRes.data);
         setMessages(messagesRes.data);
+        setTimeout(() => setHealthBarWidth(statsRes.data?.campaign_health_score || 0), 300);
       } catch (err) {
         console.error(err);
       } finally {
@@ -132,7 +167,7 @@ export default function Dashboard() {
         <motion.div variants={item}><StatCard icon={Activity} label="Total Campaigns" value={stats?.total_campaigns || 0} color="teal" testid="stat-total-campaigns" /></motion.div>
         <motion.div variants={item}><StatCard icon={Zap} label="Active Campaigns" value={stats?.active_campaigns || 0} sub="Currently running" color="blue" testid="stat-active-campaigns" /></motion.div>
         <motion.div variants={item}><StatCard icon={Users} label="Influencers" value={stats?.total_influencers || 0} sub="In your pipeline" color="purple" testid="stat-influencers" /></motion.div>
-        <motion.div variants={item}><StatCard icon={DollarSign} label="Total Spend" value={`$${(stats?.total_spend || 0).toLocaleString()}`} sub={`${stats?.total_influencers || 0} creators`} color="green" testid="stat-spend" /></motion.div>
+        <motion.div variants={item}><StatCard icon={DollarSign} label="Total Spend" value={stats?.total_spend || 0} sub={`${stats?.total_influencers || 0} creators`} color="green" testid="stat-spend" /></motion.div>
       </motion.div>
 
       {/* Campaign health bar */}
@@ -146,8 +181,8 @@ export default function Dashboard() {
         </div>
         <div className="h-2 bg-white/5 rounded-full overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-[#00D4C8] to-[#00a8ff] rounded-full transition-all duration-1000"
-            style={{ width: `${stats?.campaign_health_score || 0}%` }}
+            className="h-full bg-gradient-to-r from-[#00D4C8] to-[#00a8ff] rounded-full"
+            style={{ width: `${healthBarWidth}%`, transition: "width 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)" }}
           />
         </div>
         <div className="flex justify-between text-xs text-white/30 mt-1">

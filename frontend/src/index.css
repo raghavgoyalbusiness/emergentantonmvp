@@ -34,6 +34,7 @@
   html {
     /* fallback background for every page — keeps non-landing pages dark */
     background-color: #000000;
+    scroll-behavior: smooth;
   }
   body {
     @apply text-white;

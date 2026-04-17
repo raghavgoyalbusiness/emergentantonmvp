@@ -12,12 +12,18 @@
 }
 
 .card-hover {
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.18s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.18s ease,
+              box-shadow 0.18s ease;
+  will-change: transform;
 }
 .card-hover:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: rgba(0, 212, 200, 0.35);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+.card-hover:active {
+  transform: translateY(-1px) scale(0.99);
 }
 
 .btn-primary {
@@ -25,15 +31,17 @@
   color: #000000;
   font-weight: 700;
   font-family: 'Times New Roman', Times, serif;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.15s ease;
+  will-change: transform;
 }
 .btn-primary:hover {
-  background: rgba(0, 212, 200, 0.85);
+  background: rgba(0, 212, 200, 0.88);
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 212, 200, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 212, 200, 0.4);
 }
 .btn-primary:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -41,11 +49,16 @@
   border: 1px solid rgba(255,255,255,0.15);
   color: white;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+  will-change: transform;
 }
 .btn-secondary:hover {
   border-color: rgba(255,255,255,0.35);
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.05);
+  transform: translateY(-1px);
+}
+.btn-secondary:active {
+  transform: scale(0.97);
 }
 
 .match-score-ring {
@@ -117,4 +130,14 @@
 /* Hero card gradient border glow */
 .hero-card-glow {
   box-shadow: 0 0 0 1px rgba(0,212,200,0.08), 0 24px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Smooth input/textarea focus ring */
+input, textarea, select {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Prevent layout shift on page transitions */
+#root {
+  overflow-x: hidden;
 }

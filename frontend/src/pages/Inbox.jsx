@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
-import { Send, MessageSquare } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, MessageSquare, Loader2 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -46,6 +46,7 @@ export default function Inbox() {
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     axios.get(`${API}/messages`, { withCredentials: true })
@@ -54,6 +55,10 @@ export default function Inbox() {
         if (res.data.length > 0) setSelected(res.data[0]);
       }).finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, selected]);
 
   const markRead = async (msg) => {
     setSelected(msg);
@@ -169,8 +174,15 @@ export default function Inbox() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                <AnimatePresence initial={false}>
                 {threadMessages.map(m => (
-                  <div key={m.message_id} className={`flex ${m.direction === "outbound" ? "justify-end" : "justify-start"}`}>
+                  <motion.div
+                    key={m.message_id}
+                    className={`flex ${m.direction === "outbound" ? "justify-end" : "justify-start"}`}
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  >
                     <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm ${
                       m.direction === "outbound"
                         ? "bg-[#00D4C8] text-black font-medium rounded-tr-sm"
@@ -179,8 +191,10 @@ export default function Inbox() {
                       <p>{m.content}</p>
                       <p className={`text-xs mt-1 ${m.direction === "outbound" ? "text-black/50" : "text-white/30"}`}>{timeAgo(m.timestamp)}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
+                </AnimatePresence>
+                <div ref={bottomRef} />
               </div>
 
               <div className="p-3 border-t border-white/5">
@@ -200,7 +214,7 @@ export default function Inbox() {
                     data-testid="send-reply-btn"
                     className="btn-primary w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-50 self-end"
                   >
-                    <Send className="w-4 h-4" />
+                    {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </button>
                 </div>
                 <p className="text-white/20 text-xs mt-1 pl-1">Press Enter to send, Shift+Enter for new line</p>

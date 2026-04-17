@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
-import { Plus, ArrowRight, ChevronRight } from "lucide-react";
+import { Plus, ArrowRight, ChevronRight, Loader2 } from "lucide-react";
 import SpotlightBackground from "@/components/ui/spotlight-background";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -36,14 +36,17 @@ const colItem = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.38, ease: "easeOut" } },
 };
 
-function CampaignCard({ campaign, onMoveStage }) {
+function CampaignCard({ campaign, onMoveStage, moving }) {
   const stageIdx = STAGES.indexOf(campaign.stage);
   const nextStage = STAGES[stageIdx + 1];
 
   return (
-    <div
+    <motion.div
       data-testid={`kanban-card-${campaign.campaign_id}`}
-      className="bg-black border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-all duration-200 cursor-pointer"
+      className="bg-black border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-colors cursor-pointer"
+      whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: "spring", stiffness: 400, damping: 25 }}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
@@ -69,18 +72,23 @@ function CampaignCard({ campaign, onMoveStage }) {
         <button
           onClick={(e) => { e.stopPropagation(); onMoveStage(campaign.campaign_id, nextStage); }}
           data-testid={`move-stage-${campaign.campaign_id}`}
-          className="mt-2 w-full flex items-center justify-center gap-1 py-1.5 bg-[#00D4C8]/5 hover:bg-[#00D4C8]/10 border border-[#00D4C8]/15 hover:border-[#00D4C8]/30 rounded text-[#00D4C8] text-xs transition-all"
+          disabled={moving}
+          className="mt-2 w-full flex items-center justify-center gap-1 py-1.5 bg-[#00D4C8]/5 hover:bg-[#00D4C8]/10 border border-[#00D4C8]/15 hover:border-[#00D4C8]/30 rounded text-[#00D4C8] text-xs transition-all disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Move to {nextStage} <ChevronRight className="w-3 h-3" />
+          {moving
+            ? <><Loader2 className="w-3 h-3 animate-spin" /> Moving...</>
+            : <>Move to {nextStage} <ChevronRight className="w-3 h-3" /></>
+          }
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }
 
 export default function CampaignPipeline() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [movingId, setMovingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,11 +98,14 @@ export default function CampaignPipeline() {
   }, []);
 
   const moveStage = async (campaignId, newStage) => {
+    setMovingId(campaignId);
     try {
       const res = await axios.patch(`${API}/campaigns/${campaignId}/stage`, { stage: newStage }, { withCredentials: true });
       setCampaigns(prev => prev.map(c => c.campaign_id === campaignId ? res.data : c));
     } catch (e) {
       console.error(e);
+    } finally {
+      setMovingId(null);
     }
   };
 
@@ -157,7 +168,7 @@ export default function CampaignPipeline() {
                 </div>
                 <div className="space-y-2">
                   {stageCampaigns.map(c => (
-                    <CampaignCard key={c.campaign_id} campaign={c} onMoveStage={moveStage} />
+                    <CampaignCard key={c.campaign_id} campaign={c} onMoveStage={moveStage} moving={movingId === c.campaign_id} />
                   ))}
                   {stageCampaigns.length === 0 && (
                     <div className="border border-dashed border-white/5 rounded-lg p-4 text-center">

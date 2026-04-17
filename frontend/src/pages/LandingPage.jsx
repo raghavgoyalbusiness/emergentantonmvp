@@ -1,11 +1,21 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
 import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star, Users, FileText, Rocket, ScanLine } from "lucide-react";
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Card } from "@/components/ui/card";
 import ShaderBackground from "@/components/ui/animated-shader-background";
 import Meteors from "@/components/ui/meteors";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } },
+};
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1 } },
+};
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 
@@ -208,56 +218,74 @@ export default function LandingPage() {
       </section>
 
       {/* ── Integration Bar ── */}
-      <section className="py-10 border-y border-white/5 bg-[#131936]/50">
+      <motion.section
+        className="py-10 border-y border-white/5 bg-[#131936]/50"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.5 }}
+      >
         <div className="max-w-6xl mx-auto px-4">
           <p className="text-center text-white/30 text-xs uppercase tracking-widest mb-6">
             Anton integrates with the tools you already use
           </p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-3">
-            {integrations.map((name) => (
-              <span
+            {integrations.map((name, i) => (
+              <motion.span
                 key={name}
                 className="text-white/40 text-sm font-semibold hover:text-white/70 transition-colors cursor-default"
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04, duration: 0.3 }}
               >
                 {name}
-              </span>
+              </motion.span>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* ── Meet Anton — Workflow Section ── */}
       <section id="meet-anton" className="py-28 px-4">
         <div className="max-w-6xl mx-auto">
 
           {/* Section Header */}
-          <div className="mb-20">
-            <p className="text-[#00D4C8] text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-3">
+          <motion.div
+            className="mb-20"
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-80px" }}
+            variants={staggerContainer}
+          >
+            <motion.p variants={fadeUp} className="text-[#00D4C8] text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-3">
               <span className="w-8 h-px bg-[#00D4C8]" />
               The intelligence layer
-            </p>
+            </motion.p>
             <div className="flex flex-col md:flex-row md:items-end gap-6 justify-between">
-              <h2 className="font-heading font-black text-5xl md:text-6xl text-white tracking-tighter leading-none">
+              <motion.h2 variants={fadeUp} className="font-heading font-black text-5xl md:text-6xl text-white tracking-tighter leading-none">
                 What Anton<br />
                 <span className="text-[#00D4C8]">does for you.</span>
-              </h2>
-              <p className="text-white/50 text-lg max-w-sm font-serif leading-relaxed">
+              </motion.h2>
+              <motion.p variants={fadeUp} className="text-white/50 text-lg max-w-sm font-serif leading-relaxed">
                 Anton is the campaign operator working behind the scenes — from creator discovery to outreach to launch.
                 You direct the strategy. Anton executes.
-              </p>
+              </motion.p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Anton Workflow Steps */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"
+            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-60px" }}
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.09 } } }}
+          >
             {antonSteps.map((step, i) => {
               const Icon = step.icon;
               return (
-                <div
+                <motion.div
                   key={i}
+                  variants={fadeUp}
                   className="group relative bg-[#0D1235] border border-white/5 hover:border-[#00D4C8]/30 rounded-2xl p-6 transition-all duration-300 hover:bg-[#131936]"
                 >
-                  {/* Connector line */}
                   {i < antonSteps.length - 1 && (
                     <div className="hidden lg:block absolute top-10 left-full w-4 h-px bg-gradient-to-r from-[#00D4C8]/30 to-transparent z-0 translate-x-[-4px]" />
                   )}
@@ -271,13 +299,17 @@ export default function LandingPage() {
                     <h3 className="font-heading font-bold text-white text-base mb-2">{step.title}</h3>
                     <p className="text-white/45 text-sm leading-relaxed">{step.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
+          </motion.div>
 
           {/* CTA under Anton section */}
-          <div className="mt-12 flex justify-center">
+          <motion.div
+            className="mt-12 flex justify-center"
+            initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
+          >
             <button
               onClick={handleCTA}
               data-testid="anton-cta-btn"
@@ -285,20 +317,29 @@ export default function LandingPage() {
             >
               Let Anton build your shortlist <ArrowRight className="w-5 h-5" />
             </button>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── How Anton Works ── */}
       <section id="how-it-works" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
+          <motion.div
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5 }}
+          >
             <p className="text-[#00D4C8] text-xs font-bold uppercase tracking-widest mb-3">How Anton Works</p>
             <h2 className="font-heading font-bold text-4xl md:text-5xl text-white">Three steps from brief to launch</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          </motion.div>
+          <motion.div
+            className="grid md:grid-cols-3 gap-8"
+            initial="hidden" whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.12 } } }}
+          >
             {steps.map((step, i) => (
-              <div key={i} className="relative">
+              <motion.div key={i} variants={fadeUp} className="relative">
                 {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-[#00D4C8]/30 to-transparent z-0" />
                 )}
@@ -307,9 +348,9 @@ export default function LandingPage() {
                   <h3 className="font-heading font-bold text-xl text-white mb-2">{step.title}</h3>
                   <p className="text-white/50 text-sm leading-relaxed">{step.desc}</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 

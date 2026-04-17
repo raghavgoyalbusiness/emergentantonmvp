@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
 import {
   LayoutDashboard, Search, Kanban, BarChart3, CreditCard,
   MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles
@@ -56,23 +57,37 @@ export default function Layout({ children }) {
                 to={path}
                 onClick={() => setSidebarOpen(false)}
                 data-testid={`nav-${label.toLowerCase().replace(/ /g, "-")}`}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+                className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors duration-150
                   ${active
                     ? isAI
-                      ? "bg-[#00D4C8]/15 text-[#00D4C8] border border-[#00D4C8]/30"
-                      : "bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20"
+                      ? "text-[#00D4C8] border border-[#00D4C8]/30"
+                      : "text-[#00D4C8] border border-[#00D4C8]/20"
                     : isAI
-                      ? "text-[#00D4C8]/70 hover:text-[#00D4C8] hover:bg-[#00D4C8]/5"
-                      : "text-white/60 hover:text-white hover:bg-white/5"
+                      ? "text-[#00D4C8]/70 hover:text-[#00D4C8] border border-transparent hover:border-[#00D4C8]/10"
+                      : "text-white/60 hover:text-white border border-transparent hover:border-white/5"
                   }`}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} />
-                {label}
+                {active && (
+                  <motion.div
+                    layoutId="nav-active"
+                    className={`absolute inset-0 rounded-lg ${isAI ? "bg-[#00D4C8]/15" : "bg-[#00D4C8]/10"}`}
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                {active && (
+                  <motion.div
+                    layoutId="nav-active"
+                    className={`absolute inset-0 rounded-lg ${isAI ? "bg-[#00D4C8]/15" : "bg-[#00D4C8]/10"}`}
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <Icon className="w-4 h-4 flex-shrink-0 relative z-10" strokeWidth={1.5} />
+                <span className="relative z-10">{label}</span>
                 {label === "Inbox" && (
-                  <span className="ml-auto bg-[#00D4C8] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                  <span className="ml-auto relative z-10 bg-[#00D4C8] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
                 )}
                 {isAI && (
-                  <span className="ml-auto text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">AI</span>
+                  <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">AI</span>
                 )}
               </Link>
             </div>
@@ -97,7 +112,7 @@ export default function Layout({ children }) {
         <button
           onClick={handleLogout}
           data-testid="logout-btn"
-          className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-all"
+          className="w-full flex items-center gap-2 px-3 py-2 text-white/50 hover:text-white hover:bg-white/5 rounded-lg text-sm transition-colors active:scale-[0.97]"
         >
           <LogOut className="w-4 h-4" strokeWidth={1.5} />
           Sign Out
