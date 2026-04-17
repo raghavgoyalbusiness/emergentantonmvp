@@ -7,6 +7,7 @@ import {
   Zap, Users, DollarSign, Activity, ArrowRight,
   Clock, AlertCircle, Plus
 } from "lucide-react";
+import SpotlightBackground from "@/components/ui/spotlight-background";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -101,12 +102,13 @@ export default function Dashboard() {
   }
 
   return (
-    <motion.div
-      className="max-w-7xl mx-auto"
-      initial="hidden"
-      animate="visible"
-      variants={wrap}
-    >
+    <SpotlightBackground>
+      <motion.div
+        className="max-w-7xl mx-auto"
+        initial="hidden"
+        animate="visible"
+        variants={wrap}
+      >
       {/* Welcome */}
       <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
@@ -245,6 +247,7 @@ export default function Dashboard() {
           </div>
         </div>
       </motion.div>
-    </motion.div>
+      </motion.div>
+    </SpotlightBackground>
   );
 }

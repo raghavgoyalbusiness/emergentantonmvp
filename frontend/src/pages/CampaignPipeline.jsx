@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { Plus, ArrowRight, ChevronRight } from "lucide-react";
+import SpotlightBackground from "@/components/ui/spotlight-background";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -114,7 +115,8 @@ export default function CampaignPipeline() {
   }
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={wrap}>
+    <SpotlightBackground>
+      <motion.div initial="hidden" animate="visible" variants={wrap}>
       <motion.div variants={item} className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl text-white">Campaign Pipeline</h1>
@@ -178,6 +180,7 @@ export default function CampaignPipeline() {
           </span>
         ))}
       </motion.div>
-    </motion.div>
+      </motion.div>
+    </SpotlightBackground>
   );
 }

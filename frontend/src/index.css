@@ -75,6 +75,77 @@
   }
 }
 
+/* ── SpotlightBackground ── */
+.spotlight-container {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 56px); /* full main-area height */
+  overflow: hidden;
+}
+
+.spotlight-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* base spotlight orb */
+.spotlight {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(110px);
+  will-change: transform;
+}
+
+/* teal orb — left / upper-left */
+.spotlight-left {
+  width: 900px;
+  height: 900px;
+  top: 0%;
+  left: 10%;
+  background: radial-gradient(ellipse at center,
+    rgba(0, 212, 200, 0.13) 0%,
+    rgba(0, 212, 200, 0.05) 45%,
+    transparent 70%
+  );
+}
+
+/* purple orb — center */
+.spotlight-mid {
+  width: 750px;
+  height: 750px;
+  top: 30%;
+  left: 38%;
+  background: radial-gradient(ellipse at center,
+    rgba(120, 80, 255, 0.10) 0%,
+    rgba(100, 60, 220, 0.04) 45%,
+    transparent 70%
+  );
+}
+
+/* blue orb — right */
+.spotlight-right {
+  width: 850px;
+  height: 850px;
+  top: -10%;
+  left: 60%;
+  background: radial-gradient(ellipse at center,
+    rgba(56, 130, 246, 0.11) 0%,
+    rgba(56, 130, 246, 0.04) 45%,
+    transparent 70%
+  );
+}
+
+/* content always on top */
+.spotlight-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
 /* ── Meteor animation ── */
 @keyframes meteor-fall {
   0% {
