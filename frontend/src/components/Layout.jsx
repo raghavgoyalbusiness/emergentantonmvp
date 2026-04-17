@@ -74,13 +74,6 @@ export default function Layout({ children }) {
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
-                {active && (
-                  <motion.div
-                    layoutId="nav-active"
-                    className={`absolute inset-0 rounded-lg ${isAI ? "bg-[#00D4C8]/15" : "bg-[#00D4C8]/10"}`}
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  />
-                )}
                 <Icon className="w-4 h-4 flex-shrink-0 relative z-10" strokeWidth={1.5} />
                 <span className="relative z-10">{label}</span>
                 {label === "Inbox" && (

@@ -91,7 +91,18 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
-### ✅ Session 6 (Black Background — 2026-04)
+### ✅ Session 7 (Buttery Smooth UI — 2026-04)
+- **Page transitions**: AnimatePresence mode='wait' with fade+slide between all routes (App.js)
+- **Dashboard count-up**: Stat numbers animate from 0 → final value using useCountUp/requestAnimationFrame
+- **Dashboard health bar**: Fills from 0% → value over 1.2s cubic-bezier on load
+- **Kanban stage move**: Loader2 spinner on 'Move to X' button while API in progress; movingId state
+- **Inbox**: AnimatePresence per message (fade+scale-in), Loader2 on send button, auto-scroll to bottom
+- **Landing page**: whileInView stagger reveals for Integration Bar, Meet Anton, How Anton Works sections
+- **Sidebar**: Framer Motion layoutId='nav-active' spring slide between nav items
+- **Global**: scroll-behavior:smooth, card-hover cubic-bezier, btn-primary active:scale(0.96), will-change:transform hints
+- Fixed: duplicate layoutId='nav-active' bug caught and removed by testing agent
+
+
 - **Global background**: Replaced all `#0A0F2E` (navy) with pure `#000000` (black) across all 15 files — `index.css`, `Layout.jsx`, `App.js`, `App.css`, `AuthCallback.jsx`, `LandingPage.jsx`, `Dashboard.jsx`, `Analytics.jsx`, `Settings.jsx`, `CampaignPipeline.jsx`, `Inbox.jsx`, `InfluencerDiscovery.jsx`, `BrandAgent.jsx`, `CampaignWizard.jsx`, `Payments.jsx`
 - Aurora shader, meteor shower, and spotlight effects now pop against true black for a sharper, more premium aesthetic
 
