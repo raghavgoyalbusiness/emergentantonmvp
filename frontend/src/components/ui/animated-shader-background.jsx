@@ -38,21 +38,11 @@ const ShaderBackground = () => {
           vec2 ip = floor(p);
           vec2 u  = fract(p);
           u = u * u * (3.0 - 2.0 * u);
-          return mix(
-            mix(rand(ip),                rand(ip + vec2(1.0, 0.0)), u.x),
-            mix(rand(ip + vec2(0.0,1.0)), rand(ip + vec2(1.0,1.0)), u.x),
-            u.y
-          ) * fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
-        }
-
-        float noise2(vec2 p) {
-          vec2 ip = floor(p);
-          vec2 u  = fract(p);
-          u = u * u * (3.0 - 2.0 * u);
           float res = mix(
-            mix(rand(ip),                rand(ip + vec2(1.0, 0.0)), u.x),
-            mix(rand(ip + vec2(0.0,1.0)), rand(ip + vec2(1.0,1.0)), u.x),
-            u.y);
+            mix(rand(ip),                 rand(ip + vec2(1.0, 0.0)), u.x),
+            mix(rand(ip + vec2(0.0, 1.0)), rand(ip + vec2(1.0, 1.0)), u.x),
+            u.y
+          );
           return res * res;
         }
 
@@ -62,7 +52,7 @@ const ShaderBackground = () => {
           vec2  shift = vec2(100.0);
           mat2  rot = mat2(cos(0.5), sin(0.5), -sin(0.5), cos(0.5));
           for (int i = 0; i < NUM_OCTAVES; ++i) {
-            v += a * noise2(x);
+            v += a * noise(x);
             x  = rot * x * 2.0 + shift;
             a *= 0.4;
           }
@@ -135,7 +125,7 @@ const ShaderBackground = () => {
     };
   }, []);
 
-  return <div ref={containerRef} className="fixed inset-0 -z-10" />;
+  return <div ref={containerRef} className="fixed inset-0 z-0" />;
 };
 
 export default ShaderBackground;

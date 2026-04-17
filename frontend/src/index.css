@@ -31,8 +31,12 @@
   * {
     @apply border-border;
   }
+  html {
+    /* fallback background for every page — keeps non-landing pages dark */
+    background-color: #0A0F2E;
+  }
   body {
-    @apply bg-[#0A0F2E] text-white;
+    @apply text-white;
     font-family: 'Times New Roman', Times, serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -71,7 +75,26 @@
   }
 }
 
-/* Scrollbar */
+/* ── Meteor animation ── */
+@keyframes meteor-fall {
+  0% {
+    transform: rotate(215deg) translateX(0);
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(215deg) translateX(-700px);
+    opacity: 0;
+  }
+}
+
+.meteor {
+  animation: meteor-fall linear infinite;
+}
+
+/* ── Scrollbar ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

@@ -5,6 +5,7 @@ import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Card } from "@/components/ui/card";
 import ShaderBackground from "@/components/ui/animated-shader-background";
+import Meteors from "@/components/ui/meteors";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 
@@ -47,8 +48,9 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden relative z-[2]">
       <ShaderBackground />
+      <Meteors number={30} />
 
       {/* ── Sticky Navbar ── */}
       <header className="sticky top-0 z-50 bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5">
