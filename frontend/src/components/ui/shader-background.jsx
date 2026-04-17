@@ -171,8 +171,14 @@ const ShaderBackground = () => {
 
     const startTime = Date.now();
     let rafId;
+    let lastTime = 0;
+    const FRAME_MS = 1000 / 50; // cap at 50fps to spare GPU for Spline
 
-    const render = () => {
+    const render = (timestamp) => {
+      rafId = requestAnimationFrame(render);
+      if (timestamp - lastTime < FRAME_MS) return;
+      lastTime = timestamp;
+
       const currentTime = (Date.now() - startTime) / 1000;
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
@@ -183,7 +189,6 @@ const ShaderBackground = () => {
       gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
       gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      rafId = requestAnimationFrame(render);
     };
 
     rafId = requestAnimationFrame(render);

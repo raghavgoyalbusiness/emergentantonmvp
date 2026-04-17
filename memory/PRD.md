@@ -91,7 +91,17 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
-### ✅ Session 9 (Full Glassmorphism — 2026-04)
+### ✅ Session 10 (Robot Polish + Performance — 2026-04)
+- **Root cause fixed**: Removed `animated-shader-background.jsx` (Three.js aurora with 35-iteration fragment loop) from LandingPage — was competing with Spline robot for GPU
+- **Plasma shader capped**: 50fps (was uncapped 60fps) freeing ~17% GPU headroom for Spline
+- **SplineScene rewritten**: `onLoad` callback → AnimatePresence fade-out of orbital loader, motion fade-in of robot — no more pop-in
+- **Orbital loader**: Premium "Initialising Anton" spinner with dual-ring counter-rotate
+- **Meteors**: Reduced from 30 → 18 (lighter DOM)
+- **App.css**: `@keyframes float-gentle`, upgraded skeleton shimmer, `::selection` teal color, thinner 4px scrollbar
+- **index.css**: Thinner glass-compatible 4px scrollbar
+- **hero-card-glow**: Deeper shadow + subtle teal ambient glow
+
+
 - Designed 3-tier glass system: `.glass-1` (subtle, blur-12), `.glass-2` (standard, blur-20), `.glass-3` (elevated sidebar/header, blur-32 saturate-155%), `.glass-input` with teal focus ring
 - Updated ALL pages: Layout (sidebar+header), Dashboard, Analytics, CampaignPipeline, CampaignWizard, Payments, Settings, Inbox, BrandAgent, InfluencerDiscovery, LandingPage
 - WebGL shader (z-index:-10) now visibly bleeds through every glass panel for a premium floating-in-space aesthetic

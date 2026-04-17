@@ -165,18 +165,8 @@
   animation: meteor-fall linear infinite;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 200, 0.3);
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 212, 200, 0.5);
-}
+/* ── Scrollbar — thinner, transparent track ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,212,200,0.22); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,212,200,0.45); }

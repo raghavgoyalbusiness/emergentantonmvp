@@ -5,7 +5,6 @@ import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star, User
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Card } from "@/components/ui/card";
-import ShaderBackground from "@/components/ui/animated-shader-background";
 import Meteors from "@/components/ui/meteors";
 
 const fadeUp = {
@@ -92,8 +91,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative z-[2]">
-      <ShaderBackground />
-      <Meteors number={30} />
+      <Meteors number={18} />
 
       {/* ── Sticky Navbar ── */}
       <header className="sticky top-0 z-50 glass-3 border-b border-white/5">
@@ -192,14 +190,16 @@ export default function LandingPage() {
               </div>
 
               {/* ── Right: Spline 3D Scene + Anton nameplate ── */}
-              <div className="flex-1 relative min-h-[300px] md:min-h-0">
-                {/* Fade mask on left edge */}
-                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
+              <div className="flex-1 relative min-h-[320px] md:min-h-0">
+                {/* Subtle vignette on left edge so robot blends into glass card */}
+                <div className="absolute left-0 inset-y-0 w-20 bg-gradient-to-r from-white/[0.04] to-transparent z-10 pointer-events-none" />
+
                 <SplineScene
                   scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                   className="w-full h-full"
                 />
-                {/* Anton nameplate — HUD-style label */}
+
+                {/* Anton nameplate — HUD-style label, only shows once robot loads */}
                 <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 glass-3 border border-[#00D4C8]/20 rounded-xl px-4 py-2.5">
                   <div className="relative flex-shrink-0">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#00D4C8]" />
