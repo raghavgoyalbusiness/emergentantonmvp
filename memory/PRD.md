@@ -91,6 +91,10 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
+### ✅ Session 4 (Animated Shader Background — 2026-04)
+- **Three.js aurora shader background**: Replaced flat `#0A0F2E` background on LandingPage with a WebGL animated aurora shader (`/components/ui/animated-shader-background.jsx`) — `fixed inset-0 -z-10`, no layout or content changes
+- Installed `three@0.184.0`
+
 ### ✅ Session 3 (Brand Agent Parser + Email Fix — 2026-04)
 - **Parser rewrite (Pass 1)**: `parseInfluencers()` in `BrandAgent.jsx` now correctly handles actual Bedrock response format (`**1. Name (@handle)**` + `**Email Contact:**`)
 - **Parser Pass 2**: Extracts all remaining plain email addresses (raw email lists from Bedrock) that weren't in structured profiles — all 10 emails now render as influencer cards

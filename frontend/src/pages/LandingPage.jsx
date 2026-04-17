@@ -4,6 +4,7 @@ import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star } fro
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Card } from "@/components/ui/card";
+import ShaderBackground from "@/components/ui/animated-shader-background";
 
 // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
 
@@ -46,7 +47,8 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0F2E] text-white overflow-x-hidden">
+    <div className="min-h-screen text-white overflow-x-hidden">
+      <ShaderBackground />
 
       {/* ── Sticky Navbar ── */}
       <header className="sticky top-0 z-50 bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5">
