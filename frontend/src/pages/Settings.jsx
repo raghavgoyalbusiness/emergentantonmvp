@@ -52,7 +52,7 @@ export default function Settings() {
           {user?.picture ? (
             <img src={user.picture} alt={user.name} className="w-16 h-16 rounded-xl object-cover border border-white/10" />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-[#00D4C8]/15 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-xl glass-1 border border-[#00D4C8]/20 flex items-center justify-center">
               <span className="text-[#00D4C8] text-2xl font-bold">{user?.name?.[0]}</span>
             </div>
           )}
@@ -119,11 +119,11 @@ export default function Settings() {
               </div>
               <div>
                 {int.status === "connected" ? (
-                  <span className="flex items-center gap-1 text-green-400 text-xs bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">
+                  <span className="flex items-center gap-1 text-green-400 text-xs bg-green-500/10 backdrop-blur-sm px-2 py-0.5 rounded-full border border-green-500/30">
                     <CheckCircle2 className="w-2.5 h-2.5" /> Active
                   </span>
                 ) : (
-                  <span className="text-yellow-400 text-xs bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                  <span className="text-yellow-400 text-xs bg-yellow-500/8 backdrop-blur-sm px-2 py-0.5 rounded-full border border-yellow-500/25">
                     Demo
                   </span>
                 )}
@@ -134,7 +134,7 @@ export default function Settings() {
       </motion.div>
 
       {/* Plan info */}
-      <motion.div variants={item} className="bg-[#00D4C8]/5 border border-[#00D4C8]/20 rounded-xl p-6" data-testid="plan-section">
+      <motion.div variants={item} className="bg-[#00D4C8]/8 backdrop-blur-xl border border-[#00D4C8]/20 rounded-xl p-6" data-testid="plan-section">
         <div className="flex items-start justify-between">
           <div>
             <h3 className="font-heading font-semibold text-white mb-1">Growth Plan</h3>

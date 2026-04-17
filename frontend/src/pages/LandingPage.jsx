@@ -99,8 +99,8 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 glass-3 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#00D4C8] flex items-center justify-center">
-              <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
+            <div className="w-8 h-8 rounded-lg bg-[#00D4C8]/20 backdrop-blur-xl border border-[#00D4C8]/40 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-[#00D4C8]" strokeWidth={2.5} />
             </div>
             <span className="font-heading font-bold text-white text-lg">Influencer Connect</span>
           </div>
@@ -547,8 +547,8 @@ export default function LandingPage() {
       <footer className="border-t border-white/5 py-10 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/30">
           <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-[#00D4C8] flex items-center justify-center">
-              <Zap className="w-3 h-3 text-black" />
+            <div className="w-6 h-6 rounded bg-[#00D4C8]/20 backdrop-blur-xl border border-[#00D4C8]/40 flex items-center justify-center">
+              <Zap className="w-3 h-3 text-[#00D4C8]" />
             </div>
             <span className="font-heading font-bold text-white/50">Influencer Connect</span>
           </div>

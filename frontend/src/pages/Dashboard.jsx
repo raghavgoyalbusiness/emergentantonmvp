@@ -12,13 +12,13 @@ import SpotlightBackground from "@/components/ui/spotlight-background";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const stageColors = {
-  Brief: "bg-yellow-500/15 text-yellow-400 border-yellow-500/20",
-  Outreach: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-  Accepted: "bg-purple-500/15 text-purple-400 border-purple-500/20",
-  Live: "bg-[#00D4C8]/15 text-[#00D4C8] border-[#00D4C8]/20",
-  "Content Review": "bg-orange-500/15 text-orange-400 border-orange-500/20",
-  Paid: "bg-green-500/15 text-green-400 border-green-500/20",
-  Reported: "bg-gray-500/15 text-gray-400 border-gray-500/20",
+  Brief:           "bg-yellow-500/10  backdrop-blur-sm text-yellow-400  border border-yellow-500/25",
+  Outreach:        "bg-blue-500/10    backdrop-blur-sm text-blue-400    border border-blue-500/25",
+  Accepted:        "bg-purple-500/10  backdrop-blur-sm text-purple-400  border border-purple-500/25",
+  Live:            "bg-[#00D4C8]/10   backdrop-blur-sm text-[#00D4C8]  border border-[#00D4C8]/25",
+  "Content Review":"bg-orange-500/10  backdrop-blur-sm text-orange-400  border border-orange-500/25",
+  Paid:            "bg-green-500/10   backdrop-blur-sm text-green-400   border border-green-500/25",
+  Reported:        "bg-white/5        backdrop-blur-sm text-white/50    border border-white/10",
 };
 
 const wrap = {

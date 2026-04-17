@@ -94,10 +94,10 @@ function InfluencerCard({ inf, selected, onToggle, showScore }) {
           <button
             onClick={() => onToggle(inf.influencer_id)}
             data-testid={`toggle-influencer-${inf.influencer_id}`}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all backdrop-blur-xl ${
               selected
-                ? "bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/30"
-                : "bg-white/5 text-white/60 hover:bg-white/10 border border-white/10"
+                ? "bg-[#00D4C8]/18 text-[#00D4C8] border border-[#00D4C8]/45 shadow-[0_0_10px_rgba(0,212,200,0.15)]"
+                : "glass-1 text-white/60 hover:text-white hover:border-white/20"
             }`}
           >
             {selected ? "Added" : "Add"}

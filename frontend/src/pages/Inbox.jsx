@@ -146,7 +146,7 @@ export default function Inbox() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className={`text-xs font-semibold truncate ${unread > 0 ? "text-white" : "text-white/70"}`}>{name}</span>
-                        {unread > 0 && <span className="bg-[#00D4C8] text-black text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold flex-shrink-0 ml-1">{unread}</span>}
+                        {unread > 0 && <span className="bg-[#00D4C8]/20 text-[#00D4C8] border border-[#00D4C8]/40 text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold flex-shrink-0 ml-1">{unread}</span>}
                       </div>
                       <span className="text-xs text-white/30">{platformIcons[lastMsg?.platform]} {lastMsg?.platform}</span>
                     </div>
@@ -212,7 +212,7 @@ export default function Inbox() {
                     onClick={sendReply}
                     disabled={!reply.trim() || sending}
                     data-testid="send-reply-btn"
-                    className="btn-primary w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-50 self-end"
+                    className="btn-glass-teal w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-50 self-end"
                   >
                     {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                   </button>

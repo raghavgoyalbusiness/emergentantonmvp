@@ -255,7 +255,7 @@ function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll
         <button
           onClick={onSendAll}
           data-testid="send-all-btn"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] text-black text-xs font-semibold transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg btn-glass-teal text-xs font-semibold transition-all"
         >
           <Mail className="w-3.5 h-3.5" />
           Send to All ({influencers.length})
@@ -608,8 +608,8 @@ export default function BrandAgent() {
               className="flex-1 bg-transparent text-white text-sm placeholder-white/30 focus:outline-none resize-none leading-relaxed max-h-32 overflow-y-auto"
               style={{ fieldSizing: "content" }} />
             <button onClick={() => send()} disabled={!input.trim() || loading} data-testid="send-btn"
-              className="w-9 h-9 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-all flex-shrink-0">
-              <Send className="w-4 h-4 text-black" />
+              className="w-9 h-9 rounded-lg btn-glass-teal disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center flex-shrink-0">
+              <Send className="w-4 h-4" />
             </button>
           </div>
           <p className="text-white/20 text-xs mt-1.5 pl-1">Enter to send · Shift+Enter for new line</p>

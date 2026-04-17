@@ -70,22 +70,44 @@
 }
 
 .btn-primary {
-  background: #00D4C8;
-  color: #000000;
+  background: rgba(0, 212, 200, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 200, 0.45);
+  color: white;
   font-weight: 700;
   font-family: 'Times New Roman', Times, serif;
   transition: background 0.15s ease, transform 0.12s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.15s ease;
   will-change: transform;
 }
 .btn-primary:hover {
-  background: rgba(0, 212, 200, 0.88);
+  background: rgba(0, 212, 200, 0.28);
+  box-shadow: 0 0 24px rgba(0,212,200,0.28), 0 4px 16px rgba(0,0,0,0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(0, 212, 200, 0.4);
 }
 .btn-primary:active {
   transform: scale(0.96);
   box-shadow: none;
 }
+
+/* Small inline teal-glass variant — for icon action buttons */
+.btn-glass-teal {
+  background: rgba(0, 212, 200, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 212, 200, 0.38);
+  color: #00D4C8;
+  font-weight: 600;
+  transition: background 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+  will-change: transform;
+}
+.btn-glass-teal:hover {
+  background: rgba(0, 212, 200, 0.25);
+  box-shadow: 0 0 16px rgba(0,212,200,0.2);
+  transform: translateY(-1px);
+}
+.btn-glass-teal:active { transform: scale(0.97); }
+.btn-glass-teal:disabled { opacity: 0.45; cursor: not-allowed; }
 
 .btn-secondary {
   background: rgba(255,255,255,0.07);

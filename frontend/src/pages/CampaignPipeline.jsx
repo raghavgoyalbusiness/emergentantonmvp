@@ -10,13 +10,13 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const STAGES = ["Brief", "Outreach", "Accepted", "Live", "Content Review", "Paid", "Reported"];
 
 const stageColors = {
-  Brief: { bg: "bg-yellow-500/10", border: "border-yellow-500/20", text: "text-yellow-400", dot: "bg-yellow-400" },
-  Outreach: { bg: "bg-blue-500/10", border: "border-blue-500/20", text: "text-blue-400", dot: "bg-blue-400" },
-  Accepted: { bg: "bg-purple-500/10", border: "border-purple-500/20", text: "text-purple-400", dot: "bg-purple-400" },
-  Live: { bg: "bg-[#00D4C8]/10", border: "border-[#00D4C8]/20", text: "text-[#00D4C8]", dot: "bg-[#00D4C8]" },
-  "Content Review": { bg: "bg-orange-500/10", border: "border-orange-500/20", text: "text-orange-400", dot: "bg-orange-400" },
-  Paid: { bg: "bg-green-500/10", border: "border-green-500/20", text: "text-green-400", dot: "bg-green-400" },
-  Reported: { bg: "bg-gray-500/10", border: "border-gray-500/20", text: "text-gray-400", dot: "bg-gray-400" },
+  Brief:           { bg: "bg-yellow-500/8  backdrop-blur-sm", border: "border-yellow-500/25", text: "text-yellow-400", dot: "bg-yellow-400" },
+  Outreach:        { bg: "bg-blue-500/8    backdrop-blur-sm", border: "border-blue-500/25",   text: "text-blue-400",   dot: "bg-blue-400"   },
+  Accepted:        { bg: "bg-purple-500/8  backdrop-blur-sm", border: "border-purple-500/25", text: "text-purple-400", dot: "bg-purple-400" },
+  Live:            { bg: "bg-[#00D4C8]/8   backdrop-blur-sm", border: "border-[#00D4C8]/25", text: "text-[#00D4C8]", dot: "bg-[#00D4C8]"  },
+  "Content Review":{ bg: "bg-orange-500/8  backdrop-blur-sm", border: "border-orange-500/25", text: "text-orange-400", dot: "bg-orange-400" },
+  Paid:            { bg: "bg-green-500/8   backdrop-blur-sm", border: "border-green-500/25",  text: "text-green-400",  dot: "bg-green-400"  },
+  Reported:        { bg: "bg-white/4       backdrop-blur-sm", border: "border-white/10",      text: "text-white/50",   dot: "bg-white/50"   },
 };
 
 const wrap = {

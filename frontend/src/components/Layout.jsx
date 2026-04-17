@@ -36,8 +36,8 @@ export default function Layout({ children }) {
     >
       <div className="p-6 border-b border-white/5">
         <Link to="/dashboard" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
-          <div className="w-8 h-8 rounded-lg bg-[#00D4C8] flex items-center justify-center">
-            <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
+          <div className="w-8 h-8 rounded-lg bg-[#00D4C8]/20 backdrop-blur-xl border border-[#00D4C8]/40 flex items-center justify-center">
+            <Zap className="w-4 h-4 text-[#00D4C8]" strokeWidth={2.5} />
           </div>
           <span className="font-heading font-bold text-white text-lg leading-none">
             Influencer<br />
@@ -77,7 +77,7 @@ export default function Layout({ children }) {
                 <Icon className="w-4 h-4 flex-shrink-0 relative z-10" strokeWidth={1.5} />
                 <span className="relative z-10">{label}</span>
                 {label === "Inbox" && (
-                  <span className="ml-auto relative z-10 bg-[#00D4C8] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                  <span className="ml-auto relative z-10 bg-[#00D4C8]/20 backdrop-blur-sm border border-[#00D4C8]/40 text-[#00D4C8] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
                 )}
                 {isAI && (
                   <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">AI</span>
