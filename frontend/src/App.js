@@ -45,10 +45,12 @@ function AppRouter() {
   if (location.hash?.includes("session_id=")) {
     return <AuthCallback />;
   }
+  // Pause the shader on the landing page so Spline 3D gets full GPU bandwidth
+  const isLanding = location.pathname === '/';
   return (
     <>
-      {/* Always-on WebGL shader — becomes visible as pages fade out during transitions */}
-      <ShaderBackground />
+      {/* WebGL shader — paused on landing page to prevent GPU conflict with Spline */}
+      <ShaderBackground active={!isLanding} />
 
       <AnimatePresence mode="wait" initial={false}>
         <motion.div

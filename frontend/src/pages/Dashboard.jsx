@@ -98,6 +98,7 @@ export default function Dashboard() {
   const [healthBarWidth, setHealthBarWidth] = useState(0);
 
   useEffect(() => {
+    let timer;
     const load = async () => {
       try {
         const [statsRes, campaignsRes, messagesRes] = await Promise.all([
@@ -108,7 +109,7 @@ export default function Dashboard() {
         setStats(statsRes.data);
         setCampaigns(campaignsRes.data);
         setMessages(messagesRes.data);
-        setTimeout(() => setHealthBarWidth(statsRes.data?.campaign_health_score || 0), 300);
+        timer = setTimeout(() => setHealthBarWidth(statsRes.data?.campaign_health_score || 0), 300);
       } catch (err) {
         console.error(err);
       } finally {
@@ -116,6 +117,7 @@ export default function Dashboard() {
       }
     };
     load();
+    return () => clearTimeout(timer);
   }, []);
 
   const pendingCampaigns = campaigns.filter(c => ["Brief", "Content Review"].includes(c.stage));

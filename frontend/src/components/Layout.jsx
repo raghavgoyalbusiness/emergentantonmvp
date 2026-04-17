@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { motion } from "framer-motion";
 import {
   LayoutDashboard, Search, Kanban, BarChart3, CreditCard,
   MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles
@@ -68,10 +67,8 @@ export default function Layout({ children }) {
                   }`}
               >
                 {active && (
-                  <motion.div
-                    layoutId="nav-active"
+                  <div
                     className={`absolute inset-0 rounded-lg ${isAI ? "bg-[#00D4C8]/15" : "bg-[#00D4C8]/10"}`}
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
                 <Icon className="w-4 h-4 flex-shrink-0 relative z-10" strokeWidth={1.5} />

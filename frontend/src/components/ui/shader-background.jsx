@@ -128,32 +128,33 @@ function initShaderProgram(gl) {
   return program;
 }
 
-const ShaderBackground = () => {
+// active=false pauses the RAF loop entirely, freeing GPU for Spline on the landing page
+const ShaderBackground = ({ active = true }) => {
   const canvasRef = useRef(null);
+  const rafIdRef = useRef(null);
+  const glRef = useRef(null);
+  const programInfoRef = useRef(null);
+  const startTimeRef = useRef(Date.now());
 
+  // One-time WebGL initialisation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const gl = canvas.getContext('webgl');
-    if (!gl) {
-      console.warn('WebGL not supported.');
-      return;
-    }
+    if (!gl) { console.warn('WebGL not supported.'); return; }
 
     const shaderProgram = initShaderProgram(gl);
     if (!shaderProgram) return;
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      gl.STATIC_DRAW
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
-    const programInfo = {
+    glRef.current = gl;
+    programInfoRef.current = {
       program: shaderProgram,
+      positionBuffer,
       attribLocations: { vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition') },
       uniformLocations: {
         resolution: gl.getUniformLocation(shaderProgram, 'iResolution'),
@@ -169,35 +170,56 @@ const ShaderBackground = () => {
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const startTime = Date.now();
-    let rafId;
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (rafIdRef.current) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []);
+
+  // Start/stop the render loop based on the `active` prop
+  useEffect(() => {
+    if (!active) {
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      return;
+    }
+
+    const FRAME_MS = 1000 / 40; // 40fps is plenty for a background effect
     let lastTime = 0;
-    const FRAME_MS = 1000 / 50; // cap at 50fps to spare GPU for Spline
 
     const render = (timestamp) => {
-      rafId = requestAnimationFrame(render);
+      rafIdRef.current = requestAnimationFrame(render);
       if (timestamp - lastTime < FRAME_MS) return;
       lastTime = timestamp;
 
-      const currentTime = (Date.now() - startTime) / 1000;
+      const gl = glRef.current;
+      const pi = programInfoRef.current;
+      const canvas = canvasRef.current;
+      if (!gl || !pi || !canvas) return;
+
+      const currentTime = (Date.now() - startTimeRef.current) / 1000;
       gl.clearColor(0, 0, 0, 1);
       gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.useProgram(programInfo.program);
-      gl.uniform2f(programInfo.uniformLocations.resolution, canvas.width, canvas.height);
-      gl.uniform1f(programInfo.uniformLocations.time, currentTime);
-      gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-      gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
-      gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+      gl.useProgram(pi.program);
+      gl.uniform2f(pi.uniformLocations.resolution, canvas.width, canvas.height);
+      gl.uniform1f(pi.uniformLocations.time, currentTime);
+      gl.bindBuffer(gl.ARRAY_BUFFER, pi.positionBuffer);
+      gl.vertexAttribPointer(pi.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(pi.attribLocations.vertexPosition);
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     };
 
-    rafId = requestAnimationFrame(render);
+    rafIdRef.current = requestAnimationFrame(render);
 
     return () => {
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', resizeCanvas);
+      if (rafIdRef.current) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
     };
-  }, []);
+  }, [active]);
 
   return (
     <canvas

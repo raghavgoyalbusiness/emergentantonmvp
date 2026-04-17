@@ -91,7 +91,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative z-[2]">
-      <Meteors number={18} />
+      <Meteors number={12} />
 
       {/* ── Sticky Navbar ── */}
       <header className="sticky top-0 z-50 glass-3 border-b border-white/5">
