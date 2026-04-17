@@ -91,6 +91,15 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
+### ✅ Session 5 (Anton Brand Character — 2026-04)
+- **Hero rewrite**: "Meet Anton." headline in teal + "The AI agent fixing influencer marketing." gradient body; badge "Introducing Anton — AI Campaign Operator"; CTAs → "Start with Anton" / "See Anton in Action"
+- **Anton HUD nameplate**: Floating label on robot panel — "ANTON / AI Campaign Operator · Online" with pulsing teal indicator dot
+- **New "What Anton Does" section** (5-step workflow): Find Creators → Analyze Fit → Build Shortlist → Draft Outreach → Launch Faster; CTA "Let Anton build your shortlist"
+- **"How Anton Works"** replaces "How it Works" with Anton-framed 3-step copy
+- **Features bento** updated: "Everything Anton Manages", cards renamed "Anton's Discovery Engine / Anton Handles Outreach / Anton Tracks Your ROI"
+- **CTA banner** updated: "Ready to run campaigns with Anton?" / "Start with Anton"
+- **Nav + pricing buttons** all updated to "Start with Anton"
+
 ### ✅ Session 4 (Animated Shader Background — 2026-04)
 - **Three.js aurora shader background**: Replaced flat `#0A0F2E` background on LandingPage with a WebGL animated aurora shader (`/components/ui/animated-shader-background.jsx`) — `fixed inset-0 -z-10`, no layout or content changes
 - Installed `three@0.184.0`
