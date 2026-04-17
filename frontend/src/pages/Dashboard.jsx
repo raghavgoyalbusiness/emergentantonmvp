@@ -71,7 +71,7 @@ function StatCard({ icon: Icon, label, value, sub, color = "teal", testid }) {
   return (
     <motion.div
       data-testid={testid}
-      className="bg-[#131936] border border-white/5 rounded-xl p-5 card-hover"
+      className="glass-2 rounded-xl p-5 card-hover"
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -171,7 +171,7 @@ export default function Dashboard() {
       </motion.div>
 
       {/* Campaign health bar */}
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      <motion.div variants={item} className="glass-2 rounded-xl p-5 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div>
             <h3 className="font-heading font-semibold text-white">Campaign Health Score</h3>
@@ -193,7 +193,7 @@ export default function Dashboard() {
       {/* Bottom grid */}
       <motion.div variants={item} className="grid lg:grid-cols-3 gap-6">
         {/* Active campaigns */}
-        <div className="lg:col-span-2 bg-[#131936] border border-white/5 rounded-xl p-5">
+        <div className="lg:col-span-2 glass-2 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-heading font-semibold text-white">Active Campaigns</h3>
             <Link to="/campaigns" className="text-[#00D4C8] text-xs hover:underline flex items-center gap-1">
@@ -213,7 +213,7 @@ export default function Dashboard() {
                 <div
                   key={c.campaign_id}
                   data-testid={`campaign-card-${c.campaign_id}`}
-                  className="flex items-center justify-between p-3 bg-black rounded-lg border border-white/5 hover:border-[#00D4C8]/20 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 glass-1 rounded-lg hover:border-[#00D4C8]/20 transition-colors cursor-pointer"
                   onClick={() => navigate("/campaigns")}
                 >
                   <div className="flex-1 min-w-0">
@@ -234,7 +234,7 @@ export default function Dashboard() {
 
         {/* Right panel */}
         <div className="space-y-4">
-          <div className="bg-[#131936] border border-white/5 rounded-xl p-4">
+          <div className="glass-2 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-3">
               <AlertCircle className="w-4 h-4 text-orange-400" strokeWidth={1.5} />
               <h3 className="font-heading font-semibold text-white text-sm">Needs Action</h3>
@@ -257,7 +257,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="bg-[#131936] border border-white/5 rounded-xl p-4">
+          <div className="glass-2 rounded-xl p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-heading font-semibold text-white text-sm">Recent Messages</h3>
               <Link to="/inbox" className="text-[#00D4C8] text-xs hover:underline">View all</Link>

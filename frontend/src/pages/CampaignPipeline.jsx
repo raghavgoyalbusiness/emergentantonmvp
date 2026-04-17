@@ -43,7 +43,7 @@ function CampaignCard({ campaign, onMoveStage, moving }) {
   return (
     <motion.div
       data-testid={`kanban-card-${campaign.campaign_id}`}
-      className="bg-black border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-colors cursor-pointer"
+      className="glass-2 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-colors cursor-pointer"
       whileHover={{ y: -2, boxShadow: "0 8px 24px rgba(0,0,0,0.4)" }}
       whileTap={{ scale: 0.98 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
@@ -157,7 +157,7 @@ export default function CampaignPipeline() {
                 key={stage}
                 variants={colItem}
                 data-testid={`kanban-column-${stage.toLowerCase().replace(/ /g, "-")}`}
-                className="kanban-column w-52 flex-shrink-0"
+                className="kanban-column w-52 flex-shrink-0 glass-1 rounded-xl p-2"
               >
                 <div className={`flex items-center gap-2 px-3 py-2.5 rounded-lg ${colors.bg} border ${colors.border} mb-2`}>
                   <div className={`w-2 h-2 rounded-full ${colors.dot}`} />

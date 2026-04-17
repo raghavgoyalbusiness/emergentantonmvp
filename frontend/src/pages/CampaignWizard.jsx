@@ -91,7 +91,7 @@ export default function CampaignWizard() {
     }
   };
 
-  const inputCls = (err) => `w-full bg-black border ${err ? "border-red-500/50" : "border-white/10"} rounded-lg px-4 py-3 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#00D4C8]/50 focus:border-[#00D4C8] transition-all`;
+  const inputCls = (err) => `w-full glass-input rounded-lg px-4 py-3 text-sm ${err ? "!border-red-500/50" : ""} focus:outline-none transition-all`;
 
   return (
     <motion.div className="max-w-2xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
@@ -122,7 +122,7 @@ export default function CampaignWizard() {
         ))}
       </motion.div>
 
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-6">
+      <motion.div variants={item} className="glass-2 rounded-xl p-6">
         {/* Step 0 */}
         {step === 0 && (
           <div className="space-y-4 animate-fade-in">

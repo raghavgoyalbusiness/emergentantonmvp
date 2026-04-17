@@ -45,7 +45,7 @@ function InfluencerCard({ inf, selected, onToggle, showScore }) {
   return (
     <div
       data-testid={`influencer-card-${inf.influencer_id}`}
-      className={`bg-[#131936] border rounded-xl overflow-hidden card-hover transition-all ${selected ? "border-[#00D4C8]/50" : "border-white/5"}`}
+      className={`glass-2 rounded-xl overflow-hidden card-hover transition-all ${selected ? "!border-[#00D4C8]/50" : ""}`}
     >
       <div className="relative">
         <img
@@ -56,13 +56,13 @@ function InfluencerCard({ inf, selected, onToggle, showScore }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#131936] via-transparent to-transparent" />
         {showScore && score !== undefined && (
-          <div className="absolute top-2 right-2 bg-black/90 border border-[#00D4C8]/30 rounded-lg px-2 py-1">
+          <div className="absolute top-2 right-2 glass-2 border border-[#00D4C8]/30 rounded-lg px-2 py-1">
             <span className={`font-heading font-black text-lg ${scoreColor}`}>{score}</span>
             <span className="text-white/30 text-xs ml-0.5">%</span>
           </div>
         )}
         <div className="absolute bottom-2 left-3">
-          <span className="text-[#00D4C8] text-xs bg-black/80 px-2 py-0.5 rounded-full border border-[#00D4C8]/20">{inf.niche}</span>
+          <span className="text-[#00D4C8] text-xs glass-1 px-2 py-0.5 rounded-full border border-[#00D4C8]/20">{inf.niche}</span>
         </div>
       </div>
       <div className="p-4">
@@ -77,11 +77,11 @@ function InfluencerCard({ inf, selected, onToggle, showScore }) {
           {selected && <Check className="w-4 h-4 text-[#00D4C8] flex-shrink-0 mt-0.5" />}
         </div>
         <div className="grid grid-cols-2 gap-2 mb-3">
-          <div className="bg-black rounded-lg p-2 text-center">
+          <div className="glass-1 rounded-lg p-2 text-center">
             <div className="font-heading font-bold text-sm text-white">{(inf.followers / 1000).toFixed(0)}K</div>
             <div className="text-white/30 text-xs">Followers</div>
           </div>
-          <div className="bg-black rounded-lg p-2 text-center">
+          <div className="glass-1 rounded-lg p-2 text-center">
             <div className="font-heading font-bold text-sm text-white">{inf.engagement_rate}%</div>
             <div className="text-white/30 text-xs">Engagement</div>
           </div>
@@ -200,12 +200,12 @@ export default function InfluencerDiscovery() {
       </motion.div>
 
       {/* Controls */}
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-4 mb-6 flex flex-col md:flex-row gap-3">
+      <motion.div variants={item} className="glass-2 rounded-xl p-4 mb-6 flex flex-col md:flex-row gap-3">
         <select
           value={selectedCampaign}
           onChange={(e) => { setSelectedCampaign(e.target.value); setScored(false); }}
           data-testid="campaign-select"
-          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+          className="glass-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
         >
           <option value="">Select a campaign...</option>
           {campaigns.map(c => <option key={c.campaign_id} value={c.campaign_id}>{c.name}</option>)}
@@ -228,14 +228,14 @@ export default function InfluencerDiscovery() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search creators..."
             data-testid="search-influencers"
-            className="w-full bg-black border border-white/10 rounded-lg pl-9 pr-3 py-2 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+            className="w-full glass-input rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
           />
         </div>
 
         <select
           value={platformFilter}
           onChange={(e) => setPlatformFilter(e.target.value)}
-          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+          className="glass-input rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
         >
           <option value="">All Platforms</option>
           <option value="Instagram">Instagram</option>
@@ -246,7 +246,7 @@ export default function InfluencerDiscovery() {
 
       {/* AI Loading */}
       {scoring && (
-        <motion.div variants={item} className="bg-[#131936] border border-[#00D4C8]/20 rounded-xl p-8 mb-6 text-center">
+        <motion.div variants={item} className="glass-2 border-[#00D4C8]/20 rounded-xl p-8 mb-6 text-center">
           <div className="flex gap-2 justify-center mb-4">
             <div className="ai-dot" /><div className="ai-dot" /><div className="ai-dot" />
           </div>

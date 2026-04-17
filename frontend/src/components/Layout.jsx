@@ -32,7 +32,7 @@ export default function Layout({ children }) {
   const Sidebar = ({ mobile = false }) => (
     <aside
       className={`${mobile ? "fixed inset-y-0 left-0 z-50 w-64" : "hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 z-40"} 
-        bg-black/95 backdrop-blur-xl border-r border-white/5 flex-col`}
+        glass-3 flex-col`}
     >
       <div className="p-6 border-b border-white/5">
         <Link to="/dashboard" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
@@ -115,7 +115,7 @@ export default function Layout({ children }) {
   );
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-transparent">
       <Sidebar />
 
       {/* Mobile sidebar */}
@@ -129,7 +129,7 @@ export default function Layout({ children }) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 h-14 bg-black/80 backdrop-blur-xl border-b border-white/5 flex items-center px-4 lg:px-6 gap-4">
+        <header className="sticky top-0 z-30 h-14 glass-3 flex items-center px-4 lg:px-6 gap-4">
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden text-white/60 hover:text-white p-1"

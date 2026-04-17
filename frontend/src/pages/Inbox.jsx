@@ -117,7 +117,7 @@ export default function Inbox() {
 
       <motion.div variants={item} className="flex gap-4 h-[calc(100vh-200px)] min-h-96">
         {/* Thread list */}
-        <div className="w-72 flex-shrink-0 bg-[#131936] border border-white/5 rounded-xl overflow-hidden flex flex-col">
+        <div className="w-72 flex-shrink-0 glass-2 rounded-xl overflow-hidden flex flex-col">
           <div className="p-3 border-b border-white/5">
             <p className="text-white/50 text-xs font-semibold uppercase tracking-widest">Conversations</p>
           </div>
@@ -160,7 +160,7 @@ export default function Inbox() {
         </div>
 
         {/* Message thread */}
-        <div className="flex-1 bg-[#131936] border border-white/5 rounded-xl flex flex-col overflow-hidden">
+        <div className="flex-1 glass-2 rounded-xl flex flex-col overflow-hidden">
           {selected ? (
             <>
               <div className="p-4 border-b border-white/5 flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function Inbox() {
                     <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm ${
                       m.direction === "outbound"
                         ? "bg-[#00D4C8] text-black font-medium rounded-tr-sm"
-                        : "bg-black text-white/80 border border-white/5 rounded-tl-sm"
+                        : "glass-1 text-white/80 rounded-tl-sm"
                     }`}>
                       <p>{m.content}</p>
                       <p className={`text-xs mt-1 ${m.direction === "outbound" ? "text-black/50" : "text-white/30"}`}>{timeAgo(m.timestamp)}</p>
@@ -206,7 +206,7 @@ export default function Inbox() {
                     placeholder={`Reply to ${selected.influencer_name}...`}
                     rows={2}
                     data-testid="reply-input"
-                    className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#00D4C8] resize-none"
+                    className="flex-1 glass-input rounded-xl px-4 py-2.5 text-sm resize-none focus:outline-none"
                   />
                   <button
                     onClick={sendReply}

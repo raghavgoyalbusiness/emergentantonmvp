@@ -59,8 +59,8 @@ function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
   const selInf = influencers.find(i => i.influencer_id === selectedInf);
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-[#1A2247] border border-white/10 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()} data-testid="payment-modal">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="glass-3 rounded-2xl p-6 w-full max-w-md" onClick={e => e.stopPropagation()} data-testid="payment-modal">
         <h3 className="font-heading font-bold text-xl text-white mb-1">Fund Campaign</h3>
         <p className="text-white/40 text-sm mb-5">{campaign.name}</p>
 
@@ -69,7 +69,7 @@ function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
           <select
             value={selectedInf}
             onChange={e => handleSelect(e.target.value)}
-            className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+            className="w-full glass-input rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
             data-testid="select-creator-payment"
           >
             <option value="">Choose a creator...</option>
@@ -82,7 +82,7 @@ function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
         </div>
 
         {preview && selInf && (
-          <div className="bg-black border border-white/5 rounded-xl p-4 mb-5 animate-fade-in">
+          <div className="glass-1 rounded-xl p-4 mb-5 animate-fade-in">
             <div className="flex justify-between text-sm mb-2">
               <span className="text-white/50">Creator fee ({selInf.name})</span>
               <span className="text-white font-semibold">${preview.fee.toLocaleString()}</span>
@@ -207,7 +207,7 @@ export default function Payments() {
       )}
 
       {/* Active campaigns */}
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      <motion.div variants={item} className="glass-2 rounded-xl p-5 mb-6">
         <h3 className="font-heading font-semibold text-white mb-4">Campaigns Ready to Fund</h3>
         {activeCampaigns.length === 0 ? (
           <p className="text-white/30 text-sm">No active campaigns found.</p>
@@ -216,7 +216,7 @@ export default function Payments() {
             {activeCampaigns.map(c => {
               const infs = getCampaignInfluencers(c);
               return (
-                <div key={c.campaign_id} className="flex items-center justify-between p-4 bg-black rounded-xl border border-white/5 hover:border-[#00D4C8]/20 transition-colors" data-testid={`payment-campaign-${c.campaign_id}`}>
+                <div key={c.campaign_id} className="flex items-center justify-between p-4 glass-1 rounded-xl hover:border-[#00D4C8]/20 transition-colors" data-testid={`payment-campaign-${c.campaign_id}`}>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-white text-sm">{c.name}</h4>
                     <p className="text-white/40 text-xs">{c.brand_name} &bull; {infs.length} creator{infs.length !== 1 ? "s" : ""} selected</p>
@@ -241,7 +241,7 @@ export default function Payments() {
       </motion.div>
 
       {/* Transaction history */}
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5">
+      <motion.div variants={item} className="glass-2 rounded-xl p-5">
         <h3 className="font-heading font-semibold text-white mb-4">Transaction History</h3>
         {transactions.length === 0 ? (
           <p className="text-white/30 text-sm text-center py-6">No transactions yet</p>

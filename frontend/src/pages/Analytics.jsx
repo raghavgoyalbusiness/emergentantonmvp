@@ -26,7 +26,7 @@ const cardWrap = {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload?.length) {
     return (
-      <div className="bg-[#1A2247] border border-white/10 rounded-lg p-3 text-xs">
+      <div className="glass-2 rounded-lg p-3 text-xs">
         <p className="text-white/50 mb-1">{label}</p>
         {payload.map((p) => (
           <p key={p.name} style={{ color: p.color }} className="font-semibold">
@@ -48,7 +48,7 @@ function MetricCard({ icon: Icon, label, value, sub, color = "teal" }) {
     orange: "bg-orange-500/10 text-orange-400",
   };
   return (
-    <div className="bg-[#131936] border border-white/5 rounded-xl p-5">
+    <div className="glass-2 rounded-xl p-5">
       <div className={`w-9 h-9 rounded-lg ${colorMap[color]} flex items-center justify-center mb-3`}>
         <Icon className="w-4 h-4" strokeWidth={1.5} />
       </div>
@@ -113,7 +113,7 @@ export default function Analytics() {
 
       {/* Monthly trend */}
       {overview?.monthly_trend && (
-        <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+        <motion.div variants={item} className="glass-2 rounded-xl p-5 mb-6">
           <h3 className="font-heading font-semibold text-white mb-4">5-Month Performance</h3>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={overview.monthly_trend}>
@@ -134,14 +134,14 @@ export default function Analytics() {
       )}
 
       {/* Campaign deep dive */}
-      <motion.div variants={item} className="bg-[#131936] border border-white/5 rounded-xl p-5 mb-6">
+      <motion.div variants={item} className="glass-2 rounded-xl p-5 mb-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-heading font-semibold text-white">Campaign Deep Dive</h3>
           <select
             value={selectedId}
             onChange={e => loadCampaign(e.target.value)}
             data-testid="analytics-campaign-select"
-            className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+            className="glass-input rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
           >
             {campaigns.map(c => <option key={c.campaign_id} value={c.campaign_id}>{c.name}</option>)}
           </select>
@@ -154,19 +154,19 @@ export default function Analytics() {
         ) : data ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-              <div className="bg-black rounded-lg p-3 text-center">
+              <div className="glass-1 rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{(data.reach / 1000).toFixed(0)}K</div>
                 <div className="text-white/40 text-xs">Reach</div>
               </div>
-              <div className="bg-black rounded-lg p-3 text-center">
+              <div className="glass-1 rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{data.engagement_rate}%</div>
                 <div className="text-white/40 text-xs">Engagement</div>
               </div>
-              <div className="bg-black rounded-lg p-3 text-center">
+              <div className="glass-1 rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{data.conversions?.toLocaleString()}</div>
                 <div className="text-white/40 text-xs">Conversions</div>
               </div>
-              <div className="bg-black rounded-lg p-3 text-center">
+              <div className="glass-1 rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-[#00D4C8]">{data.roas}x</div>
                 <div className="text-white/40 text-xs">ROAS</div>
               </div>

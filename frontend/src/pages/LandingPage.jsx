@@ -96,7 +96,7 @@ export default function LandingPage() {
       <Meteors number={30} />
 
       {/* ── Sticky Navbar ── */}
-      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-50 glass-3 border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#00D4C8] flex items-center justify-center">
@@ -124,7 +124,7 @@ export default function LandingPage() {
       <section className="px-4 sm:px-6 pt-8 pb-6">
         <div className="max-w-7xl mx-auto">
           <Card
-            className="w-full min-h-[580px] bg-black relative overflow-hidden border-[#00D4C8]/10 hero-card-glow"
+            className="w-full min-h-[580px] glass-2 relative overflow-hidden border-[#00D4C8]/10 hero-card-glow"
             data-testid="hero-spline-card"
           >
             <Spotlight
@@ -200,7 +200,7 @@ export default function LandingPage() {
                   className="w-full h-full"
                 />
                 {/* Anton nameplate — HUD-style label */}
-                <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 bg-black/70 backdrop-blur-md border border-[#00D4C8]/20 rounded-xl px-4 py-2.5">
+                <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 glass-3 border border-[#00D4C8]/20 rounded-xl px-4 py-2.5">
                   <div className="relative flex-shrink-0">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#00D4C8]" />
                     <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-[#00D4C8] animate-ping opacity-40" />
@@ -219,7 +219,7 @@ export default function LandingPage() {
 
       {/* ── Integration Bar ── */}
       <motion.section
-        className="py-10 border-y border-white/5 bg-[#131936]/50"
+        className="py-10 border-y border-white/5 relative"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
@@ -284,7 +284,7 @@ export default function LandingPage() {
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  className="group relative bg-[#0D1235] border border-white/5 hover:border-[#00D4C8]/30 rounded-2xl p-6 transition-all duration-300 hover:bg-[#131936]"
+                  className="group relative glass-2 rounded-2xl p-6 hover:border-[#00D4C8]/30 transition-all duration-300"
                 >
                   {i < antonSteps.length - 1 && (
                     <div className="hidden lg:block absolute top-10 left-full w-4 h-px bg-gradient-to-r from-[#00D4C8]/30 to-transparent z-0 translate-x-[-4px]" />
@@ -343,7 +343,7 @@ export default function LandingPage() {
                 {i < steps.length - 1 && (
                   <div className="hidden md:block absolute top-8 left-full w-full h-px bg-gradient-to-r from-[#00D4C8]/30 to-transparent z-0" />
                 )}
-                <div className="bg-[#131936] border border-white/5 rounded-xl p-6 relative z-10 card-hover">
+                <div className="glass-2 border border-white/5 rounded-xl p-6 relative z-10 card-hover">
                   <div className="text-[#00D4C8] font-heading font-black text-4xl mb-4 opacity-60">{step.num}</div>
                   <h3 className="font-heading font-bold text-xl text-white mb-2">{step.title}</h3>
                   <p className="text-white/50 text-sm leading-relaxed">{step.desc}</p>
@@ -355,7 +355,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features - Editorial Asymmetric Bento ── */}
-      <section id="features" className="py-32 px-4 bg-black relative overflow-hidden">
+      <section id="features" className="py-32 px-4 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {/* Editorial Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8 border-b border-white/10 pb-12">
@@ -379,14 +379,14 @@ export default function LandingPage() {
             {/* 01: Anton's Discovery Engine - Hero Card */}
             <div
               data-testid="feature-discovery"
-              className="md:col-span-8 group relative bg-[#131936] rounded-[2rem] p-10 md:p-14 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+              className="md:col-span-8 group relative glass-2 rounded-[2rem] p-10 md:p-14 overflow-hidden hover:border-[#00D4C8]/30 transition-all duration-500"
             >
               <div className="absolute -top-10 -right-10 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-700 group-hover:scale-110 transform pointer-events-none">
                 <Search className="w-80 h-80 text-[#00D4C8]" />
               </div>
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center glass-1">
                     <Search className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">01</span>
@@ -403,11 +403,11 @@ export default function LandingPage() {
             {/* 02: Anton Handles Outreach - Tall Card */}
             <div
               data-testid="feature-outreach"
-              className="md:col-span-4 group relative bg-gradient-to-b from-[#131936] to-black rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+              className="md:col-span-4 group relative bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-xl rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/10 hover:border-[#00D4C8]/30 transition-all duration-500"
             >
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center glass-1">
                     <Zap className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">02</span>
@@ -424,11 +424,11 @@ export default function LandingPage() {
             {/* 03: Anton Tracks ROI */}
             <div
               data-testid="feature-analytics"
-              className="md:col-span-5 group relative bg-[#131936] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+              className="md:col-span-5 group relative glass-2 rounded-[2rem] p-10 md:p-12 overflow-hidden hover:border-[#00D4C8]/30 transition-all duration-500"
             >
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center glass-1">
                     <BarChart3 className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">03</span>
@@ -445,12 +445,12 @@ export default function LandingPage() {
             {/* 04: Escrow Payments - Wide Card */}
             <div
               data-testid="feature-escrow"
-              className="md:col-span-7 group relative bg-[#131936] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+              className="md:col-span-7 group relative glass-2 rounded-[2rem] p-10 md:p-12 overflow-hidden hover:border-[#00D4C8]/30 transition-all duration-500"
             >
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#00D4C811_1px,transparent_1px),linear-gradient(to_bottom,#00D4C811_1px,transparent_1px)] bg-[size:32px_32px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"></div>
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center glass-1">
                     <CreditCard className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">04</span>
@@ -482,7 +482,7 @@ export default function LandingPage() {
                 key={name}
                 data-testid={`pricing-${name.toLowerCase()}`}
                 className={`rounded-xl p-6 border relative ${
-                  highlight ? "bg-[#00D4C8]/5 border-[#00D4C8]/30 teal-glow" : "bg-[#131936] border-white/5"
+                  highlight ? "bg-[#00D4C8]/5 border-[#00D4C8]/30 teal-glow" : "glass-2"
                 }`}
               >
                 {highlight && (
@@ -519,7 +519,7 @@ export default function LandingPage() {
       {/* ── CTA Banner ── */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
-          <Card className="bg-black border-[#00D4C8]/10 relative overflow-hidden hero-card-glow">
+          <Card className="glass-2 border-[#00D4C8]/10 relative overflow-hidden hero-card-glow">
             <Spotlight className="-top-40 left-0 md:left-40 md:-top-20" fill="#00D4C8" />
             <div className="relative z-10 text-center p-12">
               <div className="flex justify-center gap-1 mb-4">
