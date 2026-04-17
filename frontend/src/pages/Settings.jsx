@@ -65,7 +65,7 @@ export default function Settings() {
             </div>
           </div>
         </div>
-        <div className="bg-[#0A0F2E] border border-white/5 rounded-lg p-4">
+        <div className="bg-black border border-white/5 rounded-lg p-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="text-white/40 text-xs block mb-1">Full Name</span>
@@ -106,7 +106,7 @@ export default function Settings() {
               key={int.name}
               variants={gridItem}
               data-testid={`integration-${int.name.toLowerCase().replace(/[^a-z0-9]/g, "-")}`}
-              className="flex items-center justify-between p-3 bg-[#0A0F2E] rounded-lg border border-white/5 hover:border-white/10 transition-colors"
+              className="flex items-center justify-between p-3 bg-black rounded-lg border border-white/5 hover:border-white/10 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">

@@ -91,7 +91,7 @@ export default function CampaignWizard() {
     }
   };
 
-  const inputCls = (err) => `w-full bg-[#0A0F2E] border ${err ? "border-red-500/50" : "border-white/10"} rounded-lg px-4 py-3 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#00D4C8]/50 focus:border-[#00D4C8] transition-all`;
+  const inputCls = (err) => `w-full bg-black border ${err ? "border-red-500/50" : "border-white/10"} rounded-lg px-4 py-3 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#00D4C8]/50 focus:border-[#00D4C8] transition-all`;
 
   return (
     <motion.div className="max-w-2xl mx-auto" initial="hidden" animate="visible" variants={wrap}>
@@ -111,7 +111,7 @@ export default function CampaignWizard() {
         {STEPS.map((s, i) => (
           <div key={i} className="flex-1 flex flex-col items-center gap-1">
             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-              i < step ? "bg-[#00D4C8] text-[#0A0F2E]" :
+              i < step ? "bg-[#00D4C8] text-black" :
               i === step ? "bg-[#00D4C8]/20 border border-[#00D4C8] text-[#00D4C8]" :
               "bg-white/5 text-white/30"
             }`}>

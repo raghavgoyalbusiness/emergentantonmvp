@@ -91,7 +91,11 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - Core UI pages: Dashboard, InfluencerDiscovery, CampaignPipeline, CampaignWizard, Analytics, Payments, Inbox, Settings
 - Landing Page 3D Spline Hero Integration
 
-### ✅ Session 5 (Anton Brand Character — 2026-04)
+### ✅ Session 6 (Black Background — 2026-04)
+- **Global background**: Replaced all `#0A0F2E` (navy) with pure `#000000` (black) across all 15 files — `index.css`, `Layout.jsx`, `App.js`, `App.css`, `AuthCallback.jsx`, `LandingPage.jsx`, `Dashboard.jsx`, `Analytics.jsx`, `Settings.jsx`, `CampaignPipeline.jsx`, `Inbox.jsx`, `InfluencerDiscovery.jsx`, `BrandAgent.jsx`, `CampaignWizard.jsx`, `Payments.jsx`
+- Aurora shader, meteor shower, and spotlight effects now pop against true black for a sharper, more premium aesthetic
+
+
 - **Hero rewrite**: "Meet Anton." headline in teal + "The AI agent fixing influencer marketing." gradient body; badge "Introducing Anton — AI Campaign Operator"; CTAs → "Start with Anton" / "See Anton in Action"
 - **Anton HUD nameplate**: Floating label on robot panel — "ANTON / AI Campaign Operator · Online" with pulsing teal indicator dot
 - **New "What Anton Does" section** (5-step workflow): Find Creators → Analyze Fit → Build Shortlist → Draft Outreach → Launch Faster; CTA "Let Anton build your shortlist"
@@ -113,7 +117,7 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 ### ✅ Session 2 (UI/UX Overhaul — 2026-04)
 - **Global Font Update**: Georgia → all H1–H6 headings; Times New Roman → body/small text
 - **Framer Motion Stagger Animations**: All dashboard pages (Dashboard, Discovery, Pipeline, Analytics, Inbox, Settings, Payments, CampaignWizard) now use `motion.div` with `staggerChildren` variants for cascading entrance effects
-- **Dark Theme Consistency**: Verified all pages use #0A0F2E background, #131936 cards, #00D4C8 teal accents — 100% consistent with landing page
+- **Dark Theme Consistency**: All pages use pure black (#000000) background, #131936 cards, #00D4C8 teal accents
 - Testing: 100% pass rate (iteration_2.json)
 
 ---

@@ -18,7 +18,7 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0A0F2E] flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="flex gap-2">
           <div className="ai-dot" />
           <div className="ai-dot" />

@@ -69,7 +69,7 @@ function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
           <select
             value={selectedInf}
             onChange={e => handleSelect(e.target.value)}
-            className="w-full bg-[#0A0F2E] border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+            className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
             data-testid="select-creator-payment"
           >
             <option value="">Choose a creator...</option>
@@ -82,7 +82,7 @@ function PaymentModal({ campaign, influencers, onClose, onSuccess }) {
         </div>
 
         {preview && selInf && (
-          <div className="bg-[#0A0F2E] border border-white/5 rounded-xl p-4 mb-5 animate-fade-in">
+          <div className="bg-black border border-white/5 rounded-xl p-4 mb-5 animate-fade-in">
             <div className="flex justify-between text-sm mb-2">
               <span className="text-white/50">Creator fee ({selInf.name})</span>
               <span className="text-white font-semibold">${preview.fee.toLocaleString()}</span>
@@ -216,7 +216,7 @@ export default function Payments() {
             {activeCampaigns.map(c => {
               const infs = getCampaignInfluencers(c);
               return (
-                <div key={c.campaign_id} className="flex items-center justify-between p-4 bg-[#0A0F2E] rounded-xl border border-white/5 hover:border-[#00D4C8]/20 transition-colors" data-testid={`payment-campaign-${c.campaign_id}`}>
+                <div key={c.campaign_id} className="flex items-center justify-between p-4 bg-black rounded-xl border border-white/5 hover:border-[#00D4C8]/20 transition-colors" data-testid={`payment-campaign-${c.campaign_id}`}>
                   <div className="flex-1 min-w-0">
                     <h4 className="font-semibold text-white text-sm">{c.name}</h4>
                     <p className="text-white/40 text-xs">{c.brand_name} &bull; {infs.length} creator{infs.length !== 1 ? "s" : ""} selected</p>

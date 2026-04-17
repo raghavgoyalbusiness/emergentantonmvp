@@ -31,12 +31,12 @@ export default function Layout({ children }) {
   const Sidebar = ({ mobile = false }) => (
     <aside
       className={`${mobile ? "fixed inset-y-0 left-0 z-50 w-64" : "hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 z-40"} 
-        bg-[#0A0F2E]/95 backdrop-blur-xl border-r border-white/5 flex-col`}
+        bg-black/95 backdrop-blur-xl border-r border-white/5 flex-col`}
     >
       <div className="p-6 border-b border-white/5">
         <Link to="/dashboard" className="flex items-center gap-2" onClick={() => setSidebarOpen(false)}>
           <div className="w-8 h-8 rounded-lg bg-[#00D4C8] flex items-center justify-center">
-            <Zap className="w-4 h-4 text-[#0A0F2E]" strokeWidth={2.5} />
+            <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
           </div>
           <span className="font-heading font-bold text-white text-lg leading-none">
             Influencer<br />
@@ -69,7 +69,7 @@ export default function Layout({ children }) {
                 <Icon className="w-4 h-4 flex-shrink-0" strokeWidth={1.5} />
                 {label}
                 {label === "Inbox" && (
-                  <span className="ml-auto bg-[#00D4C8] text-[#0A0F2E] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                  <span className="ml-auto bg-[#00D4C8] text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
                 )}
                 {isAI && (
                   <span className="ml-auto text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">AI</span>
@@ -107,7 +107,7 @@ export default function Layout({ children }) {
   );
 
   return (
-    <div className="min-h-screen bg-[#0A0F2E]">
+    <div className="min-h-screen bg-black">
       <Sidebar />
 
       {/* Mobile sidebar */}
@@ -121,7 +121,7 @@ export default function Layout({ children }) {
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 h-14 bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5 flex items-center px-4 lg:px-6 gap-4">
+        <header className="sticky top-0 z-30 h-14 bg-black/80 backdrop-blur-xl border-b border-white/5 flex items-center px-4 lg:px-6 gap-4">
           <button
             onClick={() => setSidebarOpen(true)}
             className="lg:hidden text-white/60 hover:text-white p-1"

@@ -149,7 +149,7 @@ function AgentMarkdown({ content }) {
       a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">{children}</a>,
       code: ({ inline, children }) => inline
         ? <code className="bg-white/10 text-[#00D4C8] text-xs px-1.5 py-0.5 rounded font-mono">{children}</code>
-        : <pre className="bg-[#0A0F2E] border border-white/10 rounded-lg p-3 overflow-x-auto my-2"><code className="text-xs text-white/80 font-mono">{children}</code></pre>,
+        : <pre className="bg-black border border-white/10 rounded-lg p-3 overflow-x-auto my-2"><code className="text-xs text-white/80 font-mono">{children}</code></pre>,
       table: ({ children }) => <div className="overflow-x-auto my-3"><table className="w-full text-xs border-collapse">{children}</table></div>,
       thead: ({ children }) => <thead className="border-b border-white/10">{children}</thead>,
       tr: ({ children }) => <tr className="border-b border-white/5">{children}</tr>,
@@ -172,7 +172,7 @@ function InfluencerCard({ inf, selected, onToggle, onConnect }) {
       className={`flex items-center gap-3 rounded-xl p-3 border transition-all cursor-pointer ${
         selected
           ? "bg-[#00D4C8]/5 border-[#00D4C8]/35"
-          : "bg-[#0A0F2E] border-white/6 hover:border-white/15"
+          : "bg-black border-white/6 hover:border-white/15"
       }`}
       onClick={() => onToggle(inf.handle)}
     >
@@ -255,7 +255,7 @@ function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll
         <button
           onClick={onSendAll}
           data-testid="send-all-btn"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] text-[#0A0F2E] text-xs font-semibold transition-all"
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] text-black text-xs font-semibold transition-all"
         >
           <Mail className="w-3.5 h-3.5" />
           Send to All ({influencers.length})
@@ -298,7 +298,7 @@ function OutreachModal({ targets, onClose }) {
     setSending(false);
   };
 
-  const inputCls = "w-full bg-[#0A0F2E] border border-white/10 focus:border-[#00D4C8]/50 rounded-lg px-3 py-2.5 text-white text-sm placeholder-white/25 focus:outline-none transition-colors";
+  const inputCls = "w-full bg-black border border-white/10 focus:border-[#00D4C8]/50 rounded-lg px-3 py-2.5 text-white text-sm placeholder-white/25 focus:outline-none transition-colors";
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -452,8 +452,8 @@ function Message({ msg, onOpenModal }) {
           {isUser ? <User className="w-4 h-4 text-[#00D4C8]" /> : <Bot className="w-4 h-4 text-white/70" />}
         </div>
         <div className={`max-w-[80%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
-          <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${isUser ? "bg-[#00D4C8] text-[#0A0F2E] font-medium rounded-tr-sm" : "bg-[#0E1530] text-white/85 border border-white/8 rounded-tl-sm"}`}>
-            {isUser ? <p className="text-[#0A0F2E]">{msg.content}</p> : <AgentMarkdown content={msg.content} />}
+          <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${isUser ? "bg-[#00D4C8] text-black font-medium rounded-tr-sm" : "bg-[#0E1530] text-white/85 border border-white/8 rounded-tl-sm"}`}>
+            {isUser ? <p className="text-black">{msg.content}</p> : <AgentMarkdown content={msg.content} />}
           </div>
           <div className={`flex items-center gap-1 ${isUser ? "flex-row-reverse" : ""}`}>
             <span className="text-white/25 text-xs">{msg.time}</span>
@@ -573,7 +573,7 @@ export default function BrandAgent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
                   {STARTERS.map((s, i) => (
                     <button key={i} onClick={() => send(s)} data-testid={`starter-${i}`}
-                      className="text-left px-4 py-3 bg-[#0A0F2E] border border-white/5 hover:border-[#00D4C8]/25 rounded-xl text-white/60 hover:text-white text-xs leading-relaxed transition-all">
+                      className="text-left px-4 py-3 bg-black border border-white/5 hover:border-[#00D4C8]/25 rounded-xl text-white/60 hover:text-white text-xs leading-relaxed transition-all">
                       {s}
                     </button>
                   ))}
@@ -600,7 +600,7 @@ export default function BrandAgent() {
 
         {/* Input */}
         <div className="p-3 border-t border-white/5">
-          <div className="flex gap-2 items-end bg-[#0A0F2E] border border-white/10 focus-within:border-[#00D4C8]/40 rounded-xl px-4 py-3 transition-all">
+          <div className="flex gap-2 items-end bg-black border border-white/10 focus-within:border-[#00D4C8]/40 rounded-xl px-4 py-3 transition-all">
             <textarea ref={inputRef} value={input} onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
               placeholder="Find influencers, ask for strategy, request outreach briefs..."
@@ -609,7 +609,7 @@ export default function BrandAgent() {
               style={{ fieldSizing: "content" }} />
             <button onClick={() => send()} disabled={!input.trim() || loading} data-testid="send-btn"
               className="w-9 h-9 rounded-lg bg-[#00D4C8] hover:bg-[#00bfb3] disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-all flex-shrink-0">
-              <Send className="w-4 h-4 text-[#0A0F2E]" />
+              <Send className="w-4 h-4 text-black" />
             </button>
           </div>
           <p className="text-white/20 text-xs mt-1.5 pl-1">Enter to send · Shift+Enter for new line</p>

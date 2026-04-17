@@ -178,7 +178,7 @@ export default function Dashboard() {
                 <div
                   key={c.campaign_id}
                   data-testid={`campaign-card-${c.campaign_id}`}
-                  className="flex items-center justify-between p-3 bg-[#0A0F2E] rounded-lg border border-white/5 hover:border-[#00D4C8]/20 transition-colors cursor-pointer"
+                  className="flex items-center justify-between p-3 bg-black rounded-lg border border-white/5 hover:border-[#00D4C8]/20 transition-colors cursor-pointer"
                   onClick={() => navigate("/campaigns")}
                 >
                   <div className="flex-1 min-w-0">

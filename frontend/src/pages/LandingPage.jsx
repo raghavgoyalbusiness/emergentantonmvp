@@ -86,11 +86,11 @@ export default function LandingPage() {
       <Meteors number={30} />
 
       {/* ── Sticky Navbar ── */}
-      <header className="sticky top-0 z-50 bg-[#0A0F2E]/80 backdrop-blur-xl border-b border-white/5">
+      <header className="sticky top-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#00D4C8] flex items-center justify-center">
-              <Zap className="w-4 h-4 text-[#0A0F2E]" strokeWidth={2.5} />
+              <Zap className="w-4 h-4 text-black" strokeWidth={2.5} />
             </div>
             <span className="font-heading font-bold text-white text-lg">Influencer Connect</span>
           </div>
@@ -114,7 +114,7 @@ export default function LandingPage() {
       <section className="px-4 sm:px-6 pt-8 pb-6">
         <div className="max-w-7xl mx-auto">
           <Card
-            className="w-full min-h-[580px] bg-[#0A0F2E] relative overflow-hidden border-[#00D4C8]/10 hero-card-glow"
+            className="w-full min-h-[580px] bg-black relative overflow-hidden border-[#00D4C8]/10 hero-card-glow"
             data-testid="hero-spline-card"
           >
             <Spotlight
@@ -184,13 +184,13 @@ export default function LandingPage() {
               {/* ── Right: Spline 3D Scene + Anton nameplate ── */}
               <div className="flex-1 relative min-h-[300px] md:min-h-0">
                 {/* Fade mask on left edge */}
-                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-[#0A0F2E] to-transparent z-10 pointer-events-none" />
+                <div className="absolute left-0 inset-y-0 w-16 bg-gradient-to-r from-black to-transparent z-10 pointer-events-none" />
                 <SplineScene
                   scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                   className="w-full h-full"
                 />
                 {/* Anton nameplate — HUD-style label */}
-                <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 bg-[#0A0F2E]/70 backdrop-blur-md border border-[#00D4C8]/20 rounded-xl px-4 py-2.5">
+                <div className="absolute bottom-6 left-8 z-20 flex items-center gap-3 bg-black/70 backdrop-blur-md border border-[#00D4C8]/20 rounded-xl px-4 py-2.5">
                   <div className="relative flex-shrink-0">
                     <div className="w-2.5 h-2.5 rounded-full bg-[#00D4C8]" />
                     <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-[#00D4C8] animate-ping opacity-40" />
@@ -314,7 +314,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Features - Editorial Asymmetric Bento ── */}
-      <section id="features" className="py-32 px-4 bg-[#0A0F2E] relative overflow-hidden">
+      <section id="features" className="py-32 px-4 bg-black relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {/* Editorial Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-24 gap-8 border-b border-white/10 pb-12">
@@ -345,7 +345,7 @@ export default function LandingPage() {
               </div>
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
                     <Search className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">01</span>
@@ -362,11 +362,11 @@ export default function LandingPage() {
             {/* 02: Anton Handles Outreach - Tall Card */}
             <div
               data-testid="feature-outreach"
-              className="md:col-span-4 group relative bg-gradient-to-b from-[#131936] to-[#0A0F2E] rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
+              className="md:col-span-4 group relative bg-gradient-to-b from-[#131936] to-black rounded-[2rem] p-10 md:p-12 overflow-hidden border border-white/5 hover:border-[#00D4C8]/30 transition-all duration-500"
             >
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
                     <Zap className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">02</span>
@@ -387,7 +387,7 @@ export default function LandingPage() {
             >
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
                     <BarChart3 className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">03</span>
@@ -409,7 +409,7 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#00D4C811_1px,transparent_1px),linear-gradient(to_bottom,#00D4C811_1px,transparent_1px)] bg-[size:32px_32px] opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"></div>
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div className="flex items-start justify-between mb-20">
-                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-[#0A0F2E]/50 backdrop-blur-md">
+                  <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center bg-black/50 backdrop-blur-md">
                     <CreditCard className="w-7 h-7 text-[#00D4C8]" />
                   </div>
                   <span className="font-heading text-7xl text-white/5 font-black tracking-tighter">04</span>
@@ -445,7 +445,7 @@ export default function LandingPage() {
                 }`}
               >
                 {highlight && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00D4C8] text-[#0A0F2E] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00D4C8] text-black text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                     Most Popular
                   </div>
                 )}
@@ -478,7 +478,7 @@ export default function LandingPage() {
       {/* ── CTA Banner ── */}
       <section className="py-20 px-4">
         <div className="max-w-3xl mx-auto">
-          <Card className="bg-[#0A0F2E] border-[#00D4C8]/10 relative overflow-hidden hero-card-glow">
+          <Card className="bg-black border-[#00D4C8]/10 relative overflow-hidden hero-card-glow">
             <Spotlight className="-top-40 left-0 md:left-40 md:-top-20" fill="#00D4C8" />
             <div className="relative z-10 text-center p-12">
               <div className="flex justify-center gap-1 mb-4">
@@ -507,7 +507,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/30">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded bg-[#00D4C8] flex items-center justify-center">
-              <Zap className="w-3 h-3 text-[#0A0F2E]" />
+              <Zap className="w-3 h-3 text-black" />
             </div>
             <span className="font-heading font-bold text-white/50">Influencer Connect</span>
           </div>

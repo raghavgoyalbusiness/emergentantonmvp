@@ -141,7 +141,7 @@ export default function Inbox() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
                         <span className={`text-xs font-semibold truncate ${unread > 0 ? "text-white" : "text-white/70"}`}>{name}</span>
-                        {unread > 0 && <span className="bg-[#00D4C8] text-[#0A0F2E] text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold flex-shrink-0 ml-1">{unread}</span>}
+                        {unread > 0 && <span className="bg-[#00D4C8] text-black text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold flex-shrink-0 ml-1">{unread}</span>}
                       </div>
                       <span className="text-xs text-white/30">{platformIcons[lastMsg?.platform]} {lastMsg?.platform}</span>
                     </div>
@@ -173,11 +173,11 @@ export default function Inbox() {
                   <div key={m.message_id} className={`flex ${m.direction === "outbound" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm ${
                       m.direction === "outbound"
-                        ? "bg-[#00D4C8] text-[#0A0F2E] font-medium rounded-tr-sm"
-                        : "bg-[#0A0F2E] text-white/80 border border-white/5 rounded-tl-sm"
+                        ? "bg-[#00D4C8] text-black font-medium rounded-tr-sm"
+                        : "bg-black text-white/80 border border-white/5 rounded-tl-sm"
                     }`}>
                       <p>{m.content}</p>
-                      <p className={`text-xs mt-1 ${m.direction === "outbound" ? "text-[#0A0F2E]/50" : "text-white/30"}`}>{timeAgo(m.timestamp)}</p>
+                      <p className={`text-xs mt-1 ${m.direction === "outbound" ? "text-black/50" : "text-white/30"}`}>{timeAgo(m.timestamp)}</p>
                     </div>
                   </div>
                 ))}
@@ -192,7 +192,7 @@ export default function Inbox() {
                     placeholder={`Reply to ${selected.influencer_name}...`}
                     rows={2}
                     data-testid="reply-input"
-                    className="flex-1 bg-[#0A0F2E] border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#00D4C8] resize-none"
+                    className="flex-1 bg-black border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/30 focus:outline-none focus:ring-1 focus:ring-[#00D4C8] resize-none"
                   />
                   <button
                     onClick={sendReply}

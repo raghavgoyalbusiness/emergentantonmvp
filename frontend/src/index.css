@@ -33,7 +33,7 @@
   }
   html {
     /* fallback background for every page — keeps non-landing pages dark */
-    background-color: #0A0F2E;
+    background-color: #000000;
   }
   body {
     @apply text-white;
@@ -83,7 +83,7 @@
 }
 
 .spotlight-overlay {
-  position: fixed;           /* escapes the opaque Layout bg-[#0A0F2E] wrapper */
+  position: fixed;           /* escapes the opaque Layout bg-black wrapper */
   inset: 0;
   left: 256px;               /* offset for the 16rem / 64px sidebar */
   pointer-events: none;
@@ -170,7 +170,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0F2E;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(0, 212, 200, 0.3);

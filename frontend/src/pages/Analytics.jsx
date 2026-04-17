@@ -141,7 +141,7 @@ export default function Analytics() {
             value={selectedId}
             onChange={e => loadCampaign(e.target.value)}
             data-testid="analytics-campaign-select"
-            className="bg-[#0A0F2E] border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
+            className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-1 focus:ring-[#00D4C8]"
           >
             {campaigns.map(c => <option key={c.campaign_id} value={c.campaign_id}>{c.name}</option>)}
           </select>
@@ -154,19 +154,19 @@ export default function Analytics() {
         ) : data ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-5">
-              <div className="bg-[#0A0F2E] rounded-lg p-3 text-center">
+              <div className="bg-black rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{(data.reach / 1000).toFixed(0)}K</div>
                 <div className="text-white/40 text-xs">Reach</div>
               </div>
-              <div className="bg-[#0A0F2E] rounded-lg p-3 text-center">
+              <div className="bg-black rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{data.engagement_rate}%</div>
                 <div className="text-white/40 text-xs">Engagement</div>
               </div>
-              <div className="bg-[#0A0F2E] rounded-lg p-3 text-center">
+              <div className="bg-black rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-white">{data.conversions?.toLocaleString()}</div>
                 <div className="text-white/40 text-xs">Conversions</div>
               </div>
-              <div className="bg-[#0A0F2E] rounded-lg p-3 text-center">
+              <div className="bg-black rounded-lg p-3 text-center">
                 <div className="font-heading font-bold text-xl text-[#00D4C8]">{data.roas}x</div>
                 <div className="text-white/40 text-xs">ROAS</div>
               </div>

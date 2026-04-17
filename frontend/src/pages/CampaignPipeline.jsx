@@ -43,7 +43,7 @@ function CampaignCard({ campaign, onMoveStage }) {
   return (
     <div
       data-testid={`kanban-card-${campaign.campaign_id}`}
-      className="bg-[#0A0F2E] border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-all duration-200 cursor-pointer"
+      className="bg-black border border-white/5 rounded-lg p-3 hover:border-[#00D4C8]/25 transition-all duration-200 cursor-pointer"
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
