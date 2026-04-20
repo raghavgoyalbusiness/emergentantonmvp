@@ -147,6 +147,8 @@ export default function Payments() {
       setPolling(true);
       pollStatus(sessionId);
     }
+    // pollStatus and searchParams are stable on mount — intentional empty deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const pollStatus = async (sessionId, attempt = 0) => {
