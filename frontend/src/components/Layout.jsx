@@ -11,8 +11,7 @@ const navItems = [
   { icon: Search, label: "Discovery", path: "/discovery" },
   { icon: Kanban, label: "Campaigns", path: "/campaigns" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
-  { icon: CreditCard, label: "Payments", path: "/payments" },
-  { icon: Crown, label: "Subscription", path: "/subscription" },
+  { icon: Crown, label: "Billing", path: "/payments" },
   { icon: MessageSquare, label: "Inbox", path: "/inbox" },
   { icon: Sparkles, label: "Brand Agent", path: "/brand-agent" },
   { icon: Settings, label: "Settings", path: "/settings" },
@@ -48,7 +47,7 @@ export default function Layout({ children }) {
 
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ icon: Icon, label, path }) => {
-          const active = location.pathname === path;
+          const active = location.pathname === path || (path === "/payments" && location.pathname === "/subscription");
           const isAI = label === "Brand Agent";
           return (
             <div key={path}>
