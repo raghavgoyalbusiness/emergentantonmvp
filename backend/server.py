@@ -677,6 +677,138 @@ async def list_payments(user=Depends(get_current_user)):
     ).sort("created_at", -1).to_list(100)
     return payments
 
+# ---- SUBSCRIPTION PLANS ----
+
+SUBSCRIPTION_PLANS = {
+    "starter": {
+        "name": "Starter",
+        "price": 299.00,
+        "currency": "usd",
+        "description": "Perfect for small brands",
+        "features": ["Up to 3 active campaigns", "20 creator searches/mo", "Basic analytics", "Email outreach"],
+    },
+    "growth": {
+        "name": "Growth",
+        "price": 599.00,
+        "currency": "usd",
+        "description": "Most popular for growing brands",
+        "features": ["Up to 10 active campaigns", "Unlimited creator searches", "Full analytics + ROAS", "AI outreach + briefs", "Stripe escrow payments"],
+    },
+    "scale": {
+        "name": "Scale",
+        "price": 1299.00,
+        "currency": "usd",
+        "description": "For agencies & power users",
+        "features": ["Unlimited campaigns", "White-label reports", "Priority AI processing", "Dedicated account manager", "API access"],
+    },
+}
+
+class SubscribeRequest(BaseModel):
+    plan_id: str
+    origin_url: str
+
+@api_router.get("/user/subscription")
+async def get_subscription(user=Depends(get_current_user)):
+    sub = await db.subscriptions.find_one(
+        {"user_id": user["user_id"], "payment_status": "active"}, {"_id": 0}
+    )
+    return {
+        "has_subscription": sub is not None,
+        "plan": sub.get("plan_id") if sub else None,
+        "plan_name": SUBSCRIPTION_PLANS.get(sub.get("plan_id", ""), {}).get("name") if sub else None,
+        "started_at": sub.get("started_at") if sub else None,
+    }
+
+@api_router.post("/payments/subscribe")
+async def subscribe(body: SubscribeRequest, request: Request, user=Depends(get_current_user)):
+    plan = SUBSCRIPTION_PLANS.get(body.plan_id)
+    if not plan:
+        raise HTTPException(status_code=400, detail="Invalid plan")
+
+    stripe_key = os.environ.get("STRIPE_API_KEY")
+    host_url = str(request.base_url)
+    webhook_url = f"{host_url}api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
+
+    success_url = f"{body.origin_url}/payments?session_id={{CHECKOUT_SESSION_ID}}&plan={body.plan_id}"
+    cancel_url = f"{body.origin_url}/subscription"
+
+    checkout_req = CheckoutSessionRequest(
+        amount=plan["price"],
+        currency=plan["currency"],
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "user_id": user["user_id"],
+            "email": user.get("email", ""),
+            "plan_id": body.plan_id,
+            "type": "subscription",
+        },
+    )
+    session = await stripe_checkout.create_checkout_session(checkout_req)
+
+    # Record pending transaction
+    await db.payment_transactions.insert_one({
+        "transaction_id": f"sub_{uuid.uuid4().hex[:12]}",
+        "session_id": session.session_id,
+        "user_id": user["user_id"],
+        "email": user.get("email", ""),
+        "plan_id": body.plan_id,
+        "plan_name": plan["name"],
+        "amount": plan["price"],
+        "currency": plan["currency"],
+        "payment_status": "pending",
+        "type": "subscription",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    return {"url": session.url, "session_id": session.session_id}
+
+@api_router.get("/payments/subscribe/status/{session_id}")
+async def subscription_payment_status(session_id: str, user=Depends(get_current_user)):
+    stripe_key = os.environ.get("STRIPE_API_KEY")
+    stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url="")
+    status = await stripe_checkout.get_checkout_status(session_id)
+
+    txn = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+    if not txn:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+    if status.payment_status == "paid" and txn.get("payment_status") != "active":
+        plan_id = txn.get("plan_id", "starter")
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Update transaction to active
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"payment_status": "active", "status": "complete", "updated_at": now}}
+        )
+
+        # Upsert subscription record
+        await db.subscriptions.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {
+                "user_id": user["user_id"],
+                "plan_id": plan_id,
+                "plan_name": SUBSCRIPTION_PLANS.get(plan_id, {}).get("name", plan_id),
+                "payment_status": "active",
+                "session_id": session_id,
+                "started_at": now,
+                "updated_at": now,
+            }},
+            upsert=True
+        )
+
+    return {
+        "payment_status": status.payment_status,
+        "plan_id": txn.get("plan_id"),
+        "plan_name": txn.get("plan_name"),
+    }
+
+@api_router.get("/payments/plans")
+async def list_plans():
+    return [{"id": k, **v} for k, v in SUBSCRIPTION_PLANS.items()]
+
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     body = await request.body()
@@ -688,9 +820,29 @@ async def stripe_webhook(request: Request):
         if event.payment_status == "paid":
             await db.payment_transactions.update_one(
                 {"session_id": event.session_id},
-                {"$set": {"payment_status": "paid", "status": "complete",
+                {"$set": {"payment_status": "active" if event.metadata.get("type") == "subscription" else "paid",
+                          "status": "complete",
                           "updated_at": datetime.now(timezone.utc).isoformat()}}
             )
+            # Activate subscription if subscription type
+            if event.metadata.get("type") == "subscription":
+                plan_id = event.metadata.get("plan_id", "starter")
+                user_id = event.metadata.get("user_id")
+                if user_id:
+                    now = datetime.now(timezone.utc).isoformat()
+                    await db.subscriptions.update_one(
+                        {"user_id": user_id},
+                        {"$set": {
+                            "user_id": user_id,
+                            "plan_id": plan_id,
+                            "plan_name": SUBSCRIPTION_PLANS.get(plan_id, {}).get("name", plan_id),
+                            "payment_status": "active",
+                            "session_id": event.session_id,
+                            "started_at": now,
+                            "updated_at": now,
+                        }},
+                        upsert=True
+                    )
     except Exception as e:
         logger.error(f"Webhook error: {e}")
     return {"received": True}

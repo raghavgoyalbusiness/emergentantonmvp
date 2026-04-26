@@ -89,6 +89,16 @@ export default function LandingPage() {
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
+  const handlePlanCTA = (planId) => {
+    if (user) {
+      navigate(`/subscription?plan=${planId}`);
+    } else {
+      // After login, redirect to subscription page for the selected plan
+      const redirectUrl = window.location.origin + `/subscription?plan=${planId}`;
+      window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    }
+  };
+
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative z-[2]">
       <Meteors number={12} />
@@ -178,10 +188,10 @@ export default function LandingPage() {
                 {/* Social proof chips */}
                 <div className="flex flex-wrap gap-3 text-xs text-white/40 animate-fade-up stagger-4">
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> No credit card required
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> Secure Stripe checkout
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> Live in 5 minutes
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> Cancel anytime
                   </span>
                   <span className="flex items-center gap-1.5">
                     <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8]" /> 500+ creators indexed
@@ -477,10 +487,12 @@ export default function LandingPage() {
             <p className="text-white/50 mt-3 text-lg">No hidden fees. Cancel anytime.</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            {pricing.map(({ name, price, desc, features: f, highlight }) => (
+            {pricing.map(({ name, price, desc, features: f, highlight }) => {
+              const planId = name.toLowerCase();
+              return (
               <div
                 key={name}
-                data-testid={`pricing-${name.toLowerCase()}`}
+                data-testid={`pricing-${planId}`}
                 className={`rounded-xl p-6 border relative ${
                   highlight ? "bg-[#00D4C8]/5 border-[#00D4C8]/30 teal-glow" : "glass-2"
                 }`}
@@ -497,21 +509,23 @@ export default function LandingPage() {
                   <span className="text-white/40 text-sm">/mo</span>
                 </div>
                 <ul className="space-y-2 mb-6">
-                  {f.map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+                  {f.map((feat) => (
+                    <li key={feat} className="flex items-center gap-2 text-sm text-white/70">
                       <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8] flex-shrink-0" />
-                      {item}
+                      {feat}
                     </li>
                   ))}
                 </ul>
                 <button
-                  onClick={handleCTA}
+                  onClick={() => handlePlanCTA(planId)}
+                  data-testid={`pricing-cta-${planId}`}
                   className={`w-full py-2.5 rounded-lg text-sm font-semibold transition-all ${highlight ? "btn-primary" : "btn-secondary"}`}
                 >
-                  Start with Anton
+                  Get Started
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

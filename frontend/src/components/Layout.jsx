@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Search, Kanban, BarChart3, CreditCard,
-  MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles
+  MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles, Crown
 } from "lucide-react";
 
 const navItems = [
@@ -12,6 +12,7 @@ const navItems = [
   { icon: Kanban, label: "Campaigns", path: "/campaigns" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: CreditCard, label: "Payments", path: "/payments" },
+  { icon: Crown, label: "Subscription", path: "/subscription" },
   { icon: MessageSquare, label: "Inbox", path: "/inbox" },
   { icon: Sparkles, label: "Brand Agent", path: "/brand-agent" },
   { icon: Settings, label: "Settings", path: "/settings" },

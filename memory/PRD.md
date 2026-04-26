@@ -171,6 +171,16 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - **InfluencerDiscovery**: `runAIScoring` now shows user-facing `alert()` on 401 (session expired) and 404 (campaign not found) instead of silently swallowing errors.
 - **BrandAgent error message**: Improved to "I ran into an issue fetching that data. Please try rephrasing..." instead of raw error text.
 
+### ✅ Session 5 (Stripe Paywall — 2026-04)
+- **Full Stripe subscription paywall** implemented with live keys
+- **3 pricing tiers**: Starter ($299/mo), Growth ($599/mo), Scale ($1299/mo)
+- **New backend endpoints**: `GET /api/payments/plans`, `POST /api/payments/subscribe`, `GET /api/payments/subscribe/status/{id}`, `GET /api/user/subscription`
+- **New page**: `SubscriptionPage.jsx` — shows plans, active subscription badge, payment result banner, "Go to Dashboard" after payment
+- **Landing page**: Pricing buttons now call `handlePlanCTA(planId)` → Stripe checkout (or auth first if not logged in)
+- **Layout sidebar**: "Subscription" nav item added with Crown icon
+- **Webhook updated**: Activates subscription in `db.subscriptions` on `checkout.session.completed`
+- Live Stripe keys configured in `.env` (backend + frontend)
+
 ---
 
 ## Mocked / Simulated Integrations

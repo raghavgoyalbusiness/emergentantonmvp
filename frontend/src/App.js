@@ -11,6 +11,7 @@ import CampaignPipeline from "@/pages/CampaignPipeline";
 import CampaignWizard from "@/pages/CampaignWizard";
 import Analytics from "@/pages/Analytics";
 import Payments from "@/pages/Payments";
+import SubscriptionPage from "@/pages/SubscriptionPage";
 import Inbox from "@/pages/Inbox";
 import Settings from "@/pages/Settings";
 import BrandAgent from "@/pages/BrandAgent";
@@ -63,6 +64,7 @@ function AppRouter() {
         >
           <Routes location={location}>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/subscription" element={<ProtectedRoute><Layout><SubscriptionPage /></Layout></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Layout><Dashboard /></Layout></ProtectedRoute>} />
             <Route path="/discovery" element={<ProtectedRoute><Layout><InfluencerDiscovery /></Layout></ProtectedRoute>} />
             <Route path="/campaigns" element={<ProtectedRoute><Layout><CampaignPipeline /></Layout></ProtectedRoute>} />
