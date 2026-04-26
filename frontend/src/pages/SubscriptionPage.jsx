@@ -31,7 +31,10 @@ export default function SubscriptionPage() {
         plan_id: planId,
         origin_url: window.location.origin,
       }, { withCredentials: true });
-      window.location.href = res.data.url;
+      // Use window.top to break out of any iframe (e.g. Emergent preview)
+      // Falls back to window if not in an iframe context
+      const target = window.top || window;
+      target.location.href = res.data.url;
     } catch {
       alert("Failed to start checkout. Please try again.");
       setPaying(null);
