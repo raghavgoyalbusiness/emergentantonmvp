@@ -104,6 +104,39 @@ function parseInfluencers(text) {
   return results;
 }
 
+// ─── Redact sensitive data from Claude text for non-subscribers ───────────────
+function escRx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
+
+function redactText(text, influencers) {
+  let out = text;
+
+  // 1. Replace every known email
+  for (const inf of influencers) {
+    if (inf.email) {
+      out = out.replace(new RegExp(escRx(inf.email), "gi"), "[ email hidden ]");
+    }
+  }
+  // 2. Replace any remaining email addresses not in parsed cards
+  out = out.replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, "[ email hidden ]");
+
+  // 3. Replace known names (longest first to avoid partial matches)
+  const sortedByName = [...influencers].sort((a, b) => b.name.length - a.name.length);
+  for (const inf of sortedByName) {
+    if (inf.name && inf.name.length > 2 && inf.name !== inf.handle) {
+      out = out.replace(new RegExp(escRx(inf.name), "g"), "[ name hidden ]");
+    }
+  }
+
+  // 4. Replace @handles
+  for (const inf of influencers) {
+    out = out.replace(new RegExp(`@${escRx(inf.handle)}`, "gi"), "@[ hidden ]");
+    // also bare handle in parentheses: (@handle)
+    out = out.replace(new RegExp(`\\(${escRx(inf.handle)}\\)`, "gi"), "(@[ hidden ])");
+  }
+
+  return out;
+}
+
 // ─── Variants ─────────────────────────────────────────────────────────────────
 const wrap     = { hidden: {}, visible: { transition: { staggerChildren: 0.08 } } };
 const item     = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } } };
@@ -315,21 +348,25 @@ function InfluencerCard({ inf, selected, onToggle, onConnect, isSubscribed, onBl
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        {/* Name — blurred for non-subscribers */}
+        {/* Name — hidden for non-subscribers */}
         <p
-          className={`text-white text-xs font-semibold truncate select-none ${blurred ? "blur-sm cursor-pointer hover:blur-[3px]" : ""}`}
+          className={`text-xs font-semibold truncate select-none ${
+            blurred
+              ? "text-white/20 italic cursor-pointer hover:text-[#00D4C8]/40 transition-colors"
+              : "text-white"
+          }`}
           onClick={handleBlurClick}
           data-testid={blurred ? `blurred-name-${inf.handle}` : undefined}
         >
-          {blurred ? "██████ ████████" : inf.name}
+          {blurred ? "Name hidden" : inf.name}
         </p>
 
-        {/* Handle — blurred */}
+        {/* Handle — hidden */}
         <p
-          className={`text-white/40 text-xs select-none ${blurred ? "blur-sm cursor-pointer" : ""}`}
+          className={`text-xs select-none ${blurred ? "text-white/15 italic cursor-pointer" : "text-white/40"}`}
           onClick={handleBlurClick}
         >
-          {blurred ? "@████████" : `@${inf.handle}`}
+          {blurred ? "Handle hidden" : `@${inf.handle}`}
         </p>
 
         <div className="flex gap-2 mt-0.5 flex-wrap">
@@ -338,13 +375,13 @@ function InfluencerCard({ inf, selected, onToggle, onConnect, isSubscribed, onBl
           {inf.country    && <span className="text-white/20 text-xs">{inf.country}</span>}
         </div>
 
-        {/* Email — blurred */}
+        {/* Email — hidden */}
         {blurred ? (
           <p
-            className="text-white/20 text-xs truncate blur-sm select-none cursor-pointer"
+            className="text-white/15 text-xs italic truncate select-none cursor-pointer"
             onClick={handleBlurClick}
           >
-            {hasContact ? "████████@████.com" : "No contact available"}
+            {hasContact ? "Contact hidden" : "No contact available"}
           </p>
         ) : hasContact ? (
           <p className="text-white/20 text-xs truncate">{inf.email}</p>
@@ -585,7 +622,14 @@ function Message({ msg, onOpenModal, isSubscribed, onBlurClick, onSubscribe }) {
         </div>
         <div className={`max-w-[80%] flex flex-col gap-1 ${isUser ? "items-end" : "items-start"}`}>
           <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${isUser ? "bg-[#00D4C8] text-black font-medium rounded-tr-sm" : "glass-2 text-white/85 rounded-tl-sm"}`}>
-            {isUser ? <p className="text-black">{msg.content}</p> : <AgentMarkdown content={msg.content} />}
+            {isUser
+              ? <p className="text-black">{msg.content}</p>
+              : <AgentMarkdown content={
+                  isSubscribed
+                    ? msg.content
+                    : redactText(msg.content, msg.influencers || [])
+                } />
+            }
           </div>
           <div className={`flex items-center gap-1 ${isUser ? "flex-row-reverse" : ""}`}>
             <span className="text-white/25 text-xs">{msg.time}</span>
