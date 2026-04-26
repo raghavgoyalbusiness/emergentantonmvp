@@ -730,7 +730,7 @@ async def subscribe(body: SubscribeRequest, request: Request, user=Depends(get_c
     webhook_url = f"{host_url}api/webhook/stripe"
     stripe_checkout = StripeCheckout(api_key=stripe_key, webhook_url=webhook_url)
 
-    success_url = f"{body.origin_url}/payments?session_id={{CHECKOUT_SESSION_ID}}&plan={body.plan_id}"
+    success_url = f"{body.origin_url}/subscription?session_id={{CHECKOUT_SESSION_ID}}&plan={body.plan_id}"
     cancel_url = f"{body.origin_url}/subscription"
 
     checkout_req = CheckoutSessionRequest(

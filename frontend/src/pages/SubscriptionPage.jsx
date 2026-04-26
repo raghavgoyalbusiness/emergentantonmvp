@@ -20,9 +20,23 @@ export default function SubscriptionPage() {
   const [plans, setPlans] = useState([]);
   const [currentSub, setCurrentSub] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [paying, setPaying] = useState(null); // plan_id being processed
+  const [paying, setPaying] = useState(null);
   const [polling, setPolling] = useState(false);
   const [payResult, setPayResult] = useState(null);
+
+  const handleSubscribe = async (planId) => {
+    setPaying(planId);
+    try {
+      const res = await axios.post(`${API}/payments/subscribe`, {
+        plan_id: planId,
+        origin_url: window.location.origin,
+      }, { withCredentials: true });
+      window.location.href = res.data.url;
+    } catch {
+      alert("Failed to start checkout. Please try again.");
+      setPaying(null);
+    }
+  };
 
   useEffect(() => {
     Promise.all([
@@ -31,6 +45,13 @@ export default function SubscriptionPage() {
     ]).then(([plansRes, subRes]) => {
       setPlans(plansRes.data);
       setCurrentSub(subRes.data);
+
+      // Auto-start checkout if ?plan=xxx came from landing page CTA after auth
+      const preselectedPlan = searchParams.get("plan");
+      const sessionId = searchParams.get("session_id");
+      if (preselectedPlan && !sessionId && !subRes.data?.has_subscription) {
+        handleSubscribe(preselectedPlan);
+      }
     }).catch(() => {}).finally(() => setLoading(false));
 
     const sessionId = searchParams.get("session_id");
@@ -57,20 +78,6 @@ export default function SubscriptionPage() {
         setTimeout(() => pollStatus(sessionId, attempt + 1), 2000);
       }
     } catch { setPolling(false); }
-  };
-
-  const handleSubscribe = async (planId) => {
-    setPaying(planId);
-    try {
-      const res = await axios.post(`${API}/payments/subscribe`, {
-        plan_id: planId,
-        origin_url: window.location.origin,
-      }, { withCredentials: true });
-      window.location.href = res.data.url;
-    } catch (e) {
-      alert("Failed to start checkout. Please try again.");
-      setPaying(null);
-    }
   };
 
   if (loading) return (
