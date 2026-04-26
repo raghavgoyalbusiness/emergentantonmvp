@@ -31,10 +31,8 @@ export default function SubscriptionPage() {
         plan_id: planId,
         origin_url: window.location.origin,
       }, { withCredentials: true });
-      // Use window.top to break out of any iframe (e.g. Emergent preview)
-      // Falls back to window if not in an iframe context
-      const target = window.top || window;
-      target.location.href = res.data.url;
+      // Open Stripe checkout in a new tab — works reliably from inside iframes
+      window.open(res.data.url, "_blank", "noopener,noreferrer");
     } catch {
       alert("Failed to start checkout. Please try again.");
       setPaying(null);
