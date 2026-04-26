@@ -709,6 +709,14 @@ class SubscribeRequest(BaseModel):
 
 @api_router.get("/user/subscription")
 async def get_subscription(user=Depends(get_current_user)):
+    # VIP test account — always treated as active Scale subscriber
+    if user.get("email", "").lower() == "kunaldebroy8240@gmail.com":
+        return {
+            "has_subscription": True,
+            "plan": "scale",
+            "plan_name": "Scale",
+            "started_at": None,
+        }
     sub = await db.subscriptions.find_one(
         {"user_id": user["user_id"], "payment_status": "active"}, {"_id": 0}
     )
