@@ -108,6 +108,18 @@ function parseInfluencers(text) {
 function escRx(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
 function redactText(text, influencers) {
+  // Step 0: Extract names directly from numbered-list patterns in the raw text.
+  // This is more reliable than relying on the card parser (which may fail when **bold** markers
+  // wrap the name, e.g. "**5. Yashika Enterprises** (@handle)").
+  // Pattern matches: "1. Name (@handle)" or "**1. Name** (@handle)" or "**1. Name (@handle)**"
+  const nameFromRawRegex = /\d+[.)]\s*\*{0,2}([A-Z][^(@\n*]{2,}?)\*{0,2}\s*\(@?([\w.]+)\)/g;
+  const namesFromText = new Set();
+  let m;
+  while ((m = nameFromRawRegex.exec(text)) !== null) {
+    const name = m[1].trim();
+    if (name.length > 2) namesFromText.add(name);
+  }
+
   let out = text;
 
   // 1. Replace every known email
@@ -116,10 +128,10 @@ function redactText(text, influencers) {
       out = out.replace(new RegExp(escRx(inf.email), "gi"), "[ email hidden ]");
     }
   }
-  // 2. Replace any remaining email addresses not in parsed cards
+  // Replace any remaining email addresses
   out = out.replace(/\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b/g, "[ email hidden ]");
 
-  // 3. Replace known names (longest first to avoid partial matches)
+  // 2. Replace names from parsed influencers (longest first to avoid partial matches)
   const sortedByName = [...influencers].sort((a, b) => b.name.length - a.name.length);
   for (const inf of sortedByName) {
     if (inf.name && inf.name.length > 2 && inf.name !== inf.handle) {
@@ -127,10 +139,15 @@ function redactText(text, influencers) {
     }
   }
 
+  // 3. Replace names extracted directly from raw text patterns (catches parser misses)
+  const sortedRawNames = [...namesFromText].sort((a, b) => b.length - a.length);
+  for (const name of sortedRawNames) {
+    out = out.replace(new RegExp(escRx(name), "g"), "[ name hidden ]");
+  }
+
   // 4. Replace @handles
   for (const inf of influencers) {
     out = out.replace(new RegExp(`@${escRx(inf.handle)}`, "gi"), "@[ hidden ]");
-    // also bare handle in parentheses: (@handle)
     out = out.replace(new RegExp(`\\(${escRx(inf.handle)}\\)`, "gi"), "(@[ hidden ])");
   }
 
