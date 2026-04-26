@@ -171,6 +171,13 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 - **InfluencerDiscovery**: `runAIScoring` now shows user-facing `alert()` on 401 (session expired) and 404 (campaign not found) instead of silently swallowing errors.
 - **BrandAgent error message**: Improved to "I ran into an issue fetching that data. Please try rephrasing..." instead of raw error text.
 
+### ✅ Session 6 (Billing Merge + Agent Freemium — 2026-04)
+- **Merged Payments + Subscription → BillingPage.jsx** (`/payments` and `/subscription` routes both use it)
+- **BillingPage sections**: (1) Current subscription card with plan features + "Update Plan" toggle, (2) Collapsible plans grid with "Switch to X" buttons, (3) Campaign funding (escrow), (4) Transaction history
+- **Nav updated**: "Payments" + "Subscription" merged to single "Billing" nav item (Crown icon)
+- **Stripe redirect fix**: All `window.top.location.href` replaced with `window.open(..., '_blank')` — opens Stripe in new tab
+- **BrandAgent freemium gate**: Non-subscribers get 5 free queries (stored in localStorage); influencer names/handles/emails blurred; persistent subscribe banner above input; inline subscribe prompt after every agent reply; clicking any blurred field opens SubscribeModal → navigates to `/payments`; header shows "Free · N left" badge; when limit reached, input replaced with subscribe CTA
+
 ### ✅ Session 5 (Stripe Paywall — 2026-04)
 - **Full Stripe subscription paywall** implemented with live keys
 - **3 pricing tiers**: Starter ($299/mo), Growth ($599/mo), Scale ($1299/mo)
