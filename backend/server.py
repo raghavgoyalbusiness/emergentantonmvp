@@ -938,7 +938,7 @@ async def analytics_overview(user=Depends(get_current_user)):
 
 @api_router.get("/messages")
 async def list_messages(user=Depends(get_current_user)):
-    messages = await db.messages.find({}, {"_id": 0}).sort("timestamp", -1).to_list(50)
+    messages = await db.messages.find({"user_id": user["user_id"]}, {"_id": 0}).sort("timestamp", -1).to_list(50)
     return messages
 
 @api_router.post("/messages")
@@ -946,6 +946,7 @@ async def send_message(body: MessageSend, user=Depends(get_current_user)):
     msg_id = f"msg_{uuid.uuid4().hex[:12]}"
     doc = {
         "message_id": msg_id,
+        "user_id": user["user_id"],
         "campaign_id": body.campaign_id,
         "influencer_id": body.influencer_id,
         "influencer_name": body.influencer_name,
