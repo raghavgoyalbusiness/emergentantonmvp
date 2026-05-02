@@ -218,13 +218,15 @@ async def get_dashboard_stats(user=Depends(get_current_user)):
         "user_id": user_id,
         "stage": {"$in": ["Brief", "Content Review"]}
     })
-    campaigns = await db.campaigns.find({"user_id": user_id}, {"_id": 0}).to_list(100)
+    campaigns = await db.campaigns.find(
+        {"user_id": user_id}, {"_id": 0, "selected_influencers": 1}
+    ).to_list(100)
     all_inf_ids = []
     for c in campaigns:
         all_inf_ids.extend(c.get("selected_influencers", []))
 
     payments = await db.payment_transactions.find(
-        {"user_id": user_id, "payment_status": "paid"}, {"_id": 0}
+        {"user_id": user_id, "payment_status": "paid"}, {"_id": 0, "total_amount": 1}
     ).to_list(100)
     total_spend = sum(p.get("total_amount", 0) for p in payments)
 
@@ -356,7 +358,7 @@ async def list_influencers(platform: Optional[str] = None, niche: Optional[str] 
         query["platform"] = platform
     if niche:
         query["niche"] = {"$regex": niche, "$options": "i"}
-    influencers = await db.influencers.find(query, {"_id": 0}).to_list(100)
+    influencers = await db.influencers.find(query, {"_id": 0}).to_list(200)
     return influencers
 
 @api_router.get("/influencers/{influencer_id}")
