@@ -168,8 +168,7 @@ async def exchange_session(body: SessionExchange, response: Response):
             "picture": data.get("picture"),
             "created_at": datetime.now(timezone.utc).isoformat()
         })
-        # Seed demo campaigns for new users
-        await _seed_user_campaigns(user_id)
+        # Demo seeding disabled — users start with a clean dashboard
 
     session_token = data["session_token"]
     expires_at = datetime.now(timezone.utc) + timedelta(days=7)
