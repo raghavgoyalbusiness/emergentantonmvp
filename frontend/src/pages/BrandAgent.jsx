@@ -718,14 +718,15 @@ export default function BrandAgent() {
   const [modalTargets, setModalTargets] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(null); // null=checking
   const [queriesUsed, setQueriesUsed] = useState(() =>
-    parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10)
+    parseInt(sessionStorage.getItem(STORAGE_KEY) || "0", 10)
   );
   const [showPaywall, setShowPaywall] = useState(false);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
   const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  // Fetch subscription status
+  // Fetch subscription status on mount
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     axios.get(`${API}/user/subscription`, { withCredentials: true })
       .then(res => setIsSubscribed(res.data?.has_subscription === true))
@@ -758,7 +759,7 @@ export default function BrandAgent() {
     if (isSubscribed === false) {
       const newCount = queriesUsed + 1;
       setQueriesUsed(newCount);
-      localStorage.setItem(STORAGE_KEY, String(newCount));
+      sessionStorage.setItem(STORAGE_KEY, String(newCount));
     }
 
     try {
