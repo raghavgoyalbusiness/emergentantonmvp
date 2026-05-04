@@ -77,7 +77,23 @@ const steps = [
 ];
 
 // ─── Lead Capture Popup ───────────────────────────────────────────────────────
+const EMAIL_TO      = "raghav@influencer-connect.com";
+const EMAIL_SUBJECT = "Influencer Campaign Enquiry";
+const EMAIL_BODY    = `Hi Raghav,\n\nI'd like to learn more about running an influencer marketing campaign using Anton AI Agent.\n\nBrand: \nCampaign brief: \nBudget: \n\nThanks`;
+
 function LeadPopup({ onClose }) {
+  const [showPicker, setShowPicker] = useState(false);
+
+  const gmailUrl    = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(EMAIL_TO)}&su=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
+  const outlookUrl  = `https://outlook.live.com/mail/0/deeplink/compose?to=${encodeURIComponent(EMAIL_TO)}&subject=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
+  const mailtoUrl   = `mailto:${EMAIL_TO}?subject=${encodeURIComponent(EMAIL_SUBJECT)}&body=${encodeURIComponent(EMAIL_BODY)}`;
+
+  const openEmail = (url) => {
+    window.open(url, "_blank", "noopener,noreferrer");
+    setShowPicker(false);
+    onClose();
+  };
+
   return (
     <div
       className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-4 sm:p-6"
@@ -141,21 +157,76 @@ function LeadPopup({ onClose }) {
             ))}
           </ul>
 
-          {/* CTA */}
-          <a
-            href="mailto:raghav@influencer-connect.com?subject=Influencer%20Campaign%20Enquiry&body=Hi%20Raghav%2C%0A%0AI%27d%20like%20to%20learn%20more%20about%20running%20an%20influencer%20marketing%20campaign%20using%20Anton%20AI%20Agent.%0A%0ABrand%3A%20%0ACampaign%20brief%3A%20%0ABudget%3A%20%0A%0AThanks"
-            data-testid="lead-popup-cta"
-            onClick={onClose}
-            className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
-            style={{ background: "linear-gradient(135deg, #00D4C8, #00a89e)", color: "#000" }}
-          >
-            <Mail className="w-4 h-4" />
-            Email raghav@influencer-connect.com
-          </a>
+          {/* CTA — email picker */}
+          <AnimatePresence mode="wait">
+            {!showPicker ? (
+              <motion.button
+                key="cta-btn"
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                onClick={() => setShowPicker(true)}
+                data-testid="lead-popup-cta"
+                className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
+                style={{ background: "linear-gradient(135deg, #00D4C8, #00a89e)", color: "#000" }}
+              >
+                <Mail className="w-4 h-4" />
+                Email raghav@influencer-connect.com
+              </motion.button>
+            ) : (
+              <motion.div
+                key="picker"
+                initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                className="space-y-2"
+                data-testid="email-picker"
+              >
+                <p className="text-white/40 text-xs text-center mb-3">Choose your email app</p>
 
-          <p className="text-center text-white/25 text-xs mt-3">
-            We typically respond within 24 hours
-          </p>
+                {/* Gmail */}
+                <button
+                  onClick={() => openEmail(gmailUrl)}
+                  data-testid="open-gmail-btn"
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-white/10 hover:border-[#00D4C8]/40 bg-white/3 hover:bg-[#00D4C8]/6 transition-all group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0 text-sm font-bold text-red-400 group-hover:scale-110 transition-transform">G</div>
+                  <span className="text-white text-sm font-medium">Gmail</span>
+                  <span className="ml-auto text-white/25 text-xs">Opens in browser</span>
+                </button>
+
+                {/* Outlook */}
+                <button
+                  onClick={() => openEmail(outlookUrl)}
+                  data-testid="open-outlook-btn"
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-white/10 hover:border-[#00D4C8]/40 bg-white/3 hover:bg-[#00D4C8]/6 transition-all group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0 text-sm font-bold text-blue-400 group-hover:scale-110 transition-transform">O</div>
+                  <span className="text-white text-sm font-medium">Outlook</span>
+                  <span className="ml-auto text-white/25 text-xs">Opens in browser</span>
+                </button>
+
+                {/* Default mail app */}
+                <button
+                  onClick={() => openEmail(mailtoUrl)}
+                  data-testid="open-mailto-btn"
+                  className="flex items-center gap-3 w-full px-4 py-3 rounded-xl border border-white/10 hover:border-white/20 bg-white/3 hover:bg-white/6 transition-all group"
+                >
+                  <div className="w-7 h-7 rounded-lg bg-white/8 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Mail className="w-3.5 h-3.5 text-white/50" />
+                  </div>
+                  <span className="text-white/70 text-sm">Default mail app</span>
+                  <span className="ml-auto text-white/25 text-xs">mailto:</span>
+                </button>
+
+                <button onClick={() => setShowPicker(false)} className="w-full text-white/25 text-xs py-1 hover:text-white/50 transition-colors">
+                  ← back
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!showPicker && (
+            <p className="text-center text-white/25 text-xs mt-3">
+              We typically respond within 24 hours
+            </p>
+          )}
         </div>
       </motion.div>
     </div>
