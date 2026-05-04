@@ -13,7 +13,7 @@ const navItems = [
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: Crown, label: "Billing", path: "/payments" },
   { icon: MessageSquare, label: "Inbox", path: "/inbox" },
-  { icon: Sparkles, label: "Brand Agent", path: "/brand-agent" },
+  { icon: Sparkles, label: "Anton AI Agent", path: "/brand-agent" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 

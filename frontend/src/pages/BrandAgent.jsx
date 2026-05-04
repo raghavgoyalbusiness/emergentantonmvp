@@ -795,7 +795,7 @@ export default function BrandAgent() {
             <Sparkles className="w-5 h-5 text-[#00D4C8]" strokeWidth={1.5} />
           </div>
           <div>
-            <h1 className="font-heading font-bold text-2xl text-white">Brand Agent</h1>
+            <h1 className="font-heading font-bold text-2xl text-white">Anton AI Agent</h1>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
               <span className="text-white/40 text-xs">Powered by AWS Bedrock · Claude</span>
@@ -836,7 +836,7 @@ export default function BrandAgent() {
                 <div className="w-16 h-16 rounded-2xl bg-[#00D4C8]/10 border border-[#00D4C8]/20 flex items-center justify-center mb-4">
                   <Sparkles className="w-7 h-7 text-[#00D4C8]" strokeWidth={1.5} />
                 </div>
-                <h3 className="font-heading font-semibold text-white text-lg mb-1">Ask your Brand Agent</h3>
+                <h3 className="font-heading font-semibold text-white text-lg mb-1">Ask Anton AI Agent</h3>
                 <p className="text-white/40 text-sm mb-2 max-w-sm">
                   Find influencers, select who to target, and send personalised outreach — all from one place.
                 </p>
