@@ -1,7 +1,8 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { motion } from "framer-motion";
-import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star, Users, FileText, Rocket, ScanLine } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Zap, Search, BarChart3, CreditCard, CheckCircle, Star, Users, FileText, Rocket, ScanLine, X, Mail, Sparkles } from "lucide-react";
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 import { Card } from "@/components/ui/card";
@@ -75,9 +76,108 @@ const steps = [
   { num: "03", title: "Launch with Anton", desc: "Approve outreach, sign briefs, track content, and pay — all managed by Anton in one place." },
 ];
 
+// ─── Lead Capture Popup ───────────────────────────────────────────────────────
+function LeadPopup({ onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-[999] flex items-end sm:items-center justify-center p-4 sm:p-6"
+      style={{ background: "rgba(0,0,0,0.55)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 40, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 30, scale: 0.96 }}
+        transition={{ duration: 0.32, ease: [0.25, 0.46, 0.45, 0.94] }}
+        onClick={e => e.stopPropagation()}
+        className="relative w-full max-w-md rounded-2xl border border-[#00D4C8]/20 overflow-hidden"
+        style={{ background: "linear-gradient(135deg, rgba(10,12,26,0.97) 0%, rgba(0,212,200,0.06) 100%)" }}
+        data-testid="lead-popup"
+      >
+        {/* Teal glow top edge */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D4C8]/60 to-transparent" />
+
+        {/* Close */}
+        <button
+          onClick={onClose}
+          data-testid="lead-popup-close"
+          className="absolute top-4 right-4 w-7 h-7 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white/40 hover:text-white transition-all"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+
+        <div className="p-7 pt-8">
+          {/* Icon */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-11 h-11 rounded-xl bg-[#00D4C8]/12 border border-[#00D4C8]/30 flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 text-[#00D4C8]" strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="text-[#00D4C8] text-xs font-bold uppercase tracking-widest">Done-For-You Service</p>
+              <h3 className="font-heading font-bold text-white text-lg leading-tight">
+                We'll run your campaign for you
+              </h3>
+            </div>
+          </div>
+
+          {/* Body */}
+          <p className="text-white/60 text-sm leading-relaxed mb-5">
+            Want to run an influencer marketing campaign but don't have the time?{" "}
+            <span className="text-white font-medium">Our team uses Anton AI Agent internally</span>{" "}
+            to find, brief, and manage creators for your brand — end to end.
+          </p>
+
+          {/* Bullets */}
+          <ul className="space-y-2 mb-6">
+            {[
+              "AI-powered creator discovery & shortlisting",
+              "Personalised outreach & brief management",
+              "Campaign tracking & ROI reporting",
+            ].map(pt => (
+              <li key={pt} className="flex items-start gap-2.5 text-sm text-white/70">
+                <CheckCircle className="w-3.5 h-3.5 text-[#00D4C8] flex-shrink-0 mt-0.5" />
+                {pt}
+              </li>
+            ))}
+          </ul>
+
+          {/* CTA */}
+          <a
+            href="mailto:raghav@influencer-connect.com?subject=Influencer%20Campaign%20Enquiry&body=Hi%20Raghav%2C%0A%0AI%27d%20like%20to%20learn%20more%20about%20running%20an%20influencer%20marketing%20campaign%20using%20Anton%20AI%20Agent.%0A%0ABrand%3A%20%0ACampaign%20brief%3A%20%0ABudget%3A%20%0A%0AThanks"
+            data-testid="lead-popup-cta"
+            onClick={onClose}
+            className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl font-semibold text-sm transition-all"
+            style={{ background: "linear-gradient(135deg, #00D4C8, #00a89e)", color: "#000" }}
+          >
+            <Mail className="w-4 h-4" />
+            Email raghav@influencer-connect.com
+          </a>
+
+          <p className="text-center text-white/25 text-xs mt-3">
+            We typically respond within 24 hours
+          </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    // Show popup after 2.5s, only once per session
+    if (sessionStorage.getItem("lead_popup_dismissed")) return;
+    const timer = setTimeout(() => setShowPopup(true), 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const closePopup = () => {
+    setShowPopup(false);
+    sessionStorage.setItem("lead_popup_dismissed", "1");
+  };
 
   const handleCTA = () => {
     if (user) {
@@ -101,6 +201,11 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen text-white overflow-x-hidden relative z-[2]">
+      {/* ── Lead Capture Popup ── */}
+      <AnimatePresence>
+        {showPopup && <LeadPopup key="lead-popup" onClose={closePopup} />}
+      </AnimatePresence>
+
       <Meteors number={12} />
 
       {/* ── Sticky Navbar ── */}
