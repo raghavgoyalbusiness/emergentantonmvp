@@ -4,10 +4,11 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send, Plus, Bot, User, Sparkles, Copy, Check,
-  Mail, X, Loader2, CheckSquare, Square, Users, Crown, Lock,
+  Mail, X, Loader2, CheckSquare, Square, Users, Crown, Lock, MessageCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { SendDMModal } from "@/components/SendDMModal";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const newSessionId = () => `session-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -318,7 +319,7 @@ function InlineSubscribePrompt({ onSubscribe }) {
 }
 
 // ─── Influencer card ──────────────────────────────────────────────────────────
-function InfluencerCard({ inf, selected, onToggle, onConnect, isSubscribed, onBlurClick }) {
+function InfluencerCard({ inf, selected, onToggle, onConnect, isSubscribed, onBlurClick, onDM }) {
   const [imgSrc, setImgSrc] = useState(`https://unavatar.io/instagram/${inf.handle}`);
   const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(inf.name)}&background=131936&color=00D4C8&bold=true&size=128`;
   const hasContact = !!inf.email;
@@ -414,30 +415,42 @@ function InfluencerCard({ inf, selected, onToggle, onConnect, isSubscribed, onBl
       </div>
 
       {/* Connect / Lock button */}
-      {blurred ? (
-        <button
-          onClick={handleBlurClick}
-          data-testid={`locked-connect-${inf.handle}`}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-white/3 border border-white/10 text-white/20 rounded-lg text-xs flex-shrink-0 hover:bg-[#00D4C8]/10 hover:text-[#00D4C8] hover:border-[#00D4C8]/20 transition-all"
-        >
-          <Lock className="w-3 h-3" /> Locked
-        </button>
-      ) : hasContact ? (
-        <button
-          onClick={e => { e.stopPropagation(); onConnect([inf]); }}
-          data-testid={`connect-btn-${inf.handle}`}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all flex-shrink-0"
-        >
-          <Mail className="w-3 h-3" /> Connect
-        </button>
-      ) : (
-        <div
-          data-testid={`connect-btn-${inf.handle}`}
-          className="flex items-center gap-1 px-2.5 py-1.5 bg-white/3 border border-white/8 text-white/25 rounded-lg text-xs flex-shrink-0 cursor-not-allowed select-none"
-        >
-          <Mail className="w-3 h-3" /> No email
-        </div>
-      )}
+      <div className="flex flex-col gap-1.5 flex-shrink-0">
+        {blurred ? (
+          <button
+            onClick={handleBlurClick}
+            data-testid={`locked-connect-${inf.handle}`}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-white/3 border border-white/10 text-white/20 rounded-lg text-xs hover:bg-[#00D4C8]/10 hover:text-[#00D4C8] hover:border-[#00D4C8]/20 transition-all"
+          >
+            <Lock className="w-3 h-3" /> Locked
+          </button>
+        ) : hasContact ? (
+          <button
+            onClick={e => { e.stopPropagation(); onConnect([inf]); }}
+            data-testid={`connect-btn-${inf.handle}`}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-[#00D4C8]/10 hover:bg-[#00D4C8]/20 border border-[#00D4C8]/30 hover:border-[#00D4C8]/60 text-[#00D4C8] rounded-lg text-xs font-semibold transition-all"
+          >
+            <Mail className="w-3 h-3" /> Email
+          </button>
+        ) : (
+          <div
+            data-testid={`connect-btn-${inf.handle}`}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-white/3 border border-white/8 text-white/25 rounded-lg text-xs flex-shrink-0 cursor-not-allowed select-none"
+          >
+            <Mail className="w-3 h-3" /> No email
+          </div>
+        )}
+        {/* DM button — always visible for subscribers */}
+        {!blurred && (
+          <button
+            onClick={e => { e.stopPropagation(); onDM(inf); }}
+            data-testid={`dm-btn-${inf.handle}`}
+            className="flex items-center gap-1 px-2.5 py-1.5 bg-pink-500/8 hover:bg-pink-500/15 border border-pink-500/20 hover:border-pink-500/40 text-pink-400/70 hover:text-pink-400 rounded-lg text-xs font-semibold transition-all"
+          >
+            <MessageCircle className="w-3 h-3" /> DM
+          </button>
+        )}
+      </div>
     </motion.div>
   );
 }
@@ -617,7 +630,7 @@ function TypingIndicator() {
 }
 
 // ─── Message + cards section ──────────────────────────────────────────────────
-function Message({ msg, onOpenModal, isSubscribed, onBlurClick, onSubscribe }) {
+function Message({ msg, onOpenModal, isSubscribed, onBlurClick, onSubscribe, onDM }) {
   const isUser = msg.role === "user";
   const [selected, setSelected] = useState(new Set());
 
@@ -684,6 +697,7 @@ function Message({ msg, onOpenModal, isSubscribed, onBlurClick, onSubscribe }) {
                 onConnect={onOpenModal}
                 isSubscribed={isSubscribed}
                 onBlurClick={onBlurClick}
+                onDM={onDM}
               />
             ))}
           </motion.div>
@@ -716,6 +730,7 @@ export default function BrandAgent() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [modalTargets, setModalTargets] = useState(null);
+  const [dmTarget, setDmTarget] = useState(null);
   const [isSubscribed, setIsSubscribed] = useState(null); // null=checking
   const [queriesUsed, setQueriesUsed] = useState(() =>
     parseInt(sessionStorage.getItem(STORAGE_KEY) || "0", 10)
@@ -866,6 +881,7 @@ export default function BrandAgent() {
                     isSubscribed={isSubscribed === true}
                     onBlurClick={() => setShowPaywall(true)}
                     onSubscribe={goToSubscribe}
+                    onDM={setDmTarget}
                   />
                 ))}
               </motion.div>
@@ -927,6 +943,13 @@ export default function BrandAgent() {
       <AnimatePresence>
         {modalTargets && (
           <OutreachModal key="modal" targets={modalTargets} onClose={() => setModalTargets(null)} />
+        )}
+      </AnimatePresence>
+
+      {/* Send DM modal */}
+      <AnimatePresence>
+        {dmTarget && (
+          <SendDMModal key="dm-modal" influencer={dmTarget} onClose={() => setDmTarget(null)} />
         )}
       </AnimatePresence>
 

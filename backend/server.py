@@ -84,10 +84,23 @@ class MessageSend(BaseModel):
     campaign_id: Optional[str] = None
     influencer_id: Optional[str] = None
 
+class SocialAccountCreate(BaseModel):
+    platform: str  # "instagram" | "tiktok"
+    handle: str
+    display_name: Optional[str] = None
+
+class DmLogRequest(BaseModel):
+    platform: str
+    from_handle: str
+    to_handle: str
+    influencer_name: Optional[str] = None
+    message: Optional[str] = None
+
 class OutreachUpdate(BaseModel):
     email_subject: Optional[str] = None
     email_body: Optional[str] = None
     dm_script: Optional[str] = None
+
 
 class AgentChatRequest(BaseModel):
     message: str
@@ -935,6 +948,60 @@ async def analytics_overview(user=Depends(get_current_user)):
             {"month": "Feb", "reach": 312000, "conversions": 980},
         ]
     }
+
+# ---- SOCIAL ACCOUNTS ROUTES ----
+
+@api_router.get("/social/accounts")
+async def get_social_accounts(user=Depends(get_current_user)):
+    accounts = await db.social_accounts.find({"user_id": user["user_id"]}, {"_id": 0}).to_list(10)
+    return accounts
+
+@api_router.post("/social/accounts")
+async def connect_social_account(body: SocialAccountCreate, user=Depends(get_current_user)):
+    handle = body.handle.lstrip("@").strip()
+    if not handle:
+        raise HTTPException(status_code=400, detail="Handle cannot be empty")
+    account_id = f"sa_{uuid.uuid4().hex[:12]}"
+    doc = {
+        "account_id": account_id,
+        "user_id": user["user_id"],
+        "platform": body.platform.lower(),
+        "handle": handle,
+        "display_name": body.display_name or f"@{handle}",
+        "connected_at": datetime.now(timezone.utc).isoformat(),
+    }
+    # Replace existing account for same platform
+    await db.social_accounts.replace_one(
+        {"user_id": user["user_id"], "platform": body.platform.lower()},
+        doc, upsert=True
+    )
+    return doc
+
+@api_router.delete("/social/accounts/{account_id}")
+async def disconnect_social_account(account_id: str, user=Depends(get_current_user)):
+    await db.social_accounts.delete_one({"account_id": account_id, "user_id": user["user_id"]})
+    return {"message": "Disconnected"}
+
+@api_router.post("/social/dm/log")
+async def log_dm(body: DmLogRequest, user=Depends(get_current_user)):
+    doc = {
+        "dm_id": f"dm_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "platform": body.platform,
+        "from_handle": body.from_handle,
+        "to_handle": body.to_handle,
+        "influencer_name": body.influencer_name,
+        "message": body.message,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    await db.dm_log.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/social/dm/log")
+async def get_dm_log(user=Depends(get_current_user)):
+    logs = await db.dm_log.find({"user_id": user["user_id"]}, {"_id": 0}).sort("timestamp", -1).to_list(100)
+    return logs
 
 # ---- MESSAGES ROUTES ----
 
