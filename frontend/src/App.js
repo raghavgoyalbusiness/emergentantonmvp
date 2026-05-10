@@ -1,5 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import AuthCallback from "@/components/AuthCallback";
@@ -15,6 +16,19 @@ import Inbox from "@/pages/Inbox";
 import Settings from "@/pages/Settings";
 import BrandAgent from "@/pages/BrandAgent";
 import ShaderBackground from "@/components/ui/shader-background";
+
+// ── GA4 SPA page-view tracker ──────────────────────────────────────────────
+function GA4Tracker() {
+  const location = useLocation();
+  useEffect(() => {
+    if (typeof window.gtag !== "function") return;
+    window.gtag("event", "page_view", {
+      page_path: location.pathname + location.search,
+      page_title: document.title,
+    });
+  }, [location]);
+  return null;
+}
 
 // Exit is slightly longer so the WebGL shader portal is visible for a beat
 const pageVariants = {
@@ -85,6 +99,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <GA4Tracker />
         <AppRouter />
       </AuthProvider>
     </BrowserRouter>
