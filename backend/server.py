@@ -1124,6 +1124,73 @@ async def agent_chat(body: AgentChatRequest):
         logger.error(f"Bedrock unexpected error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/agent/generate-outreach")
+async def generate_outreach_email(body: dict, user=Depends(get_current_user)):
+    """Use GPT-4.1-mini to generate a personalised influencer outreach email."""
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OpenAI API key not configured")
+
+    influencer_name   = body.get("influencer_name", "the influencer")
+    influencer_handle = body.get("influencer_handle", "")
+    followers         = body.get("followers", "unknown")
+    engagement        = body.get("engagement", "unknown")
+    platform          = body.get("platform", "Instagram")
+    brand_name        = body.get("brand_name", "")
+    product_details   = body.get("product_details", "")
+    campaign_details  = body.get("campaign_details", "")
+    budget            = body.get("budget", "")
+    target_audience   = body.get("target_audience", "")
+
+    chat = LlmChat(
+        api_key=api_key,
+        session_id=f"outreach_{uuid.uuid4().hex[:8]}",
+        system_message=(
+            "You are an expert influencer marketing outreach specialist. "
+            "Write warm, professional, personalised cold outreach emails. "
+            "Always respond with valid JSON only — no markdown, no explanation."
+        )
+    ).with_model("openai", "gpt-4.1-mini")
+
+    prompt = f"""Write a personalised influencer outreach email with these details:
+
+INFLUENCER:
+- Name: {influencer_name}
+- Handle: @{influencer_handle}
+- Platform: {platform}
+- Followers: {followers}
+- Engagement Rate: {engagement}
+
+BRAND CAMPAIGN:
+- Brand: {brand_name}
+- Product/Service: {product_details}
+- Campaign: {campaign_details}
+- Budget: {budget}
+- Target Audience: {target_audience}
+
+Requirements:
+- Warm, conversational tone (not corporate)
+- Mention something specific about their content/niche
+- Keep body under 180 words
+- End with a clear, low-pressure CTA (e.g. "Would you be open to a quick chat?")
+- Subject line should be catchy and personal
+
+Respond ONLY with this JSON:
+{{"subject": "<subject line>", "body": "<full email body>"}}"""
+
+    try:
+        response = await chat.send_message(UserMessage(text=prompt))
+        # Extract JSON from response
+        import re
+        json_match = re.search(r'\{[\s\S]*\}', response)
+        if json_match:
+            result = json.loads(json_match.group())
+            return {"subject": result.get("subject", ""), "body": result.get("body", "")}
+        return {"subject": "", "body": response}
+    except Exception as e:
+        logger.error(f"OpenAI generate-outreach error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/agent/send-outreach")
 async def send_outreach(body: OutreachEmailRequest):
     smtp_email    = os.environ.get("SMTP_EMAIL", "")

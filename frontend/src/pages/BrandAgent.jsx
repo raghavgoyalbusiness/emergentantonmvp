@@ -4,7 +4,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Send, Plus, Bot, User, Sparkles, Copy, Check,
-  Mail, X, Loader2, CheckSquare, Square, Users, Crown, Lock, MessageCircle,
+  Mail, X, Loader2, CheckSquare, Square, Users, Crown, Lock, MessageCircle, Wand2,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -499,11 +499,41 @@ function BulkBar({ influencers, selected, onToggleAll, onSendSelected, onSendAll
 // ─── Outreach modal ───────────────────────────────────────────────────────────
 function OutreachModal({ targets, onClose }) {
   const isBulk = targets.length > 1;
+  const firstInf = targets[0];
   const [form, setForm] = useState({ brand_name: "", budget: "", target_audience: "", campaign_details: "", product_details: "" });
   const [sending, setSending] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState("");
+  const [aiDraft, setAiDraft] = useState(null);   // { subject, body }
+  const [generating, setGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
   const field = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const generateDraft = async () => {
+    if (!form.brand_name || !form.product_details) {
+      setError("Please fill in Brand Name and Product/Service first."); return;
+    }
+    setGenerating(true); setError(""); setAiDraft(null);
+    try {
+      const res = await axios.post(`${API}/agent/generate-outreach`, {
+        influencer_name: firstInf.name,
+        influencer_handle: firstInf.handle,
+        followers: firstInf.followers,
+        engagement: firstInf.engagement,
+        platform: "Instagram",
+        ...form,
+      }, { withCredentials: true });
+      setAiDraft(res.data);
+    } catch (e) {
+      setError(e?.response?.data?.detail || "AI generation failed. Please try again.");
+    } finally { setGenerating(false); }
+  };
+
+  const copyDraft = () => {
+    if (!aiDraft) return;
+    navigator.clipboard.writeText(`Subject: ${aiDraft.subject}\n\n${aiDraft.body}`);
+    setCopied(true); setTimeout(() => setCopied(false), 2000);
+  };
 
   const submit = async () => {
     if (!form.brand_name || !form.budget || !form.target_audience || !form.campaign_details || !form.product_details) {
@@ -514,7 +544,10 @@ function OutreachModal({ targets, onClose }) {
     setSending(true); setError("");
     const settled = await Promise.allSettled(
       emailTargets.map(inf => axios.post(`${API}/agent/send-outreach`, {
-        to_email: inf.email, influencer_name: inf.name, influencer_handle: inf.handle, ...form,
+        to_email: inf.email, influencer_name: inf.name, influencer_handle: inf.handle,
+        email_subject: aiDraft?.subject || undefined,
+        email_body: aiDraft?.body || undefined,
+        ...form,
       }))
     );
     setResults({ sent: settled.filter(r => r.status === "fulfilled").length, failed: settled.filter(r => r.status === "rejected").length });
@@ -528,10 +561,11 @@ function OutreachModal({ targets, onClose }) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.22 }}
-        className="glass-3 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden"
+        className="glass-3 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={e => e.stopPropagation()} data-testid="outreach-modal"
       >
-        <div className="flex items-center gap-3 p-5 border-b border-white/5">
+        {/* Header */}
+        <div className="flex items-center gap-3 p-5 border-b border-white/5 flex-shrink-0">
           <div className="w-9 h-9 rounded-xl bg-[#00D4C8]/10 border border-[#00D4C8]/25 flex items-center justify-center flex-shrink-0">
             {isBulk ? <Users className="w-4 h-4 text-[#00D4C8]" /> : <Mail className="w-4 h-4 text-[#00D4C8]" />}
           </div>
@@ -540,8 +574,8 @@ function OutreachModal({ targets, onClose }) {
               <><h3 className="font-heading font-semibold text-white text-base">Bulk Outreach</h3>
               <p className="text-white/40 text-xs">Sending to {targets.length} influencers</p></>
             ) : (
-              <><h3 className="font-heading font-semibold text-white text-base">{targets[0].name}</h3>
-              <p className="text-white/40 text-xs">@{targets[0].handle} · {targets[0].email}</p></>
+              <><h3 className="font-heading font-semibold text-white text-base">{firstInf.name}</h3>
+              <p className="text-white/40 text-xs">@{firstInf.handle} · {firstInf.email}</p></>
             )}
           </div>
           {isBulk && (
@@ -563,53 +597,126 @@ function OutreachModal({ targets, onClose }) {
           </button>
         </div>
 
-        {results ? (
-          <div className="flex flex-col items-center py-10 px-8 text-center">
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${results.failed === 0 ? "bg-green-500/10 border border-green-500/20" : "bg-yellow-500/10 border border-yellow-500/20"}`}>
-              <Check className={`w-7 h-7 ${results.failed === 0 ? "text-green-400" : "text-yellow-400"}`} />
+        <div className="overflow-y-auto flex-1">
+          {results ? (
+            <div className="flex flex-col items-center py-10 px-8 text-center">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 ${results.failed === 0 ? "bg-green-500/10 border border-green-500/20" : "bg-yellow-500/10 border border-yellow-500/20"}`}>
+                <Check className={`w-7 h-7 ${results.failed === 0 ? "text-green-400" : "text-yellow-400"}`} />
+              </div>
+              <h4 className="font-heading font-semibold text-white text-lg mb-1">{results.failed === 0 ? "All Emails Sent!" : "Partially Sent"}</h4>
+              <p className="text-white/50 text-sm">
+                <span className="text-green-400 font-semibold">{results.sent} sent</span>
+                {results.failed > 0 && <span className="text-red-400 font-semibold ml-2">{results.failed} failed</span>}
+              </p>
+              <button onClick={onClose} className="mt-6 btn-primary px-6 py-2.5 rounded-xl text-sm">Done</button>
             </div>
-            <h4 className="font-heading font-semibold text-white text-lg mb-1">{results.failed === 0 ? "All Emails Sent!" : "Partially Sent"}</h4>
-            <p className="text-white/50 text-sm">
-              <span className="text-green-400 font-semibold">{results.sent} sent</span>
-              {results.failed > 0 && <span className="text-red-400 font-semibold ml-2">{results.failed} failed</span>}
-            </p>
-            <button onClick={onClose} className="mt-6 btn-primary px-6 py-2.5 rounded-xl text-sm">Done</button>
-          </div>
-        ) : (
-          <div className="p-5 space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-white/50 text-xs mb-1 block">Brand Name *</label>
-                <input value={form.brand_name} onChange={e => field("brand_name", e.target.value)} placeholder="e.g. Lumina Beauty" className={inputCls} data-testid="modal-brand-name" />
+          ) : (
+            <div className="p-5 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-white/50 text-xs mb-1 block">Brand Name *</label>
+                  <input value={form.brand_name} onChange={e => field("brand_name", e.target.value)} placeholder="e.g. Lumina Beauty" className={inputCls} data-testid="modal-brand-name" />
+                </div>
+                <div>
+                  <label className="text-white/50 text-xs mb-1 block">Budget *</label>
+                  <input value={form.budget} onChange={e => field("budget", e.target.value)} placeholder="e.g. $2,000–$5,000" className={inputCls} data-testid="modal-budget" />
+                </div>
               </div>
               <div>
-                <label className="text-white/50 text-xs mb-1 block">Budget *</label>
-                <input value={form.budget} onChange={e => field("budget", e.target.value)} placeholder="e.g. $2,000–$5,000" className={inputCls} data-testid="modal-budget" />
+                <label className="text-white/50 text-xs mb-1 block">Product / Service *</label>
+                <input value={form.product_details} onChange={e => field("product_details", e.target.value)} placeholder="e.g. Organic skincare serum line" className={inputCls} data-testid="modal-product" />
+              </div>
+              <div>
+                <label className="text-white/50 text-xs mb-1 block">Campaign Details *</label>
+                <textarea value={form.campaign_details} onChange={e => field("campaign_details", e.target.value)} placeholder="e.g. 2 Instagram posts + 1 story in June" rows={2} className={`${inputCls} resize-none`} data-testid="modal-campaign" />
+              </div>
+              <div>
+                <label className="text-white/50 text-xs mb-1 block">Target Audience *</label>
+                <input value={form.target_audience} onChange={e => field("target_audience", e.target.value)} placeholder="e.g. Women 25–35, skincare enthusiasts" className={inputCls} data-testid="modal-audience" />
+              </div>
+
+              {/* AI Generate button */}
+              {!isBulk && (
+                <button
+                  onClick={generateDraft}
+                  disabled={generating}
+                  data-testid="ai-generate-btn"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[#00D4C8]/30 bg-[#00D4C8]/6 hover:bg-[#00D4C8]/12 text-[#00D4C8] text-sm font-semibold transition-all disabled:opacity-60"
+                >
+                  {generating
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Generating with GPT-4.1-mini…</>
+                    : <><Wand2 className="w-4 h-4" /> Generate AI Email Draft</>}
+                </button>
+              )}
+
+              {/* AI Draft Preview */}
+              <AnimatePresence>
+                {aiDraft && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-xl border border-[#00D4C8]/20 bg-[#00D4C8]/4 p-4"
+                    data-testid="ai-draft-preview"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5">
+                        <Wand2 className="w-3.5 h-3.5 text-[#00D4C8]" />
+                        <span className="text-[#00D4C8] text-xs font-semibold">AI Generated Draft</span>
+                      </div>
+                      <button
+                        onClick={copyDraft}
+                        data-testid="copy-draft-btn"
+                        className="flex items-center gap-1 text-white/40 hover:text-white text-xs transition-colors"
+                      >
+                        {copied ? <><Check className="w-3 h-3 text-green-400" /> Copied!</> : <><Copy className="w-3 h-3" /> Copy</>}
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-white/35 text-xs">Subject:</span>
+                        <input
+                          value={aiDraft.subject}
+                          onChange={e => setAiDraft(p => ({ ...p, subject: e.target.value }))}
+                          className="w-full bg-transparent text-white/90 text-xs font-semibold focus:outline-none border-b border-white/10 pb-1 mt-0.5"
+                          data-testid="draft-subject"
+                        />
+                      </div>
+                      <div>
+                        <span className="text-white/35 text-xs">Body:</span>
+                        <textarea
+                          value={aiDraft.body}
+                          onChange={e => setAiDraft(p => ({ ...p, body: e.target.value }))}
+                          rows={6}
+                          className="w-full bg-transparent text-white/75 text-xs focus:outline-none resize-none mt-0.5 leading-relaxed"
+                          data-testid="draft-body"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      onClick={generateDraft}
+                      disabled={generating}
+                      className="text-[#00D4C8]/50 hover:text-[#00D4C8] text-xs mt-1 transition-colors"
+                    >
+                      ↻ Regenerate
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
+
+              <div className="flex gap-2 pt-1">
+                <button onClick={onClose} className="flex-1 btn-secondary py-2.5 rounded-xl text-sm">Cancel</button>
+                <button onClick={submit} disabled={sending} data-testid="send-outreach-btn"
+                  className="flex-1 btn-primary py-2.5 rounded-xl text-sm flex items-center gap-2 justify-center disabled:opacity-60">
+                  {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                  {sending ? "Sending…" : isBulk ? `Send to ${targets.length} Influencers` : "Send Email"}
+                </button>
               </div>
             </div>
-            <div>
-              <label className="text-white/50 text-xs mb-1 block">Product / Service *</label>
-              <input value={form.product_details} onChange={e => field("product_details", e.target.value)} placeholder="e.g. Organic skincare serum line" className={inputCls} data-testid="modal-product" />
-            </div>
-            <div>
-              <label className="text-white/50 text-xs mb-1 block">Campaign Details *</label>
-              <textarea value={form.campaign_details} onChange={e => field("campaign_details", e.target.value)} placeholder="e.g. 2 Instagram posts + 1 story in June" rows={2} className={`${inputCls} resize-none`} data-testid="modal-campaign" />
-            </div>
-            <div>
-              <label className="text-white/50 text-xs mb-1 block">Target Audience *</label>
-              <input value={form.target_audience} onChange={e => field("target_audience", e.target.value)} placeholder="e.g. Women 25–35, skincare enthusiasts" className={inputCls} data-testid="modal-audience" />
-            </div>
-            {error && <p className="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
-            <div className="flex gap-2 pt-1">
-              <button onClick={onClose} className="flex-1 btn-secondary py-2.5 rounded-xl text-sm">Cancel</button>
-              <button onClick={submit} disabled={sending} data-testid="send-outreach-btn"
-                className="flex-1 btn-primary py-2.5 rounded-xl text-sm flex items-center gap-2 justify-center disabled:opacity-60">
-                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-                {sending ? `Sending…` : isBulk ? `Send to ${targets.length} Influencers` : "Send Email"}
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </motion.div>
     </div>
   );
