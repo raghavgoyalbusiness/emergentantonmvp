@@ -3,17 +3,21 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import {
   LayoutDashboard, Search, Kanban, BarChart3, CreditCard,
-  MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles, Crown
+  MessageSquare, Settings, LogOut, Menu, X, Zap, Bell, Sparkles, Crown,
+  Brain, Users, MailOpen
 } from "lucide-react";
 
 const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Search, label: "Discovery", path: "/discovery" },
+  { icon: Users, label: "Creator CRM", path: "/crm" },
   { icon: Kanban, label: "Campaigns", path: "/campaigns" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
   { icon: Crown, label: "Billing", path: "/payments" },
   { icon: MessageSquare, label: "Inbox", path: "/inbox" },
+  { icon: MailOpen, label: "Outreach Hub", path: "/outreach-hub" },
   { icon: Sparkles, label: "Anton AI Agent", path: "/brand-agent" },
+  { icon: Brain, label: "Brand Brain", path: "/brand-brain" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
@@ -48,7 +52,7 @@ export default function Layout({ children }) {
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ icon: Icon, label, path }) => {
           const active = location.pathname === path || (path === "/payments" && location.pathname === "/subscription");
-          const isAI = label === "Brand Agent";
+          const isAI = label === "Anton AI Agent" || label === "Brand Brain";
           return (
             <div key={path}>
               {isAI && <div className="my-2 border-t border-white/5" />}
@@ -76,8 +80,17 @@ export default function Layout({ children }) {
                 {label === "Inbox" && (
                   <span className="ml-auto relative z-10 bg-[#00D4C8]/20 backdrop-blur-sm border border-[#00D4C8]/40 text-[#00D4C8] text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">3</span>
                 )}
-                {isAI && (
+                {label === "Anton AI Agent" && (
                   <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">AI</span>
+                )}
+                {label === "Brand Brain" && (
+                  <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">NEW</span>
+                )}
+                {label === "Creator CRM" && (
+                  <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">NEW</span>
+                )}
+                {label === "Outreach Hub" && (
+                  <span className="ml-auto relative z-10 text-[0.6rem] bg-[#00D4C8]/10 text-[#00D4C8] border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full font-semibold tracking-wide">NEW</span>
                 )}
               </Link>
             </div>

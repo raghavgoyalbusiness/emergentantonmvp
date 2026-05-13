@@ -105,10 +105,90 @@ class OutreachUpdate(BaseModel):
 class AgentChatRequest(BaseModel):
     message: str
     session_id: str
+    brand_context: Optional[str] = None
 
 class AgentChatResponse(BaseModel):
     response: str
     session_id: str
+
+# ---- BRAND BRAIN MODELS ----
+
+class BrandProfileCreate(BaseModel):
+    company_name: str
+    website_url: Optional[str] = None
+    industry: Optional[str] = None
+    target_audience: Optional[str] = None
+    price_point: Optional[str] = "mid"
+    brand_voice: Optional[str] = None
+    visual_style: Optional[str] = None
+    core_messaging: Optional[str] = None
+    tone_guide: Optional[str] = None
+    words_to_use: Optional[List[str]] = []
+    words_to_avoid: Optional[List[str]] = []
+    creator_no_gos: Optional[List[str]] = []
+    topic_no_gos: Optional[List[str]] = []
+    competitor_brands: Optional[List[str]] = []
+    content_filters: Optional[List[str]] = []
+
+class BrandProductCreate(BaseModel):
+    name: str
+    price: Optional[float] = None
+    margin_pct: Optional[float] = None
+    target_customer: Optional[str] = None
+    hero_benefits: Optional[List[str]] = []
+    image_url: Optional[str] = None
+
+# ---- CREATOR CRM MODELS ----
+
+class CrmCreatorCreate(BaseModel):
+    influencer_id: Optional[str] = None
+    name: str
+    handle: str
+    platform: str
+    followers: Optional[int] = 0
+    engagement_rate: Optional[float] = 0.0
+    niche: Optional[str] = None
+    email: Optional[str] = None
+    profile_pic: Optional[str] = None
+    tags: Optional[List[str]] = []
+
+class CrmCreatorUpdate(BaseModel):
+    stage: Optional[str] = None
+    tags: Optional[List[str]] = None
+    reliability_score: Optional[int] = None
+
+class CrmNoteCreate(BaseModel):
+    content: str
+
+# ---- OUTREACH HUB MODELS ----
+
+class SequenceStep(BaseModel):
+    day: int
+    subject: str
+    message: str
+
+class SequenceCreate(BaseModel):
+    creator_name: str
+    creator_email: Optional[str] = None
+    campaign_id: Optional[str] = None
+    sequence_type: str = "paid"
+    steps: List[SequenceStep]
+
+class NegotiateRequest(BaseModel):
+    creator_name: str
+    creator_ask: str
+    our_budget: str
+    deliverables: str
+    campaign_context: Optional[str] = None
+
+class DealTermsRequest(BaseModel):
+    creator_name: str
+    campaign_name: str
+    deliverables: List[str]
+    timeline: str
+    payment_amount: float
+    usage_rights: Optional[str] = "90 days organic"
+    exclusivity: Optional[str] = None
 
 class OutreachEmailRequest(BaseModel):
     to_email: str
@@ -1099,6 +1179,11 @@ async def agent_chat(body: AgentChatRequest):
     if not agent_id or not alias_id:
         raise HTTPException(status_code=500, detail="Bedrock agent not configured")
 
+    # Inject brand context if provided by the frontend
+    input_text = body.message
+    if body.brand_context and body.brand_context.strip():
+        input_text = f"{body.brand_context}\n\nUser query: {body.message}"
+
     try:
         bedrock = _get_bedrock_client()
         response = await asyncio.get_event_loop().run_in_executor(
@@ -1107,7 +1192,7 @@ async def agent_chat(body: AgentChatRequest):
                 agentId=agent_id,
                 agentAliasId=alias_id,
                 sessionId=body.session_id,
-                inputText=body.message,
+                inputText=input_text,
                 enableTrace=False,
                 endSession=False,
             )
@@ -1288,6 +1373,279 @@ async def send_outreach(body: OutreachEmailRequest):
     except Exception as e:
         logger.error(f"Email send error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+# ---- BRAND BRAIN ROUTES ----
+
+@api_router.get("/brand-brain/profile")
+async def get_brand_profile(user=Depends(get_current_user)):
+    profile = await db.brand_profiles.find_one({"user_id": user["user_id"]}, {"_id": 0})
+    return profile or {}
+
+@api_router.post("/brand-brain/profile")
+async def save_brand_profile(body: BrandProfileCreate, user=Depends(get_current_user)):
+    now = datetime.now(timezone.utc).isoformat()
+    doc = {
+        "profile_id": f"bp_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        **body.dict(),
+        "updated_at": now
+    }
+    await db.brand_profiles.replace_one({"user_id": user["user_id"]}, doc, upsert=True)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/brand-brain/products")
+async def get_brand_products(user=Depends(get_current_user)):
+    products = await db.brand_products.find({"user_id": user["user_id"]}, {"_id": 0}).to_list(100)
+    return products
+
+@api_router.post("/brand-brain/products")
+async def add_brand_product(body: BrandProductCreate, user=Depends(get_current_user)):
+    now = datetime.now(timezone.utc).isoformat()
+    doc = {
+        "product_id": f"prod_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        **body.dict(),
+        "created_at": now
+    }
+    await db.brand_products.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.delete("/brand-brain/products/{product_id}")
+async def delete_brand_product(product_id: str, user=Depends(get_current_user)):
+    await db.brand_products.delete_one({"product_id": product_id, "user_id": user["user_id"]})
+    return {"message": "Product deleted"}
+
+# ---- CREATOR CRM ROUTES ----
+
+@api_router.get("/crm/creators")
+async def list_crm_creators(
+    stage: Optional[str] = None,
+    platform: Optional[str] = None,
+    tag: Optional[str] = None,
+    user=Depends(get_current_user)
+):
+    query = {"user_id": user["user_id"]}
+    if stage and stage != "all":
+        query["stage"] = stage
+    if platform and platform != "all":
+        query["platform"] = {"$regex": platform, "$options": "i"}
+    if tag:
+        query["tags"] = tag
+    creators = await db.crm_creators.find(query, {"_id": 0}).sort("updated_at", -1).to_list(500)
+    return creators
+
+@api_router.post("/crm/creators")
+async def add_crm_creator(body: CrmCreatorCreate, user=Depends(get_current_user)):
+    existing = await db.crm_creators.find_one(
+        {"user_id": user["user_id"], "handle": body.handle.lower()}, {"_id": 0}
+    )
+    if existing:
+        return existing
+    now = datetime.now(timezone.utc).isoformat()
+    doc = {
+        "crm_id": f"crm_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "influencer_id": body.influencer_id,
+        "name": body.name,
+        "handle": body.handle.lower(),
+        "platform": body.platform,
+        "followers": body.followers,
+        "engagement_rate": body.engagement_rate,
+        "niche": body.niche,
+        "email": body.email,
+        "profile_pic": body.profile_pic,
+        "stage": "Discovered",
+        "tags": body.tags or [],
+        "notes": [],
+        "reliability_score": 75,
+        "created_at": now,
+        "updated_at": now
+    }
+    await db.crm_creators.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/crm/creators/{crm_id}")
+async def get_crm_creator(crm_id: str, user=Depends(get_current_user)):
+    doc = await db.crm_creators.find_one({"crm_id": crm_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Creator not found")
+    return doc
+
+@api_router.patch("/crm/creators/{crm_id}")
+async def update_crm_creator(crm_id: str, body: CrmCreatorUpdate, user=Depends(get_current_user)):
+    updates = {k: v for k, v in body.dict().items() if v is not None}
+    updates["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.crm_creators.update_one(
+        {"crm_id": crm_id, "user_id": user["user_id"]},
+        {"$set": updates}
+    )
+    doc = await db.crm_creators.find_one({"crm_id": crm_id}, {"_id": 0})
+    return doc
+
+@api_router.post("/crm/creators/{crm_id}/notes")
+async def add_crm_note(crm_id: str, body: CrmNoteCreate, user=Depends(get_current_user)):
+    note = {
+        "note_id": f"note_{uuid.uuid4().hex[:8]}",
+        "content": body.content,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.crm_creators.update_one(
+        {"crm_id": crm_id, "user_id": user["user_id"]},
+        {"$push": {"notes": note}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return note
+
+@api_router.delete("/crm/creators/{crm_id}")
+async def delete_crm_creator(crm_id: str, user=Depends(get_current_user)):
+    await db.crm_creators.delete_one({"crm_id": crm_id, "user_id": user["user_id"]})
+    return {"message": "Creator removed from CRM"}
+
+@api_router.post("/crm/import")
+async def import_influencers_to_crm(user=Depends(get_current_user)):
+    influencers = await db.influencers.find({}, {"_id": 0}).to_list(100)
+    imported = 0
+    skipped = 0
+    for inf in influencers:
+        existing = await db.crm_creators.find_one(
+            {"user_id": user["user_id"], "handle": inf["handle"].lower()}
+        )
+        if existing:
+            skipped += 1
+            continue
+        now = datetime.now(timezone.utc).isoformat()
+        doc = {
+            "crm_id": f"crm_{uuid.uuid4().hex[:12]}",
+            "user_id": user["user_id"],
+            "influencer_id": inf.get("influencer_id"),
+            "name": inf["name"],
+            "handle": inf["handle"].lower(),
+            "platform": inf["platform"],
+            "followers": inf.get("followers", 0),
+            "engagement_rate": inf.get("engagement_rate", 0),
+            "niche": inf.get("niche"),
+            "email": inf.get("email"),
+            "profile_pic": inf.get("profile_pic"),
+            "stage": "Discovered",
+            "tags": [],
+            "notes": [],
+            "reliability_score": 75,
+            "created_at": now,
+            "updated_at": now
+        }
+        await db.crm_creators.insert_one(doc)
+        imported += 1
+    return {"imported": imported, "skipped": skipped}
+
+# ---- OUTREACH HUB ROUTES ----
+
+@api_router.post("/outreach-hub/sequences")
+async def create_sequence(body: SequenceCreate, user=Depends(get_current_user)):
+    now = datetime.now(timezone.utc).isoformat()
+    steps = [{"day": s.day, "subject": s.subject, "message": s.message, "status": "pending"} for s in body.steps]
+    doc = {
+        "sequence_id": f"seq_{uuid.uuid4().hex[:12]}",
+        "user_id": user["user_id"],
+        "creator_name": body.creator_name,
+        "creator_email": body.creator_email,
+        "campaign_id": body.campaign_id,
+        "sequence_type": body.sequence_type,
+        "steps": steps,
+        "status": "active",
+        "created_at": now,
+        "updated_at": now
+    }
+    await db.outreach_sequences.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+@api_router.get("/outreach-hub/sequences")
+async def list_sequences(user=Depends(get_current_user)):
+    seqs = await db.outreach_sequences.find({"user_id": user["user_id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return seqs
+
+@api_router.delete("/outreach-hub/sequences/{sequence_id}")
+async def delete_sequence(sequence_id: str, user=Depends(get_current_user)):
+    await db.outreach_sequences.delete_one({"sequence_id": sequence_id, "user_id": user["user_id"]})
+    return {"message": "Sequence deleted"}
+
+@api_router.post("/outreach-hub/negotiate")
+async def ai_negotiate(body: NegotiateRequest, user=Depends(get_current_user)):
+    prompt = f"""You are an influencer marketing negotiation expert helping a brand counter a creator's rate.
+
+Creator: {body.creator_name}
+Their ask: {body.creator_ask}
+Our budget: {body.our_budget}
+Deliverables: {body.deliverables}
+Campaign context: {body.campaign_context or "Standard influencer campaign"}
+
+Provide a professional, friendly counter-offer strategy. Respond ONLY with this JSON:
+{{
+  "counter_offer": "Specific counter-offer with amount and rationale",
+  "talking_points": ["Key point 1 to justify offer", "Key point 2", "Key point 3"],
+  "response_script": "Ready-to-send negotiation message to creator (max 150 words, warm and professional)",
+  "risk_level": "low",
+  "recommendation": "Brief recommendation on whether to proceed at this rate"
+}}"""
+    try:
+        chat = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=f"negotiate-{uuid.uuid4().hex[:8]}",
+            system_message="You are an expert influencer marketing negotiation strategist. Always respond with valid JSON only, no markdown."
+        ).with_model("anthropic", "claude-sonnet-4-5-20250929")
+        response_text = await chat.send_message(UserMessage(text=prompt))
+        response_text = response_text.strip()
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        logger.error(f"Negotiate error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate negotiation advice")
+
+@api_router.post("/outreach-hub/deal-terms")
+async def generate_deal_terms(body: DealTermsRequest, user=Depends(get_current_user)):
+    prompt = f"""Generate professional influencer partnership deal terms.
+
+Creator: {body.creator_name}
+Campaign: {body.campaign_name}
+Deliverables: {', '.join(body.deliverables)}
+Timeline: {body.timeline}
+Payment: ${body.payment_amount:,.0f}
+Usage rights: {body.usage_rights}
+Exclusivity: {body.exclusivity or "None"}
+
+Return ONLY this JSON:
+{{
+  "summary": "One paragraph deal summary",
+  "deliverables_clause": "Formal deliverables clause",
+  "payment_clause": "Payment terms clause",
+  "usage_rights_clause": "Usage rights clause",
+  "exclusivity_clause": "Exclusivity clause if applicable",
+  "disclosure_requirement": "FTC disclosure requirement",
+  "revision_policy": "Revision policy (2 rounds standard)",
+  "cancellation_policy": "Cancellation policy",
+  "full_agreement": "Complete professional agreement text (all clauses combined, ready to send to creator)"
+}}"""
+    try:
+        chat = LlmChat(
+            api_key=os.environ.get('EMERGENT_LLM_KEY'),
+            session_id=f"dealterms-{uuid.uuid4().hex[:8]}",
+            system_message="You are an influencer marketing legal and contracts expert. Generate clear, professional deal terms. Always respond with valid JSON only."
+        ).with_model("anthropic", "claude-sonnet-4-5-20250929")
+        response_text = await chat.send_message(UserMessage(text=prompt))
+        response_text = response_text.strip()
+        if "```json" in response_text:
+            response_text = response_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in response_text:
+            response_text = response_text.split("```")[1].split("```")[0].strip()
+        return json.loads(response_text)
+    except Exception as e:
+        logger.error(f"Deal terms error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate deal terms")
 
 # ---- SEED HELPERS ----
 

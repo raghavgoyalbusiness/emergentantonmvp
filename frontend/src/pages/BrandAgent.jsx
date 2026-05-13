@@ -843,16 +843,21 @@ export default function BrandAgent() {
     parseInt(sessionStorage.getItem(STORAGE_KEY) || "0", 10)
   );
   const [showPaywall, setShowPaywall] = useState(false);
+  const [brandProfile, setBrandProfile] = useState(null);
+  const [brandProducts, setBrandProducts] = useState([]);
   const bottomRef = useRef(null);
   const inputRef  = useRef(null);
   const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  // Fetch subscription status on mount
+  // Fetch subscription status and brand profile on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     axios.get(`${API}/user/subscription`, { withCredentials: true })
       .then(res => setIsSubscribed(res.data?.has_subscription === true))
       .catch(() => setIsSubscribed(false));
+    // Load brand brain profile for context injection
+    axios.get(`${API}/brand-brain/profile`).then(r => { if (r.data && r.data.company_name) setBrandProfile(r.data); }).catch(() => {});
+    axios.get(`${API}/brand-brain/products`).then(r => setBrandProducts(r.data || [])).catch(() => {});
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -861,6 +866,27 @@ export default function BrandAgent() {
   const goToSubscribe = useCallback(() => {
     navigate("/payments");
   }, [navigate]);
+
+  // Build brand context string to inject into every query
+  const buildBrandContext = useCallback(() => {
+    if (!brandProfile?.company_name) return null;
+    const parts = [
+      "=== BRAND CONTEXT (use this when making recommendations) ===",
+      `Company: ${brandProfile.company_name}`,
+      brandProfile.industry ? `Industry: ${brandProfile.industry}` : null,
+      brandProfile.price_point ? `Price point: ${brandProfile.price_point}` : null,
+      brandProfile.target_audience ? `Target audience: ${brandProfile.target_audience}` : null,
+      brandProfile.brand_voice ? `Brand voice: ${brandProfile.brand_voice}` : null,
+      brandProfile.words_to_use?.length ? `Preferred words: ${brandProfile.words_to_use.join(", ")}` : null,
+      brandProfile.words_to_avoid?.length ? `Avoid words: ${brandProfile.words_to_avoid.join(", ")}` : null,
+      brandProfile.creator_no_gos?.length ? `Creator no-gos: ${brandProfile.creator_no_gos.join(", ")}` : null,
+      brandProfile.topic_no_gos?.length ? `Topic no-gos: ${brandProfile.topic_no_gos.join(", ")}` : null,
+      brandProfile.competitor_brands?.length ? `Competitor brands (avoid): ${brandProfile.competitor_brands.join(", ")}` : null,
+      brandProducts?.length ? `Products: ${brandProducts.map(p => p.name).join(", ")}` : null,
+      "===",
+    ].filter(Boolean);
+    return parts.join("\n");
+  }, [brandProfile, brandProducts]);
 
   const send = async (text) => {
     const content = (text || input).trim();
@@ -885,7 +911,12 @@ export default function BrandAgent() {
     }
 
     try {
-      const { data } = await axios.post(`${API}/agent/chat`, { message: content, session_id: sessionId });
+      const brandContextStr = buildBrandContext();
+      const { data } = await axios.post(`${API}/agent/chat`, {
+        message: content,
+        session_id: sessionId,
+        brand_context: brandContextStr || undefined
+      });
       const response  = data.response || "I didn't receive a response. Please try again.";
       const influencers = parseInfluencers(response);
       setMessages(prev => [...prev, { role: "agent", content: response, influencers, time: now(), id: Date.now() + 1 }]);
@@ -921,6 +952,12 @@ export default function BrandAgent() {
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
               <span className="text-white/40 text-xs">Powered by AWS Bedrock · Claude</span>
+              {brandProfile?.company_name && (
+                <span className="ml-1 text-[#00D4C8]/60 text-xs border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-[#00D4C8]/60 rounded-full" />
+                  {brandProfile.company_name}
+                </span>
+              )}
               {isSubscribed === false && (
                 <span className="ml-1 text-[#00D4C8]/60 text-xs border border-[#00D4C8]/20 px-1.5 py-0.5 rounded-full">
                   Free · {Math.max(0, FREE_QUERY_LIMIT - queriesUsed)} left

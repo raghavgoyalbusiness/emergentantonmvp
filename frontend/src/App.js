@@ -15,6 +15,9 @@ import BillingPage from "@/pages/BillingPage";
 import Inbox from "@/pages/Inbox";
 import Settings from "@/pages/Settings";
 import BrandAgent from "@/pages/BrandAgent";
+import BrandBrain from "@/pages/BrandBrain";
+import CreatorCRM from "@/pages/CreatorCRM";
+import OutreachHub from "@/pages/OutreachHub";
 import ShaderBackground from "@/components/ui/shader-background";
 
 // ── GA4 SPA page-view tracker ──────────────────────────────────────────────
@@ -86,6 +89,9 @@ function AppRouter() {
             <Route path="/payments" element={<ProtectedRoute><Layout><BillingPage /></Layout></ProtectedRoute>} />
             <Route path="/inbox" element={<ProtectedRoute><Layout><Inbox /></Layout></ProtectedRoute>} />
             <Route path="/brand-agent" element={<ProtectedRoute><Layout><BrandAgent /></Layout></ProtectedRoute>} />
+            <Route path="/brand-brain" element={<ProtectedRoute><Layout><BrandBrain /></Layout></ProtectedRoute>} />
+            <Route path="/crm" element={<ProtectedRoute><Layout><CreatorCRM /></Layout></ProtectedRoute>} />
+            <Route path="/outreach-hub" element={<ProtectedRoute><Layout><OutreachHub /></Layout></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Layout><Settings /></Layout></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
