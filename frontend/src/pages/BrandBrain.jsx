@@ -193,7 +193,16 @@ export default function BrandBrain() {
           axios.get(`${API}/campaigns`)
         ]);
         if (prof.data && Object.keys(prof.data).length > 0) {
-          setProfile(p => ({ ...p, ...prof.data }));
+          setProfile(p => ({
+            ...p,
+            ...prof.data,
+            words_to_use: prof.data.words_to_use || [],
+            words_to_avoid: prof.data.words_to_avoid || [],
+            creator_no_gos: prof.data.creator_no_gos || [],
+            topic_no_gos: prof.data.topic_no_gos || [],
+            competitor_brands: prof.data.competitor_brands || [],
+            content_filters: prof.data.content_filters || [],
+          }));
         }
         setProducts(prods.data || []);
         setCampaigns(camps.data || []);

@@ -1,30 +1,31 @@
 # Influencer Connect — PRD
-_Last updated: Feb 2026_
+_Last updated: May 2026_
 
 ## Original Problem Statement
-Build "Influencer Connect", a fully functional AI-powered influencer marketing platform MVP that automatically matches brands with micro/mid-tier influencers, manages campaigns from brief to payment, and delivers ROI reporting.
+Build "Influencer Connect" — a fully functional AI-powered influencer marketing SaaS platform (competing with Kuli/Reacher/Grin) that automatically matches brands with micro/mid-tier influencers, manages campaigns, and delivers ROI reporting. Powered by Anton AI agent.
 
 ## User Personas
-- **Brand Marketers**: Need to find influencers, create campaigns, track ROI
-- **Agency Users**: Manage multiple brands, need pipeline visibility
+- **Brand Marketers**: Find influencers, create campaigns, track ROI
+- **Agency Users**: Manage multiple brands, pipeline visibility
 
 ## Core Requirements
 - AI Brand Onboarding (Campaign Wizard with Claude Sonnet 4.5)
-- Influencer Discovery with AI scoring (simulated Apify + Claude)
-- Automated Outreach (simulated Jasper + lemlist)
-- Campaign Pipeline / Kanban (Brief → Outreach → Accepted → Live → Content Review → Paid → Reported)
-- Unified Inbox (Texts.com simulated)
-- Stripe Payments (Test Mode, escrow model)
+- Influencer Discovery with AI scoring (Bedrock + Claude)
+- Anton AI Agent (AWS Bedrock + Claude, brand-context-aware)
+- Anton Brand Brain — brand profile that feeds into all Anton queries
+- Creator CRM — kanban pipeline management (11 stages)
+- Outreach Automation — follow-up sequences + AI negotiation + deal terms generator
+- Campaign Pipeline / Kanban (Brief → Reported)
+- Unified Inbox (all messages)
+- Stripe Payments (Test Mode)
 - ROI Analytics Dashboard
 
 ## User Explicit Choices
-- Fully functional UI/UX with simulated/demo data for 3rd party APIs
+- Fully functional UI/UX with demo data
 - Google OAuth via Emergent-managed auth
-- Realistic demo data seeded upon launch
-- **Georgia** for headings (H1–H6)
-- **Times New Roman** for body/small text
-- Dark premium aesthetic matching landing page (#0A0F2E navy, #00D4C8 teal)
-- Framer Motion stagger entrance animations across all dashboard views
+- **Georgia** for headings, **Times New Roman** for body
+- Dark premium aesthetic (#0A0F2E navy, #00D4C8 teal)
+- Framer Motion stagger entrance animations
 
 ---
 
@@ -33,32 +34,29 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 ```
 /app
 ├── backend/
-│   ├── .env
+│   ├── .env (MONGO_URL, Stripe, OPENAI_API_KEY, EMERGENT_LLM_KEY, AWS creds)
 │   ├── requirements.txt
-│   └── server.py (FastAPI app, routes, seeder)
+│   └── server.py (FastAPI - ALL routes, 1800+ lines)
 ├── frontend/
-│   ├── .env
-│   ├── tailwind.config.js  (Georgia + Times New Roman font families)
+│   ├── .env (REACT_APP_BACKEND_URL)
 │   ├── src/
-│   │   ├── index.css       (global font overrides)
-│   │   ├── App.css         (btn-primary, animations)
-│   │   ├── App.js
-│   │   ├── components/
-│   │   │   ├── AuthCallback.jsx
-│   │   │   ├── Layout.jsx
-│   │   │   └── ui/ (shadcn + splite.jsx + spotlight.jsx)
-│   │   ├── context/AuthContext.jsx
+│   │   ├── App.js (routes: /brand-brain, /crm, /outreach-hub + existing)
+│   │   ├── components/Layout.jsx (nav: 11 items including new P0 pages)
 │   │   └── pages/
-│   │       ├── LandingPage.jsx  (3D Spline hero + Spotlight)
+│   │       ├── LandingPage.jsx  (3D Spline hero + GA4)
 │   │       ├── Dashboard.jsx
-│   │       ├── InfluencerDiscovery.jsx
-│   │       ├── CampaignPipeline.jsx
-│   │       ├── CampaignWizard.jsx
-│   │       ├── Analytics.jsx
-│   │       ├── Payments.jsx
-│   │       ├── Inbox.jsx
-│   │       └── Settings.jsx
+│   │       ├── BrandBrain.jsx (NEW - brand profile + products + memory)
+│   │       ├── CreatorCRM.jsx (NEW - kanban/list pipeline + side panel)
+│   │       ├── OutreachHub.jsx (NEW - sequences + AI negotiate + deal terms)
+│   │       ├── BrandAgent.jsx (Anton AI - now injects brand context)
+│   │       ├── BillingPage.jsx (unified subscription page)
+│   │       ├── Settings.jsx (social accounts: IG/TikTok)
+│   │       └── ... (Discovery, Campaigns, Analytics, Inbox)
 └── memory/
+    ├── PRD.md (this file)
+    ├── ROADMAP.md (full feature backlog A–L)
+    └── test_credentials.md
+```└── memory/
     ├── PRD.md
     └── test_credentials.md
 ```
@@ -84,7 +82,57 @@ Build "Influencer Connect", a fully functional AI-powered influencer marketing p
 
 ## What's Been Implemented
 
-### ✅ Session 1 (Initial Build)
+### ✅ Phase 1 — P0 SaaS Modules (May 2026)
+- **Anton Brand Brain** (`/brand-brain`): 5-tab profile setup page (Profile, Pillars, Rules, Products, Campaign Memory). Saves brand context to MongoDB. Anton AI automatically injects brand context into every Bedrock query. Products CRUD. Tag chip inputs for words to use/avoid, no-gos, competitor brands.
+- **Creator CRM** (`/crm`): Full Kanban + List view with 11 pipeline stages (Discovered → Renewed). Import from discovery DB (20 seeded creators). Creator detail side panel with stage selector, tags, notes timeline, reliability bar. Stage-color-coded pipeline columns.
+- **Outreach Hub** (`/outreach-hub`): 3 tabs — (1) Follow-up Sequences (3-step builder with day timing), (2) AI Negotiation Assistant (Claude-powered counter-offer generator), (3) Deal Terms Generator (Claude-powered full contract). CopyBtn for ready-to-send scripts.
+- **Brand Brain → Anton Integration**: BrandAgent.jsx now fetches brand profile + products on mount, formats a context string, and sends it in every `/api/agent/chat` request via the `brand_context` field. Anton header shows brand indicator badge when profile is set.
+- **New nav items**: Creator CRM (Users), Outreach Hub (MailOpen), Brand Brain (Brain) — all with NEW badges.
+- **Backend**: New routes under `/api/brand-brain/`, `/api/crm/`, `/api/outreach-hub/`. New MongoDB collections: `brand_profiles`, `brand_products`, `crm_creators`, `outreach_sequences`.
+
+### ✅ Previous Sessions (Sessions 1–10)
+- Stripe subscription paywall (3 tiers: Starter $299, Growth $599, Scale $1299)
+- BillingPage unified (merged Payments + Subscription)
+- BrandAgent freemium gate (5 free queries, blurred results)
+- VIP bypass for raghavgoyalbiz@gmail.com and kunaldebroy8240@gmail.com
+- Social accounts (Instagram, TikTok) + DM deep-link integration in influencer cards
+- AI Outreach Email Writer (OpenAI GPT-4o-mini)
+- Google Analytics 4 (Measurement ID: G-6D5LZSCBMF)
+- Done-For-You lead-gen popup on landing page
+- AWS Bedrock + Claude agent integration
+- Google OAuth (Emergent-managed)
+- 20 seeded influencers + 8 seeded campaigns
+- Full glassmorphism design system + WebGL shader background + Framer Motion animations
+
+---
+
+## Mocked / Simulated Integrations
+- **MOCKED**: Apify, Jasper.ai, lemlist, HeyGen, Gumloop, Attio, Tidio, Fireflies.ai, Texts.com, Northbeam, OpusClip
+- **FUNCTIONAL**: DB, UI routes, Google Auth, Stripe, Claude Sonnet 4.5, GPT-4o-mini, AWS Bedrock
+
+---
+
+## P0 / P1 / P2 Backlog (from ROADMAP.md)
+
+### P0 — Complete ✅
+- Anton Brand Brain
+- Creator CRM
+- Outreach Automation Expansion
+
+### P1 (High priority — next sprint)
+- **F. AI Campaign Brief Generator** — Full strategy, creator mix, budget planner, deliverables tracker, content calendar
+- **H. Analytics & Reporting Upgrade** — CPV/CPE/GMV/ROAS dashboard, predictive ROI, PDF/CSV export
+- **C. Content Intelligence Engine** — Hook analysis, brand-safety scan, content quality scores
+- **I. Contracts & Compliance** — Milestone payments, contract generator, e-signature, invoice generation
+
+### P2 (Future)
+- G. TikTok Shop / Social Commerce
+- J. Fraud & Verification
+- K. Creator Portal (two-sided marketplace)
+- L. Agency Features (multi-brand workspace, white-label)
+- Split server.py into multiple router files for maintainability
+
+
 - Project scaffolding and MongoDB + FastAPI backend
 - Google OAuth Integration (Emergent-managed)
 - Stripe Payments (Test Mode) — escrow model
