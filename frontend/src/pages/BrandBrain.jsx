@@ -3,7 +3,7 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain, Save, Plus, Trash2, Loader2, Package, ShieldOff,
-  MessageSquare, Mic2, Target, CheckCircle, AlertCircle, ChevronRight
+  Mic2, Target, CheckCircle, AlertCircle
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -182,6 +182,7 @@ export default function BrandBrain() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [showAddProduct, setShowAddProduct] = useState(false);
 
   useEffect(() => {
@@ -213,14 +214,22 @@ export default function BrandBrain() {
   }, []);
 
   const saveProfile = async () => {
+    if (!profile.company_name.trim()) {
+      setSaveError("Company name is required.");
+      setTimeout(() => setSaveError(""), 3000);
+      return;
+    }
     setSaving(true);
+    setSaveError("");
     try {
       const { data } = await axios.post(`${API}/brand-brain/profile`, profile);
       setProfile(p => ({ ...p, ...data }));
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
-    } catch (_) {}
-    finally { setSaving(false); }
+    } catch (_) {
+      setSaveError("Failed to save. Please try again.");
+      setTimeout(() => setSaveError(""), 3000);
+    } finally { setSaving(false); }
   };
 
   const addProduct = async (prod) => {
@@ -265,6 +274,12 @@ export default function BrandBrain() {
               <motion.span initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0 }}
                 className="flex items-center gap-1.5 text-green-400 text-sm">
                 <CheckCircle className="w-4 h-4" /> Saved!
+              </motion.span>
+            )}
+            {saveError && (
+              <motion.span initial={{ opacity:0, x:10 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0 }}
+                className="flex items-center gap-1.5 text-red-400 text-sm">
+                <AlertCircle className="w-4 h-4" /> {saveError}
               </motion.span>
             )}
           </AnimatePresence>

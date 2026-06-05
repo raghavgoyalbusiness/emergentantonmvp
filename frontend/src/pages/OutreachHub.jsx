@@ -3,8 +3,8 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   MailOpen, Plus, Loader2, Trash2, X, Copy, Check,
-  Zap, FileText, ChevronDown, ChevronUp, AlertCircle,
-  CheckCircle, Clock, ArrowRight, Handshake
+  Zap, FileText, ChevronDown, ChevronUp,
+  CheckCircle, Clock, Handshake
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;

@@ -55,7 +55,7 @@ export default function Layout({ children }) {
           const isAI = label === "Anton AI Agent" || label === "Brand Brain";
           return (
             <div key={path}>
-              {isAI && <div className="my-2 border-t border-white/5" />}
+              {label === "Anton AI Agent" && <div className="my-2 border-t border-white/5" />}
               <Link
                 to={path}
                 onClick={() => setSidebarOpen(false)}

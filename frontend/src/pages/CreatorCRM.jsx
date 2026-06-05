@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Users, Plus, Loader2, LayoutGrid, List, ChevronDown,
+  Users, Loader2, LayoutGrid, List,
   X, Trash2, Tag, FileText, Instagram, Youtube, CheckCircle,
   Download, Star, MessageSquare, Filter, ArrowRight
 } from "lucide-react";
@@ -120,26 +120,38 @@ function CreatorPanel({ creator, onClose, onUpdate, onDelete }) {
   const [img, setImg] = useState(creator.profile_pic || `https://ui-avatars.com/api/?name=${encodeURIComponent(creator.name)}&background=131936&color=00D4C8&bold=true&size=200`);
 
   const updateStage = async (newStage) => {
+    const prevStage = stage;
     setUpdatingStage(true);
     setStage(newStage);
-    await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { stage: newStage });
-    onUpdate(creator.crm_id, { stage: newStage });
-    setUpdatingStage(false);
+    try {
+      await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { stage: newStage });
+      onUpdate(creator.crm_id, { stage: newStage });
+    } catch (_) {
+      setStage(prevStage); // revert on failure
+    } finally {
+      setUpdatingStage(false);
+    }
   };
 
   const addNote = async () => {
     if (!noteText.trim()) return;
     setAddingNote(true);
-    const { data } = await axios.post(`${API}/crm/creators/${creator.crm_id}/notes`, { content: noteText.trim() });
-    setNotes(n => [data, ...n]);
-    setNoteText("");
-    setAddingNote(false);
+    try {
+      const { data } = await axios.post(`${API}/crm/creators/${creator.crm_id}/notes`, { content: noteText.trim() });
+      setNotes(n => [data, ...n]);
+      setNoteText("");
+    } catch (_) {}
+    finally { setAddingNote(false); }
   };
 
   const updateTags = async (newTags) => {
     setTags(newTags);
-    await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { tags: newTags });
-    onUpdate(creator.crm_id, { tags: newTags });
+    try {
+      await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { tags: newTags });
+      onUpdate(creator.crm_id, { tags: newTags });
+    } catch (_) {
+      setTags(tags); // revert
+    }
   };
 
   const addTag = () => {
@@ -311,9 +323,11 @@ export default function CreatorCRM() {
   };
 
   const deleteCreator = async (crmId) => {
-    await axios.delete(`${API}/crm/creators/${crmId}`);
-    setCreators(prev => prev.filter(c => c.crm_id !== crmId));
-    setSelectedCreator(null);
+    try {
+      await axios.delete(`${API}/crm/creators/${crmId}`);
+      setCreators(prev => prev.filter(c => c.crm_id !== crmId));
+      setSelectedCreator(null);
+    } catch (_) {}
   };
 
   const filtered = creators.filter(c => {
@@ -411,6 +425,15 @@ export default function CreatorCRM() {
         <div className="flex-1 flex gap-4 overflow-hidden">
           {/* Main content */}
           <div className="flex-1 overflow-hidden">
+            {/* Empty filter result */}
+            {filtered.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-40 text-center">
+                <Filter className="w-6 h-6 text-white/15 mb-2" />
+                <p className="text-white/30 text-sm">No creators match these filters</p>
+                <button onClick={() => { setStageFilter("all"); setPlatformFilter("all"); }}
+                  className="text-[#00D4C8] text-xs mt-2 hover:underline">Clear filters</button>
+              </div>
+            )}
             {/* KANBAN VIEW */}
             {view === "kanban" && (
               <div className="h-full overflow-x-auto">
