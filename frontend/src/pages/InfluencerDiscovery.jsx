@@ -131,6 +131,7 @@ export default function InfluencerDiscovery() {
       setCampaigns(campRes.data);
       if (campRes.data.length > 0) setSelectedCampaign(campRes.data[0].campaign_id);
     }).finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const runAIScoring = async () => {

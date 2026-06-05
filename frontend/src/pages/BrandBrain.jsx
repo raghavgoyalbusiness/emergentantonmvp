@@ -207,10 +207,14 @@ export default function BrandBrain() {
         }
         setProducts(prods.data || []);
         setCampaigns(camps.data || []);
-      } catch (_) {}
-      finally { setLoading(false); }
+      } catch (err) {
+        console.error("Failed to load brand brain data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const saveProfile = async () => {
@@ -233,13 +237,21 @@ export default function BrandBrain() {
   };
 
   const addProduct = async (prod) => {
-    const { data } = await axios.post(`${API}/brand-brain/products`, prod);
-    setProducts(p => [data, ...p]);
+    try {
+      const { data } = await axios.post(`${API}/brand-brain/products`, prod);
+      setProducts(p => [data, ...p]);
+    } catch (err) {
+      console.error("Failed to add product:", err);
+    }
   };
 
   const deleteProduct = async (id) => {
-    await axios.delete(`${API}/brand-brain/products/${id}`);
-    setProducts(p => p.filter(x => x.product_id !== id));
+    try {
+      await axios.delete(`${API}/brand-brain/products/${id}`);
+      setProducts(p => p.filter(x => x.product_id !== id));
+    } catch (err) {
+      console.error("Failed to delete product:", err);
+    }
   };
 
   const fp = useCallback((k, v) => setProfile(p => ({ ...p, [k]: v })), []);

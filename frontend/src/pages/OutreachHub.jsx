@@ -12,6 +12,11 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const wrap = { hidden:{}, visible:{ transition:{ staggerChildren:0.07 } } };
 const item = { hidden:{ opacity:0, y:16 }, visible:{ opacity:1, y:0, transition:{ duration:0.35, ease:"easeOut" } } };
 
+// Module-level animation constants (avoids recreating objects on every render)
+const expandAnim  = { initial:{ height:0 }, animate:{ height:"auto" }, exit:{ height:0 } };
+const modalAnim   = { initial:{ opacity:0, scale:0.93 }, animate:{ opacity:1, scale:1 }, exit:{ opacity:0, scale:0.93 } };
+const resultAnim  = { initial:{ opacity:0, y:10 }, animate:{ opacity:1, y:0 } };
+
 const SEQ_TYPES = ["gifting","paid","affiliate","ambassador","ugc","event"];
 const TABS = [
   { id:"sequences", label:"Follow-up Sequences", icon:MailOpen },
@@ -59,10 +64,10 @@ function SequenceRow({ seq, onDelete }) {
 
       <AnimatePresence>
         {expanded && (
-          <motion.div initial={{ height:0 }} animate={{ height:"auto" }} exit={{ height:0 }} className="overflow-hidden">
+          <motion.div {...expandAnim} className="overflow-hidden">
             <div className="border-t border-white/5 p-4 space-y-3">
               {seq.steps?.map((step, i) => (
-                <div key={i} className="flex gap-3">
+                <div key={`${seq.sequence_id}-step-${i}`} className="flex gap-3">
                   <div className="flex flex-col items-center gap-1 flex-shrink-0">
                     <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold border ${
                       step.status === "sent" ? "bg-green-500/15 text-green-400 border-green-500/25"
@@ -121,7 +126,7 @@ function AddSequenceModal({ onAdd, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <motion.div initial={{ opacity:0, scale:0.93 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0, scale:0.93 }}
+      <motion.div {...modalAnim}
         className="glass-3 rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl"
         onClick={e => e.stopPropagation()}>
         <h3 className="font-heading font-bold text-white text-lg mb-4">Create Follow-up Sequence</h3>
@@ -157,7 +162,7 @@ function AddSequenceModal({ onAdd, onClose }) {
             <label className="text-white/40 text-xs mb-2 block">Sequence Steps</label>
             <div className="space-y-3">
               {form.steps.map((step, i) => (
-                <div key={i} className="glass-1 rounded-xl p-3 border border-white/8">
+                <div key={`form-step-${i}`} className="glass-1 rounded-xl p-3 border border-white/8">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="w-5 h-5 rounded-full bg-[#00D4C8]/10 text-[#00D4C8] text-xs flex items-center justify-center">{i+1}</span>
                     <span className="text-white/50 text-xs">Day</span>
@@ -276,7 +281,7 @@ function NegotiateTab() {
           </div>
         )}
         {result && (
-          <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} className="space-y-3">
+          <motion.div {...resultAnim} className="space-y-3">
             <div className="glass-2 rounded-xl p-4 border border-[#00D4C8]/15">
               <div className="flex items-center justify-between mb-2">
                 <p className="text-[#00D4C8] text-xs font-semibold">Recommended Counter-Offer</p>
@@ -294,7 +299,7 @@ function NegotiateTab() {
                 <p className="text-white/50 text-xs font-medium mb-2">Talking Points</p>
                 <ul className="space-y-1.5">
                   {result.talking_points.map((pt, i) => (
-                    <li key={i} className="flex gap-2 text-xs text-white/60">
+                    <li key={`tp-${i}`} className="flex gap-2 text-xs text-white/60">
                       <span className="text-[#00D4C8] mt-0.5 flex-shrink-0">•</span>{pt}
                     </li>
                   ))}
@@ -450,7 +455,7 @@ function DealsTab() {
           </div>
         )}
         {result && (
-          <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} className="glass-2 rounded-2xl p-5 space-y-4 max-h-[70vh] overflow-y-auto">
+          <motion.div {...resultAnim} className="glass-2 rounded-2xl p-5 space-y-4 max-h-[70vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <p className="text-white text-sm font-semibold">Generated Agreement</p>
               {result.full_agreement && <CopyBtn text={result.full_agreement} />}
@@ -509,20 +514,32 @@ export default function OutreachHub() {
       try {
         const { data } = await axios.get(`${API}/outreach-hub/sequences`);
         setSequences(data);
-      } catch(_) {}
-      finally { setLoadingSeq(false); }
+      } catch (err) {
+        console.error("Failed to load sequences:", err);
+      } finally {
+        setLoadingSeq(false);
+      }
     };
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addSequence = async (form) => {
-    const { data } = await axios.post(`${API}/outreach-hub/sequences`, form);
-    setSequences(s => [data, ...s]);
+    try {
+      const { data } = await axios.post(`${API}/outreach-hub/sequences`, form);
+      setSequences(s => [data, ...s]);
+    } catch (err) {
+      console.error("Failed to create sequence:", err);
+    }
   };
 
   const deleteSequence = async (id) => {
-    await axios.delete(`${API}/outreach-hub/sequences/${id}`);
-    setSequences(s => s.filter(x => x.sequence_id !== id));
+    try {
+      await axios.delete(`${API}/outreach-hub/sequences/${id}`);
+      setSequences(s => s.filter(x => x.sequence_id !== id));
+    } catch (err) {
+      console.error("Failed to delete sequence:", err);
+    }
   };
 
   return (

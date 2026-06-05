@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -126,8 +126,9 @@ function CreatorPanel({ creator, onClose, onUpdate, onDelete }) {
     try {
       await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { stage: newStage });
       onUpdate(creator.crm_id, { stage: newStage });
-    } catch (_) {
-      setStage(prevStage); // revert on failure
+    } catch (err) {
+      console.error("Failed to update stage:", err);
+      setStage(prevStage); // revert optimistic update
     } finally {
       setUpdatingStage(false);
     }
@@ -140,8 +141,9 @@ function CreatorPanel({ creator, onClose, onUpdate, onDelete }) {
       const { data } = await axios.post(`${API}/crm/creators/${creator.crm_id}/notes`, { content: noteText.trim() });
       setNotes(n => [data, ...n]);
       setNoteText("");
-    } catch (_) {}
-    finally { setAddingNote(false); }
+    } catch (err) {
+      console.error("Failed to add note:", err);
+    } finally { setAddingNote(false); }
   };
 
   const updateTags = async (newTags) => {
@@ -149,8 +151,9 @@ function CreatorPanel({ creator, onClose, onUpdate, onDelete }) {
     try {
       await axios.patch(`${API}/crm/creators/${creator.crm_id}`, { tags: newTags });
       onUpdate(creator.crm_id, { tags: newTags });
-    } catch (_) {
-      setTags(tags); // revert
+    } catch (err) {
+      console.error("Failed to update tags:", err);
+      setTags(tags); // revert optimistic update
     }
   };
 
@@ -297,15 +300,18 @@ export default function CreatorCRM() {
   const [stageFilter, setStageFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const { data } = await axios.get(`${API}/crm/creators`);
       setCreators(data);
-    } catch(_) {}
-    finally { setLoading(false); }
-  };
+    } catch (err) {
+      console.error("Failed to load CRM creators:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   const doImport = async () => {
     setImporting(true);
@@ -313,8 +319,12 @@ export default function CreatorCRM() {
       const { data } = await axios.post(`${API}/crm/import`);
       setImportResult(data);
       await load();
-    } catch(_) {}
-    finally { setImporting(false); setTimeout(() => setImportResult(null), 4000); }
+    } catch (err) {
+      console.error("Failed to import creators:", err);
+    } finally {
+      setImporting(false);
+      setTimeout(() => setImportResult(null), 4000);
+    }
   };
 
   const updateCreator = (crmId, changes) => {
@@ -327,7 +337,9 @@ export default function CreatorCRM() {
       await axios.delete(`${API}/crm/creators/${crmId}`);
       setCreators(prev => prev.filter(c => c.crm_id !== crmId));
       setSelectedCreator(null);
-    } catch (_) {}
+    } catch (err) {
+      console.error("Failed to delete creator:", err);
+    }
   };
 
   const filtered = creators.filter(c => {

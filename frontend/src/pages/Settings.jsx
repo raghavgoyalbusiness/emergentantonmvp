@@ -104,8 +104,9 @@ function SocialAccountsSection() {
     try {
       await axios.delete(`${API}/social/accounts/${accountId}`, { withCredentials: true });
       fetchAccounts();
-    } catch (_) {}
-    finally { setDisconnecting(null); }
+    } catch (err) {
+      console.error("Failed to disconnect social account:", err);
+    } finally { setDisconnecting(null); }
   };
 
   return (

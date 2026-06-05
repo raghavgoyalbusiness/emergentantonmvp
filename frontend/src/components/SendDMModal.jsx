@@ -74,7 +74,9 @@ export function SendDMModal({ influencer, onClose }) {
         influencer_name: influencer.name || influencer.handle,
         message,
       }, { withCredentials: true });
-    } catch (_) { /* non-blocking */ }
+    } catch (err) {
+      console.warn("DM log failed (non-blocking):", err?.message);
+    }
     setLogging(false);
 
     window.open(dmUrl, "_blank", "noopener,noreferrer");

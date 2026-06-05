@@ -851,13 +851,19 @@ export default function BrandAgent() {
 
   // Fetch subscription status and brand profile on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Runs once on mount. API/axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     axios.get(`${API}/user/subscription`, { withCredentials: true })
       .then(res => setIsSubscribed(res.data?.has_subscription === true))
       .catch(() => setIsSubscribed(false));
     // Load brand brain profile for context injection
-    axios.get(`${API}/brand-brain/profile`).then(r => { if (r.data && r.data.company_name) setBrandProfile(r.data); }).catch(() => {});
-    axios.get(`${API}/brand-brain/products`).then(r => setBrandProducts(r.data || [])).catch(() => {});
+    axios.get(`${API}/brand-brain/profile`)
+      .then(r => { if (r.data && r.data.company_name) setBrandProfile(r.data); })
+      .catch(err => console.warn("Brand profile not loaded:", err?.message));
+    axios.get(`${API}/brand-brain/products`)
+      .then(r => setBrandProducts(r.data || []))
+      .catch(err => console.warn("Brand products not loaded:", err?.message));
   }, []);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
