@@ -66,6 +66,8 @@ export default function Analytics() {
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Runs once on mount — API and axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     Promise.all([
       axios.get(`${API}/campaigns`, { withCredentials: true }),

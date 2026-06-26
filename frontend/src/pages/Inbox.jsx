@@ -48,6 +48,8 @@ export default function Inbox() {
   const [loading, setLoading] = useState(true);
   const bottomRef = useRef(null);
 
+  // Runs once on mount — API and axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     axios.get(`${API}/messages`, { withCredentials: true })
       .then(res => {

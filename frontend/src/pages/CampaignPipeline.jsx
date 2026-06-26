@@ -91,6 +91,8 @@ export default function CampaignPipeline() {
   const [movingId, setMovingId] = useState(null);
   const navigate = useNavigate();
 
+  // Runs once on mount — API and axios are stable module-level constants.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     axios.get(`${API}/campaigns`, { withCredentials: true })
       .then(res => setCampaigns(res.data))
