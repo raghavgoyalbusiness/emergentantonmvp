@@ -85,7 +85,11 @@ function parseInfluencers(text) {
     results.push({
       handle, name: name || handle, email, contactUrl,
       followers: followersMatch ? followersMatch[1].trim() : null,
-      engagement: engMatch ? (engMatch[1].includes("%") ? engMatch[1] : `${engMatch[1]}%`) : null,
+      engagement: (() => {
+        if (!engMatch) return null;
+        const val = engMatch[1];
+        return val.includes("%") ? val : `${val}%`;
+      })(),
       country: countryMatch ? countryMatch[1].trim() : null,
     });
   }
@@ -180,28 +184,31 @@ function CopyButton({ text }) {
 }
 
 // ─── Markdown ─────────────────────────────────────────────────────────────────
+// Component map defined at module level — prevents new types on every render
+const MD_COMPONENTS = {
+  h1: ({ children }) => <h1 className="font-heading font-bold text-lg text-white mt-3 mb-2 first:mt-0">{children}</h1>,
+  h2: ({ children }) => <h2 className="font-heading font-semibold text-base text-white mt-3 mb-1.5 first:mt-0">{children}</h2>,
+  h3: ({ children }) => <h3 className="font-heading font-semibold text-sm text-[#00D4C8] mt-3 mb-1 first:mt-0">{children}</h3>,
+  p:  ({ children }) => <p className="text-white/85 text-sm leading-relaxed mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+  ul: ({ children }) => <ul className="space-y-1 my-2 pl-1">{children}</ul>,
+  ol: ({ children }) => <ol className="space-y-1 my-2 pl-4 list-decimal">{children}</ol>,
+  li: ({ children }) => <li className="text-sm text-white/80 leading-relaxed flex gap-2"><span className="text-[#00D4C8] mt-1.5 flex-shrink-0">•</span><span>{children}</span></li>,
+  hr: () => <hr className="border-0 border-t border-white/10 my-3" />,
+  a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">{children}</a>,
+  code: ({ inline, children }) => inline
+    ? <code className="bg-white/10 text-[#00D4C8] text-xs px-1.5 py-0.5 rounded font-mono">{children}</code>
+    : <pre className="glass-1 rounded-lg p-3 overflow-x-auto my-2"><code className="text-xs text-white/80 font-mono">{children}</code></pre>,
+  table: ({ children }) => <div className="overflow-x-auto my-3"><table className="w-full text-xs border-collapse">{children}</table></div>,
+  thead: ({ children }) => <thead className="border-b border-white/10">{children}</thead>,
+  tr: ({ children }) => <tr className="border-b border-white/5">{children}</tr>,
+  th: ({ children }) => <th className="text-left text-white/40 font-medium py-1.5 pr-4">{children}</th>,
+  td: ({ children }) => <td className="text-white/75 py-1.5 pr-4">{children}</td>,
+};
+
 function AgentMarkdown({ content }) {
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={{
-      h1: ({ children }) => <h1 className="font-heading font-bold text-lg text-white mt-3 mb-2 first:mt-0">{children}</h1>,
-      h2: ({ children }) => <h2 className="font-heading font-semibold text-base text-white mt-3 mb-1.5 first:mt-0">{children}</h2>,
-      h3: ({ children }) => <h3 className="font-heading font-semibold text-sm text-[#00D4C8] mt-3 mb-1 first:mt-0">{children}</h3>,
-      p:  ({ children }) => <p className="text-white/85 text-sm leading-relaxed mb-2 last:mb-0">{children}</p>,
-      strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-      ul: ({ children }) => <ul className="space-y-1 my-2 pl-1">{children}</ul>,
-      ol: ({ children }) => <ol className="space-y-1 my-2 pl-4 list-decimal">{children}</ol>,
-      li: ({ children }) => <li className="text-sm text-white/80 leading-relaxed flex gap-2"><span className="text-[#00D4C8] mt-1.5 flex-shrink-0">•</span><span>{children}</span></li>,
-      hr: () => <hr className="border-0 border-t border-white/10 my-3" />,
-      a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#00D4C8] hover:underline underline-offset-2">{children}</a>,
-      code: ({ inline, children }) => inline
-        ? <code className="bg-white/10 text-[#00D4C8] text-xs px-1.5 py-0.5 rounded font-mono">{children}</code>
-        : <pre className="glass-1 rounded-lg p-3 overflow-x-auto my-2"><code className="text-xs text-white/80 font-mono">{children}</code></pre>,
-      table: ({ children }) => <div className="overflow-x-auto my-3"><table className="w-full text-xs border-collapse">{children}</table></div>,
-      thead: ({ children }) => <thead className="border-b border-white/10">{children}</thead>,
-      tr: ({ children }) => <tr className="border-b border-white/5">{children}</tr>,
-      th: ({ children }) => <th className="text-left text-white/40 font-medium py-1.5 pr-4">{children}</th>,
-      td: ({ children }) => <td className="text-white/75 py-1.5 pr-4">{children}</td>,
-    }}>
+    <ReactMarkdown remarkPlugins={[remarkGfm]} components={MD_COMPONENTS}>
       {content}
     </ReactMarkdown>
   );
@@ -711,7 +718,11 @@ function OutreachModal({ targets, onClose }) {
                 <button onClick={submit} disabled={sending} data-testid="send-outreach-btn"
                   className="flex-1 btn-primary py-2.5 rounded-xl text-sm flex items-center gap-2 justify-center disabled:opacity-60">
                   {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-                  {sending ? "Sending…" : isBulk ? `Send to ${targets.length} Influencers` : "Send Email"}
+                  {(() => {
+                    if (sending) return "Sending…";
+                    if (isBulk) return `Send to ${targets.length} Influencers`;
+                    return "Send Email";
+                  })()}
                 </button>
               </div>
             </div>
@@ -849,10 +860,7 @@ export default function BrandAgent() {
   const inputRef  = useRef(null);
   const now = () => new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
-  // Fetch subscription status and brand profile on mount
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // Runs once on mount. API/axios are stable module-level constants.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Fetch subscription status and brand profile on mount — runs once.
   useEffect(() => {
     axios.get(`${API}/user/subscription`, { withCredentials: true })
       .then(res => setIsSubscribed(res.data?.has_subscription === true))
@@ -866,7 +874,6 @@ export default function BrandAgent() {
       .catch(err => console.warn("Brand products not loaded:", err?.message));
   }, []);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
 
   const goToSubscribe = useCallback(() => {
